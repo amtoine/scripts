@@ -38,7 +38,7 @@ _get_mocp_info () {
     # lines are uniquely identified with the "$1:" pattern at the
     # beginning of each line.
     # do not forget to remove it to keep the info.
-    info=$(mocp -i -M "$XDG_CONFIG_HOME/moc" | grep "^$1:" | sed "s/^$1: //")
+    info=$(mocp -i | grep "^$1:" | sed "s/^$1: //")
     echo "$info"
 }
 
