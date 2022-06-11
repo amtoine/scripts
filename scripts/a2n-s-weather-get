@@ -14,7 +14,57 @@
 # License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
+# parse the arguments
+OPTIONS=$(getopt -o h --long help -n 'a2n-s-weather-get' -- "$@")
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+eval set -- "$OPTIONS"
+
+# allow the user to change the environment variables.
 [[ ! -v ICONS ]] && ICONS="/usr/share/icons/a2n-s-icons"
 [[ ! -v PLACES ]] && PLACES="Paris,Seoul,Nantes"
 
-notify-send -t 4500 "$(curl -s "wttr.in/{$PLACES}?format=3")" --icon="$ICONS/weather-cloud-and-sun.png"
+
+usage () {
+  #
+  # the usage function.
+  #
+  echo "Usage: a2n-s-weather-get [-h]"
+  echo "Type -h or --help for the full help."
+  exit 0
+}
+
+
+help () {
+  #
+  # the help function.
+  #
+  echo "a2n-s-weather-get :"
+  echo "     TODO."
+  echo ""
+  echo "Usage:"
+  echo "     a2n-s-weather-get [-h]"
+  echo ""
+  echo "Switches:"
+  echo "     -h/--help             shows this help."
+  echo ""
+  echo "Environment variables:"
+  echo "     ICONS                 TODO (defaults to \"/usr/share/icons/a2n-s-icons\")"
+  echo "     PLACES                TODO (defaults to \"Paris,Seoul,Nantes\")"
+  exit 0
+}
+
+
+main () {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h | --help )   help ;;
+      -- ) shift; break ;;
+      * ) break ;;
+    esac
+  done
+
+  notify-send -t 4500 "$(curl -s "wttr.in/{$PLACES}?format=3")" --icon="$ICONS/weather-cloud-and-sun.png"
+}
+
+
+main "$@"

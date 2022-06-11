@@ -14,15 +14,63 @@
 # License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
-tmpfile=$(mktemp /tmp/repo.diag.XXXXXX)
-trap  'rm "$tmpfile"' 0 1 15
+# parse the arguments
+OPTIONS=$(getopt -o h --long help -n 'a2n-s-lgrd' -- "$@")
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+eval set -- "$OPTIONS"
 
-echo "repo,remote,branch,staged,unstaged,untracked,stashed" > $tmpfile
 
-echo "Fetching repos from $(pwd) ..."
-for repo in $(find $pwd -type d | grep "\.git\$" | sed 's/\/\.git//' | grep -v ".local" | grep -v "^./.cache" | grep -v "^./.vim" | grep -v "^./torch" | grep -v "^./.cargo"); do
-  echo -ne "treating: $repo                                         \r"
-  _repo.info.sh $repo >> $tmpfile
-done
-sed -i 's/@/,/g; s/: */,/g; s/(//g; s/)//g;' $tmpfile
-csvcut $tmpfile | csvlook -I | less -S
+usage () {
+  #
+  # the usage function.
+  #
+  echo "Usage: a2n-s-lgrd [-h]"
+  echo "Type -h or --help for the full help."
+  exit 0
+}
+
+
+help () {
+  #
+  # the help function.
+  #
+  echo "a2n-s-lgrd:"
+  echo "     TODO."
+  echo ""
+  echo "Usage:"
+  echo "     a2n-s-lgrd [-h]"
+  echo ""
+  echo "Switches:"
+  echo "     -h/--help             shows this help."
+  exit 0
+}
+
+
+main () {
+  #
+  # TODO.
+  #
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h | --help )   help ;;
+      -- ) shift; break ;;
+      * ) break ;;
+    esac
+  done
+
+  tmpfile=$(mktemp /tmp/repo.diag.XXXXXX)
+  trap  'rm "$tmpfile"' 0 1 15
+
+  echo "repo,remote,branch,staged,unstaged,untracked,stashed" > $tmpfile
+
+  echo "Fetching repos from $(pwd) ..."
+  for repo in $(find $pwd -type d | grep "\.git\$" | sed 's/\/\.git//' | grep -v ".local" | grep -v "^./.cache" | grep -v "^./.vim" | grep -v "^./torch" | grep -v "^./.cargo"); do
+    echo -ne "treating: $repo                                         \r"
+    _repo.info.sh $repo >> $tmpfile
+  done
+  sed -i 's/@/,/g; s/: */,/g; s/(//g; s/)//g;' $tmpfile
+  csvcut $tmpfile | csvlook -I | less -S
+}
+
+
+main "$@"
