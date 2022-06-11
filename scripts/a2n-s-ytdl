@@ -3,19 +3,19 @@
 #      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s
 #     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles
 #     \__,_/___|_||_|       /__/
-#        _     __  _        __       _      _ _      _
-#       | |   / / | |__    / /  _  _| |_ __| | |  __| |_
-#      _| |  / /  | '_ \  / /  | || |  _/ _` | |_(_-< ' \
-#     (_)_| /_/   |_.__/ /_/    \_, |\__\__,_|_(_)__/_||_|
-#                               |__/
+#           ___                     _      _ _
+#      __ _|_  )_ _ ___ ______ _  _| |_ __| | |
+#     / _` |/ /| ' \___(_-<___| || |  _/ _` | |
+#     \__,_/___|_||_|  /__/    \_, |\__\__,_|_|
+#                              |__/
 #
 # Description:  allows one to download a youtube video audio or a whole playlist.
 # Dependencies: youtube-dl
-# License:      https://github.com/a2n-s/dotfiles/blob/main/LICENSE 
+# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 # parse the arguments
-OPTIONS=$(getopt -o hu:a: --long help,url:,archive: -n 'ytdl.sh' -- "$@")
+OPTIONS=$(getopt -o hu:a: --long help,url:,archive: -n 'a2n-s-ytdl' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -26,7 +26,7 @@ usage () {
      #
      # the usage function.
      #
-     echo "Usage: ytdl.sh [-h] -u URL -a ARCHIVE"
+     echo "Usage: a2n-s-ytdl [-h] -u URL -a ARCHIVE"
      echo "Type -h or --help for the full help."
      exit 0
 }
@@ -35,11 +35,11 @@ help () {
      #
      # the help function.
      #
-     echo "ytdl.sh:"
+     echo "a2n-s-ytdl:"
      echo "     a script to download music from youtube."
      echo ""
      echo "Usage:"
-     echo "     ytdl.sh [-h] -u URL -a ARCHIVE"
+     echo "     a2n-s-ytdl [-h] -u URL -a ARCHIVE"
      echo ""
      echo "Switches:"
      echo "     -h/--help             shows this help."

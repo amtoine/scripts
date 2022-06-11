@@ -3,19 +3,19 @@
 #      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s
 #     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles
 #     \__,_/___|_||_|       /__/
-#             __                          _
-#      ___   / /  ___ _ __  ___ _ _    __| |_
-#     (_-<  / /  / _ \ '_ \/ -_) ' \ _(_-< ' \
-#     /__/ /_/   \___/ .__/\___|_||_(_)__/_||_|
-#                    |_|
+#           ___
+#      __ _|_  )_ _ ___ ______ ___ _ __  ___ _ _
+#     / _` |/ /| ' \___(_-<___/ _ \ '_ \/ -_) ' \
+#     \__,_/___|_||_|  /__/   \___/ .__/\___|_||_|
+#                                 |_|
 #
 # Description:  tries to replace a tiny part of xdg-open as it does not behave as I want.
 # Dependencies: kitty, feh, okular
-# License:      https://github.com/a2n-s/dotfiles/blob/main/LICENSE 
+# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 # parse the arguments.
-OPTIONS=$(getopt -o h --long help -n 'open.sh' -- "$@")
+OPTIONS=$(getopt -o h --long help -n 'a2n-s-open' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -27,7 +27,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: open.sh [-h] FILE/URL"
+  echo "Usage: a2n-s-open [-h] FILE/URL"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -36,12 +36,12 @@ help () {
   #
   # the help function.
   #
-  echo "open.sh:"
+  echo "a2n-s-open:"
   echo "     This script opens files and urls automatically."
   echo "     Do not forget to puth it in your PATH."
   echo ""
   echo "Usage:"
-  echo "     open.sh [-h] FILE/URL"
+  echo "     a2n-s-open [-h] FILE/URL"
   echo ""
   echo "Switches:"
   echo "     -h/--help       shows this help."

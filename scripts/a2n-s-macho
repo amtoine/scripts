@@ -3,15 +3,15 @@
 #      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s
 #     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles
 #     \__,_/___|_||_|       /__/
-#             __                _             _
-#      ___   / /  _ __  __ _ __| |_  ___   __| |_
-#     (_-<  / /  | '  \/ _` / _| ' \/ _ \_(_-< ' \
-#     /__/ /_/   |_|_|_\__,_\__|_||_\___(_)__/_||_|
+#           ___                              _
+#      __ _|_  )_ _ ___ ______ _ __  __ _ __| |_  ___
+#     / _` |/ /| ' \___(_-<___| '  \/ _` / _| ' \/ _ \
+#     \__,_/___|_||_|  /__/   |_|_|_\__,_\__|_||_\___/
 #
 # Description:  gives a complete overview of all the active repos on the system.
 #               inpired from https://hiphish.github.io/blog/2020/05/31/macho-man-command-on-steroids
 # Dependencies: man, fzf
-# License:      https://github.com/a2n-s/dotfiles/blob/main/LICENSE 
+# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 export FZF_DEFAULT_OPTS='
@@ -24,12 +24,12 @@ help () {
   #
   # the help function.
   #
-  echo "macho.sh:"
+  echo "a2n-s-macho:"
   echo "     This script allows the user to easily search man pages with fzf."
   echo "     Do not forget to puth it in your PATH."
   echo ""
   echo "Usage:"
-  echo "     macho.sh [-h] [-s SECTION]"
+  echo "     a2n-s-macho [-h] [-s SECTION]"
   echo ""
   echo "Switches:"
   echo "     -h         show this help."

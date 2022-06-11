@@ -3,23 +3,24 @@
 #      __ _|_  )_ _ ___ ___   personal page: https://a2n-s.github.io/
 #     / _` |/ /| ' \___(_-<   github   page: https://github.com/a2n-s
 #     \__,_/___|_||_|  /__/   my   dotfiles: https://github.com/a2n-s/dotfiles
-#        _     __  _        __  _          _   _                     _
-#       | |   / / | |__    / / | |__  __ _| |_| |_ ___ _ _ _  _   __| |_
-#      _| |  / /  | '_ \  / /  | '_ \/ _` |  _|  _/ -_) '_| || |_(_-< ' \
-#     (_)_| /_/   |_.__/ /_/   |_.__/\__,_|\__|\__\___|_|  \_, (_)__/_||_|
-#                                                          |__/
+#           ___                _          _   _
+#      __ _|_  )_ _ ___ ______| |__  __ _| |_| |_ ___ _ _ _  _
+#     / _` |/ /| ' \___(_-<___| '_ \/ _` |  _|  _/ -_) '_| || |
+#     \__,_/___|_||_|  /__/   |_.__/\__,_|\__|\__\___|_|  \_, |
+#                                                         |__/
+#
 # Description:  a script to check the state of the battery and throw appropriate notifications.
 #   run `sudo systemctl enable cronie` to activate the `cron` daemon if not already done, then
-#   add `* * * * * DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=<address> $HOME/.local/bin/battery.sh --check`
+#   add `* * * * * DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=<address> /usr/local/bin/a2n-s-battery --check`
 #   to the `cron` table with `crontab -e` and restart the `cron` daemon with
 #   `sudo systemctl restart cronie`. The address can be found with `echo $DBUS_SESSION_BUS_ADDRESS`.
 # Dependencies: dunst.
-# License:      https://github.com/a2n-s/dotfiles/blob/main/LICENSE
+# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 # parse the arguments
 OPTIONS=$(getopt -o hcp --long help,check,print \
-              -n 'battery.sh' -- "$@")
+              -n 'a2n-s-battery' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -103,7 +104,7 @@ print_battery () {
     else
         icon="full"
     fi
-    dunstify --urgency low "battery.sh" "$BATTERY is $status at $level" --icon="$ICONS/battery-$icon.png" --timeout 5000
+    dunstify --urgency low "a2n-s-battery" "$BATTERY is $status at $level" --icon="$ICONS/battery-$icon.png" --timeout 5000
 }
 
 check_battery () {
@@ -123,7 +124,7 @@ check_battery () {
         elif [ "$state" = "high" ]; then
             icon="$ICONS/battery-full.png"
         fi
-        dunstify --urgency critical "battery.sh" "$BATTERY is $state" --icon="$icon" --replace="$DUNST_ID";
+        dunstify --urgency critical "a2n-s-battery" "$BATTERY is $state" --icon="$icon" --replace="$DUNST_ID";
         print_battery "$status" "$level"
     else
         dunstify --close="$DUNST_ID";
@@ -134,7 +135,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: battery.sh [-hcp]"
+  echo "Usage: a2n-s-battery [-hcp]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -143,11 +144,11 @@ help () {
   #
   # the help function.
   #
-  echo "battery.sh:"
+  echo "a2n-s-battery:"
   echo "     a script to check the state of the battery and throw appropriate notifications."
   echo ""
   echo "Usage:"
-  echo "     battery.sh [-hcp]"
+  echo "     a2n-s-battery [-hcp]"
   echo ""
   echo "Switches:"
   echo "     -h/--help             shows this help."

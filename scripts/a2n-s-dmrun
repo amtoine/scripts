@@ -3,14 +3,14 @@
 #      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s
 #     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles
 #     \__,_/___|_||_|       /__/
-#             __     _                          _
-#      ___   / /  __| |_ __  _ _ _  _ _ _    __| |_
-#     (_-<  / /  / _` | '  \| '_| || | ' \ _(_-< ' \
-#     /__/ /_/   \__,_|_|_|_|_|  \_,_|_||_(_)__/_||_|
+#           ___                   _
+#      __ _|_  )_ _ ___ ______ __| |_ __  _ _ _  _ _ _
+#     / _` |/ /| ' \___(_-<___/ _` | '  \| '_| || | ' \
+#     \__,_/___|_||_|  /__/   \__,_|_|_|_|_|  \_,_|_||_|
 #
 # Description:  wrapper around dmenu_run to launch dmenu in the middle and in a grid fashion.
 # Dependencies: dmenu
-# License:      https://github.com/a2n-s/dotfiles/blob/main/LICENSE 
+# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 DMWIDTH=700;

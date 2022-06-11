@@ -3,10 +3,10 @@
 #      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s
 #     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles
 #     \__,_/___|_||_|       /__/
-#             __                              _
-#      ___   / / __ __ ____ _____ _ ___ __ __| |_
-#     (_-<  / /  \ V  V /\ V / -_) ' \ V /(_-< ' \
-#     /__/ /_/    \_/\_/  \_/\___|_||_\_(_)__/_||_|
+#           ___
+#      __ _|_  )_ _ ___ ________ __ ____ _____ _ ___ __
+#     / _` |/ /| ' \___(_-<___\ V  V /\ V / -_) ' \ V /
+#     \__,_/___|_||_|  /__/    \_/\_/  \_/\___|_||_\_/
 #
 # Description:  prints some information about the current virtual
 #               python environment running.
@@ -30,7 +30,7 @@
 #                    jupyter  | /home/ants/.venvs/ml/bin/jupyter
 #                    notebook | /home/ants/.venvs/ml/bin/jupyter-notebook (6.4.6)
 # Dependencies: python, pip, and jupyter, jupyter-notebook to have full information but required.
-# License:      https://github.com/a2n-s/dotfiles/blob/main/LICENSE 
+# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 if command -v python &> /dev/null; then

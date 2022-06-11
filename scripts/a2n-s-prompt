@@ -3,11 +3,11 @@
 #      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s
 #     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles
 #     \__,_/___|_||_|       /__/
-#             __                          _        _
-#      ___   / /  _ __ _ _ ___ _ __  _ __| |_   __| |_
-#     (_-<  / /  | '_ \ '_/ _ \ '  \| '_ \  _|_(_-< ' \
-#     /__/ /_/   | .__/_| \___/_|_|_| .__/\__(_)__/_||_|
-#                |_|                |_|
+#           ___                                        _
+#      __ _|_  )_ _ ___ ______ _ __ _ _ ___ _ __  _ __| |_
+#     / _` |/ /| ' \___(_-<___| '_ \ '_/ _ \ '  \| '_ \  _|
+#     \__,_/___|_||_|  /__/   | .__/_| \___/_|_|_| .__/\__|
+#                             |_|                |_|
 #
 # Description:  a dmenu binary prompt inspired by https://www.youtube.com/watch?v=R9m723tAurA 
 #               Gives a dmenu prompt labeled with $1 and ask to perform command $2.
@@ -16,11 +16,11 @@
 #               ~/scripts/prompt "Do you really want to shutdown your machine?" "shutdown -h now"
 #               will ask you before shutting down.
 # Dependencies: dmenu
-# License:      https://github.com/a2n-s/dotfiles/blob/main/LICENSE 
+# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 # parse the arguments.
-OPTIONS=$(getopt -o h --long help -n 'prompt.sh' -- "$@")
+OPTIONS=$(getopt -o h --long help -n 'a2n-s-prompt' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -31,7 +31,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: prompt.sh [-h] MESSAGE COMMAND"
+  echo "Usage: a2n-s-prompt [-h] MESSAGE COMMAND"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -40,12 +40,12 @@ help () {
   #
   # the help function.
   #
-  echo "pedit.sh:"
+  echo "a2n-s-prompt:"
   echo "     This script opens a binary prompt to launch or discard applications."
   echo "     Do not forget to puth it in your PATH."
   echo ""
   echo "Usage:"
-  echo "     prompt.sh [-h] MESSAGE COMMAND"
+  echo "     a2n-s-prompt [-h] MESSAGE COMMAND"
   echo ""
   echo "Switches:"
   echo "     -h/--help       shows this help."

@@ -3,14 +3,14 @@
 #      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s 
 #     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles 
 #     \__,_/___|_||_|       /__/
-#        _     __  _        __  _   _                          _
-#       | |   / / | |__    / / | |_| |_  ___ _ __  ___ ___  __| |_
-#      _| |  / /  | '_ \  / /  |  _| ' \/ -_) '  \/ -_|_-<_(_-< ' \
-#     (_)_| /_/   |_.__/ /_/    \__|_||_\___|_|_|_\___/__(_)__/_||_|
+#           ___                _   _
+#      __ _|_  )_ _ ___ ______| |_| |_  ___ _ __  ___ ___
+#     / _` |/ /| ' \___(_-<___|  _| ' \/ -_) '  \/ -_|_-<
+#     \__,_/___|_||_|  /__/    \__|_||_\___|_|_|_\___/__/
 #
 # Description:  manages all the themes of my desktop environment.
 # Dependencies:
-# License:      https://github.com/a2n-s/dotfiles/blob/main/LICENSE
+# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 ################################################################################################
@@ -133,7 +133,7 @@ strip () {
     echo "${Dst}Done${Off}"
   else
     echo -e "No cache to clean at ${Pmt}$CACHE${Off}."
-    echo -e "Consider using ${Tip}themes.sh -u${Off} to update the cache.";
+    echo -e "Consider using ${Tip}a2n-s-themes -u${Off} to update the cache.";
   fi
 }
 
@@ -149,7 +149,7 @@ print () {
     fi
   else
     echo -e "No database at ${Pmt}$colordatabase${Off}."
-    echo -e "Consider using ${Tip}themes.sh -s${Off} to generate the ${Dst}$colordatabase${Off} database.";
+    echo -e "Consider using ${Tip}a2n-s-themes -s${Off} to generate the ${Dst}$colordatabase${Off} database.";
   fi
 }
 
@@ -165,7 +165,7 @@ preview () {
     fi
   else
     echo -e "No database at ${Pmt}$colorpreview${Off}."
-    echo -e "Consider using ${Tip}themes.sh -s${Off} to generate the ${Dst}$colorpreview${Off} database.";
+    echo -e "Consider using ${Tip}a2n-s-themes -s${Off} to generate the ${Dst}$colorpreview${Off} database.";
   fi
 }
 
@@ -178,7 +178,7 @@ clean () {
     rm -rf "$CACHE";
   else
     echo -e "No cache to clean at ${Pmt}$CACHE${Off}."
-    echo -e "Consider using ${Tip}themes.sh -u${Off} to update the cache.";
+    echo -e "Consider using ${Tip}a2n-s-themes -u${Off} to update the cache.";
   fi
 }
 
@@ -444,7 +444,7 @@ theme () {
     done
   else
     echo -e "No database at ${Pmt}$colordatabase${Off}."
-    echo -e "Consider using ${Tip}themes.sh -s${Off} to generate the ${Dst}$colordatabase${Off} database.";
+    echo -e "Consider using ${Tip}a2n-s-themes -s${Off} to generate the ${Dst}$colordatabase${Off} database.";
   fi
 }
 
@@ -452,7 +452,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: themes.sh [-huscpaPd] [-t=THEME] [-C=C1,C2]"
+  echo "Usage: a2n-s-themes [-huscpaPd] [-t=THEME] [-C=C1,C2]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -461,13 +461,13 @@ help () {
   #
   # the help function.
   #
-  echo "themes.sh:"
+  echo "a2n-s-themes:"
   echo "     This script allows the user to easily download"
   echo "     preprocess and change colorschemes."
   echo "     Do not forget to puth it in your PATH."
   echo ""
   echo "Usage:"
-  echo "     themes.sh [-huscpPaob] [-t=THEME] [-C=C1,C2]"
+  echo "     a2n-s-themes [-huscpPaob] [-t=THEME] [-C=C1,C2]"
   echo ""
   echo "Switches:"
   echo "     -h/--help           shows this help."
@@ -506,7 +506,7 @@ help () {
 }
 
 # parse the arguments.
-OPTIONS=$(getopt -o huscpt::C:aPbod --long help,update,strip,clean,print,theme::,config:,all,preview,boot,other,dmenu -n 'themes.sh' -- "$@")
+OPTIONS=$(getopt -o huscpt::C:aPbod --long help,update,strip,clean,print,theme::,config:,all,preview,boot,other,dmenu -n 'a2n-s-themes' -- "$@")
 if [ $? != 0 ] ; then usage >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 

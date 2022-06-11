@@ -3,20 +3,20 @@
 #      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s
 #     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles
 #     \__,_/___|_||_|       /__/
-#             __                       _      _
-#      ___   / /  ___ ___ _  _ _ _  __| |  __| |_
-#     (_-<  / /  (_-</ _ \ || | ' \/ _` |_(_-< ' \
-#     /__/ /_/   /__/\___/\_,_|_||_\__,_(_)__/_||_|
+#           ___                                     _
+#      __ _|_  )_ _ ___ ______ ___ ___ _  _ _ _  __| |
+#     / _` |/ /| ' \___(_-<___(_-</ _ \ || | ' \/ _` |
+#     \__,_/___|_||_|  /__/   /__/\___/\_,_|_||_\__,_|
 #
 # Description:  manages sound and bluetooth sinks.
 #               one can use multiple flags, only the last one will be used.
-# Dependencies: amixer, ~/scripts/bluetooth.toggle.sh
-# License:      https://github.com/a2n-s/dotfiles/blob/main/LICENSE 
+# Dependencies: amixer
+# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 # parse the arguments
 OPTIONS=$(getopt -o udtmbc:s:nh --long up,down,toggle,bluetooth,channel:,step:,notify,help \
-              -n 'sound.sh' -- "$@")
+              -n 'a2n-s-sound' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -73,7 +73,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: sound.sh [-hudtbn] -c CHANNEL [-s STEP]"
+  echo "Usage: a2n-s-sound [-hudtbn] -c CHANNEL [-s STEP]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -82,12 +82,12 @@ help () {
   #
   # the help function.
   #
-  echo "hdmi.sh:"
+  echo "a2n-s-sound:"
   echo "     This script allows the user to easily control the sound."
   echo "     Do not forget to puth it in your PATH."
   echo ""
   echo "Usage:"
-  echo "     sound.sh [-hudtbn] -c CHANNEL [-s STEP]"
+  echo "     a2n-s-sound [-hudtbn] -c CHANNEL [-s STEP]"
   echo ""
   echo "Switches:"
   echo "     -h/--help               shows this help."

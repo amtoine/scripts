@@ -3,15 +3,15 @@
 #      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s 
 #     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles 
 #     \__,_/___|_||_|       /__/
-#        _     __  _        __                    _        _
-#       | |   / / | |__    / /  ____ __  __ _ _ _| |__  __| |_
-#      _| |  / /  | '_ \  / /  (_-< '_ \/ _` | '_| / /_(_-< ' \
-#     (_)_| /_/   |_.__/ /_/   /__/ .__/\__,_|_| |_\_(_)__/_||_|
-#                                 |_|
+#           ___                                  _
+#      __ _|_  )_ _ ___ ______ ____ __  __ _ _ _| |__
+#     / _` |/ /| ' \___(_-<___(_-< '_ \/ _` | '_| / /
+#     \__,_/___|_||_|  /__/   /__/ .__/\__,_|_| |_\_\
+#                                |_|
 #
 # Description:  sparkline generator
 # Dependencies: awk
-# License:      https://github.com/a2n-s/dotfiles/blob/main/LICENSE
+# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 command awk -v FS="[[:space:],]*" -v argv="$argv" '

@@ -3,19 +3,19 @@
 #      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s 
 #     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles 
 #     \__,_/___|_||_|       /__/
-#             __           _      _
-#      ___   / / __ ____ _| |  __| |_
-#     (_-<  / /  \ \ / _` | |_(_-< ' \
-#     /__/ /_/   /_\_\__,_|_(_)__/_||_|
+#           ___                         _
+#      __ _|_  )_ _ ___ ________ ____ _| |
+#     / _` |/ /| ' \___(_-<___\ \ / _` | |
+#     \__,_/___|_||_|  /__/   /_\_\__,_|_|
 #
 # Description:  wraps the xautolock command with some notifications.
 # Dependencies: xautolock, dunst
-# License:      https://github.com/a2n-s/dotfiles/blob/main/LICENSE
+# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 # parse the arguments
 OPTIONS=$(getopt -o hedn --long help,nable,disable,notify \
-              -n 'xal.sh' -- "$@")
+              -n 'a2n-s-xal' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -26,7 +26,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: xal.sh [-hedn]"
+  echo "Usage: a2n-s-xal [-hedn]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -35,12 +35,12 @@ help () {
   #
   # the help function.
   #
-  echo "xal.sh:"
+  echo "a2n-s-xal:"
   echo "     This script allows the user to easily toggle xautolock."
   echo "     Do not forget to puth it in your PATH."
   echo ""
   echo "Usage:"
-  echo "     xal.sh [-hedn]"
+  echo "     a2n-s-xal [-hedn]"
   echo ""
   echo "Switches:"
   echo "     -h/--help               shows this help."
@@ -66,8 +66,8 @@ main () {
   done
   [ -z "$ACTION" ] && usage
   case "$ACTION" in
-    disable ) xautolock -disable; [[ "$NOTIFY" == "yes" ]] && dunstify "xal.sh" "xautolock disabled" --icon="$ICONS/lock-unlocked.png" ;;
-    enable) xautolock -enable; [[ "$NOTIFY" == "yes" ]] && dunstify "xal.sh" "xautolock enabled" --icon="$ICONS/lock-locked.png" ;;
+    disable ) xautolock -disable; [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-xal" "xautolock disabled" --icon="$ICONS/lock-unlocked.png" ;;
+    enable) xautolock -enable; [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-xal" "xautolock enabled" --icon="$ICONS/lock-locked.png" ;;
     * ) echo "an error occured (got unexpected '$ACTION')" ;;
   esac
 }
