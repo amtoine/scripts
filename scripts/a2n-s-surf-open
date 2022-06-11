@@ -14,31 +14,82 @@
 # License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
-xidfile="/tmp/tabbed-surf.xid"
-uri="file:///home/ants/.config/surf/html/homepage.html"
 
-[ -f $xidfile ] && pidof surf || rm $xidfile
+# parse the arguments
+OPTIONS=$(getopt -o h --long help -n 'a2n-s-surf-open' -- "$@")
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+eval set -- "$OPTIONS"
 
-if [ "$#" -gt 0 ];
-then
-	uri="$1"
-fi
+# allow the user to change the environment variables.
+[[ ! -v XIDFILE ]] && XIDFILE="/tmp/tabbed-surf.xid"
+[[ ! -v URI ]] && URI="file:///home/ants/.config/surf/html/homepage.html"
 
-runtabbed() {
-	tabbed -dcn tabbed-surf -r 2 surf -e '' "$uri" >"$xidfile" \
-		2>/dev/null &
+
+usage () {
+  #
+  # the usage function.
+  #
+  echo "Usage: a2n-s-surf-open [-h]"
+  echo "Type -h or --help for the full help."
+  exit 0
 }
 
-if [ ! -r "$xidfile" ];
-then
-	runtabbed
-else
-	xid=$(cat "$xidfile")
-	xprop -id "$xid" >/dev/null 2>&1
-	if [ $? -gt 0 ];
-	then
-		runtabbed
-	else
-		surf -e "$xid" "$uri" >/dev/null 2>&1 &
-	fi
-fi
+
+help () {
+  #
+  # the help function.
+  #
+  echo "a2n-s-surf-open:"
+  echo "     TODO."
+  echo ""
+  echo "Usage:"
+  echo "     a2n-s-surf-open [-h]"
+  echo ""
+  echo "Switches:"
+  echo "     -h/--help             shows this help."
+  echo ""
+  echo "Environment variables:"
+  echo "     XIDFILE               TODO (defaults to \"/tmp/tabbed-surf.xid\")"
+  echo "     URI                   TODO (defaults to \"file:///home/ants/.config/surf/html/homepage.html\")"
+  exit 0
+}
+
+
+main () {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h | --help )   help ;;
+      -- ) shift; break ;;
+      * ) break ;;
+    esac
+  done
+
+  [ -f $XIDFILE ] && pidof surf || rm $XIDFILE
+
+  if [ "$#" -gt 0 ];
+  then
+	  URI="$1"
+  fi
+
+  runtabbed() {
+	  tabbed -dcn tabbed-surf -r 2 surf -e '' "$URI" >"$XIDFILE" \
+		  2>/dev/null &
+  }
+
+  if [ ! -r "$XIDFILE" ];
+  then
+	  runtabbed
+  else
+	  xid=$(cat "$XIDFILE")
+	  xprop -id "$xid" >/dev/null 2>&1
+	  if [ $? -gt 0 ];
+	  then
+		  runtabbed
+	  else
+		  surf -e "$xid" "$URI" >/dev/null 2>&1 &
+	  fi
+  fi
+}
+
+
+main "$@"

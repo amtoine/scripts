@@ -33,40 +33,85 @@
 # License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
-if command -v python &> /dev/null; then
-    PY=$(which python)
-    PYV=$(python --version)
-fi
-if command -v pip &> /dev/null; then
-    PIP=$(which pip)
-    PIPV=$(pip --version | cut -d' ' -f1-2)
-fi
-if command -v python3 &> /dev/null; then
-    PY3=$(which python3)
-    PIP3=$(which pip3)
-fi
-if command -v pip3 &> /dev/null; then
-    PY3V=$(python3 --version)
-    PIP3V=$(pip3 --version | cut -d' ' -f1-2)
-fi
-JPT="--"
-if command -v jupyter &> /dev/null; then
-    JPT=$(which jupyter)
-fi
-NB="--"
-NBV="--"
-if command -v jupyter-notebook &> /dev/null; then
-    NB=$(which jupyter-notebook)
-    NBV=$(jupyter-notebook --version)
-fi
+# parse the arguments
+OPTIONS=$(getopt -o h --long help -n 'a2n-s-wvenv' -- "$@")
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+eval set -- "$OPTIONS"
+
+
+usage () {
+  #
+  # the usage function.
+  #
+  echo "Usage: a2n-s-wvenv [-h]"
+  echo "Type -h or --help for the full help."
+  exit 0
+}
+
+
+help () {
+  #
+  # the help function.
+  #
+  echo "a2n-s-wvenv:"
+  echo "     TODO."
+  echo ""
+  echo "Usage:"
+  echo "     a2n-s-wvenv [-h]"
+  echo ""
+  echo "Switches:"
+  echo "     -h/--help             shows this help."
+  exit 0
+}
+
+
+main () {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h | --help )   help ;;
+      -- ) shift; break ;;
+      * ) break ;;
+    esac
+  done
+
+  if command -v python &> /dev/null; then
+      PY=$(which python)
+      PYV=$(python --version)
+  fi
+  if command -v pip &> /dev/null; then
+      PIP=$(which pip)
+      PIPV=$(pip --version | cut -d' ' -f1-2)
+  fi
+  if command -v python3 &> /dev/null; then
+      PY3=$(which python3)
+      PIP3=$(which pip3)
+  fi
+  if command -v pip3 &> /dev/null; then
+      PY3V=$(python3 --version)
+      PIP3V=$(pip3 --version | cut -d' ' -f1-2)
+  fi
+  JPT="--"
+  if command -v jupyter &> /dev/null; then
+      JPT=$(which jupyter)
+  fi
+  NB="--"
+  NBV="--"
+  if command -v jupyter-notebook &> /dev/null; then
+      NB=$(which jupyter-notebook)
+      NBV=$(jupyter-notebook --version)
+  fi
 
 
 
-echo " command |                    path (version)"
-echo "---------+-------------------------------------------------------"
-echo " python  | $PY ($PYV)"
-echo "    pip  | $PIP ($PIPV)"
-echo "python3  | $PY3 ($PY3V)"
-echo "   pip3  | $PIP3 ($PIP3V)"
-echo "jupyter  | $JPT"
-echo "notebook | $NB ($NBV)"
+  echo " command |                    path (version)"
+  echo "---------+-------------------------------------------------------"
+  echo " python  | $PY ($PYV)"
+  echo "    pip  | $PIP ($PIPV)"
+  echo "python3  | $PY3 ($PY3V)"
+  echo "   pip3  | $PIP3 ($PIP3V)"
+  echo "jupyter  | $JPT"
+  echo "notebook | $NB ($NBV)"
+}
+
+
+main "$@"

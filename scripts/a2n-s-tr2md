@@ -14,16 +14,61 @@
 # License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
-# name=$(pwd | rev | cut -d'/' -f1 | rev)
-# tree -p --filelimit 29 -L 3 | sed "s/^\./📦 $name/g; \
-#                                    s/├/┣/g; \
-#                                    s/─ \[d.*\] / 📂/g; \
-#                                    s/─ \[-.*\] / 📜/g; \
-#                                    s/─ \[l.*\] / 📜/g; \
-#                                    s/─/━/g; \
-#                                    s/│/┃/g; \
-#                                    s/└/┗/g; \
-#                                    s/┃\s\s\s/\s\s\s\s\s\s/g; \
-#                                    s/$/  /g" \
-#                                > tree.md
-tree -apI .git --dirsfirst | sed 's/\[\(.\).........\]/[\1]/;'
+# parse the arguments
+OPTIONS=$(getopt -o h --long help -n 'a2n-s-tr2md' -- "$@")
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+eval set -- "$OPTIONS"
+
+
+usage () {
+  #
+  # the usage function.
+  #
+  echo "Usage: a2n-s-tr2md [-h]"
+  echo "Type -h or --help for the full help."
+  exit 0
+}
+
+
+help () {
+  #
+  # the help function.
+  #
+  echo "a2n-s-tr2md:"
+  echo "     TODO."
+  echo ""
+  echo "Usage:"
+  echo "     a2n-s-tr2md [-h]"
+  echo ""
+  echo "Switches:"
+  echo "     -h/--help             shows this help."
+  exit 0
+}
+
+
+main () {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h | --help )   help ;;
+      -- ) shift; break ;;
+      * ) break ;;
+    esac
+  done
+
+  # name=$(pwd | rev | cut -d'/' -f1 | rev)
+  # tree -p --filelimit 29 -L 3 | sed "s/^\./📦 $name/g; \
+  #                                    s/├/┣/g; \
+  #                                    s/─ \[d.*\] / 📂/g; \
+  #                                    s/─ \[-.*\] / 📜/g; \
+  #                                    s/─ \[l.*\] / 📜/g; \
+  #                                    s/─/━/g; \
+  #                                    s/│/┃/g; \
+  #                                    s/└/┗/g; \
+  #                                    s/┃\s\s\s/\s\s\s\s\s\s/g; \
+  #                                    s/$/  /g" \
+  #                                > tree.md
+  tree -apI .git --dirsfirst | sed 's/\[\(.\).........\]/[\1]/;'
+}
+
+
+main "$@"

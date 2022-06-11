@@ -14,8 +14,56 @@
 # License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
-if [[ $(setxkbmap -query | grep layout | sed "s/layout:\s\+\(.*\)/\1/") = fr ]]; then
-	setxkbmap -layout us;
-elif [[ $(setxkbmap -query | grep layout | sed "s/layout:\s\+\(.*\)/\1/") = us ]]; then
-	setxkbmap -layout fr;
-fi
+# parse the arguments
+OPTIONS=$(getopt -o h --long help -n 'a2n-s-togkb' -- "$@")
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+eval set -- "$OPTIONS"
+
+
+usage () {
+  #
+  # the usage function.
+  #
+  echo "Usage: a2n-s-togkb [-h]"
+  echo "Type -h or --help for the full help."
+  exit 0
+}
+
+
+help () {
+  #
+  # the help function.
+  #
+  echo "a2n-s-togkb:"
+  echo "     TODO."
+  echo ""
+  echo "Usage:"
+  echo "     a2n-s-togkb [-h]"
+  echo ""
+  echo "Switches:"
+  echo "     -h/--help             shows this help."
+  exit 0
+}
+
+
+main () {
+  #
+  # TODO.
+  #
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h | --help )   help ;;
+      -- ) shift; break ;;
+      * ) break ;;
+    esac
+  done
+
+  if [[ $(setxkbmap -query | grep layout | sed "s/layout:\s\+\(.*\)/\1/") = fr ]]; then
+    setxkbmap -layout us;
+  elif [[ $(setxkbmap -query | grep layout | sed "s/layout:\s\+\(.*\)/\1/") = us ]]; then
+    setxkbmap -layout fr;
+  fi
+}
+
+
+main "$@"

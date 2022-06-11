@@ -14,16 +14,61 @@
 # License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
-dir="$HOME/.pkgslists"
-echo "updating packages list..."
-  pacman -Qqe > $dir/allpkglist.txt
-  pacman -Qqent > $dir/pkglist.txt
-echo "updating dependencies list..."
-  comm -13 <(pacman -Qqdt | sort) <(pacman -Qqdtt | sort) > $dir/optdeplist.txt
-echo "updating foreign packages list..."
-  pacman -Qqem > $dir/foreignpkglist.txt
-echo "updating cargo commands list..."
-  cargo --list > $dir/cargocmdlist.txt
-echo "updating python packages list..."
-  /usr/bin/pip list > $dir/pippkglist.txt
-echo "all done!"
+# parse the arguments
+OPTIONS=$(getopt -o h --long help -n 'a2n-s-upl' -- "$@")
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+eval set -- "$OPTIONS"
+
+
+usage () {
+  #
+  # the usage function.
+  #
+  echo "Usage: a2n-s-upl [-h]"
+  echo "Type -h or --help for the full help."
+  exit 0
+}
+
+
+help () {
+  #
+  # the help function.
+  #
+  echo "a2n-s-upl:"
+  echo "     TODO."
+  echo ""
+  echo "Usage:"
+  echo "     a2n-s-upl [-h]"
+  echo ""
+  echo "Switches:"
+  echo "     -h/--help             shows this help."
+  exit 0
+}
+
+
+main () {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h | --help )   help ;;
+      -- ) shift; break ;;
+      * ) break ;;
+    esac
+  done
+
+  dir="$HOME/.pkgslists"
+  echo "updating packages list..."
+    pacman -Qqe > $dir/allpkglist.txt
+    pacman -Qqent > $dir/pkglist.txt
+  echo "updating dependencies list..."
+    comm -13 <(pacman -Qqdt | sort) <(pacman -Qqdtt | sort) > $dir/optdeplist.txt
+  echo "updating foreign packages list..."
+    pacman -Qqem > $dir/foreignpkglist.txt
+  echo "updating cargo commands list..."
+    cargo --list > $dir/cargocmdlist.txt
+  echo "updating python packages list..."
+    /usr/bin/pip list > $dir/pippkglist.txt
+  echo "all done!"
+}
+
+
+main "$@"

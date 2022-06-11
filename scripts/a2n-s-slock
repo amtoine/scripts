@@ -13,8 +13,53 @@
 # License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
-# slock -m "$(cowsay $(fortune -c) | lolcat -ft)"
-# slock -m "$(figlet -tcf slant "Screen Is Locked. Type Your Password To Unlock." -w 100)"
-# slock -m "$(figlet -tcf slant "Screen Is Locked. Type Your Password To Unlock." -w 100 | lolcat -ft)"
-# slock -m "$(figlet -tf small "Bet you can't crack it open.")"
-slock -m ""
+# parse the arguments
+OPTIONS=$(getopt -o h --long help -n 'a2n-s-slock' -- "$@")
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+eval set -- "$OPTIONS"
+
+
+usage () {
+  #
+  # the usage function.
+  #
+  echo "Usage: a2n-s-slock [-h]"
+  echo "Type -h or --help for the full help."
+  exit 0
+}
+
+
+help () {
+  #
+  # the help function.
+  #
+  echo "a2n-s-slock:"
+  echo "     TODO."
+  echo ""
+  echo "Usage:"
+  echo "     a2n-s-slock [-h]"
+  echo ""
+  echo "Switches:"
+  echo "     -h/--help             shows this help."
+  exit 0
+}
+
+
+main () {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h | --help )   help ;;
+      -- ) shift; break ;;
+      * ) break ;;
+    esac
+  done
+
+  # slock -m "$(cowsay $(fortune -c) | lolcat -ft)"
+  # slock -m "$(figlet -tcf slant "Screen Is Locked. Type Your Password To Unlock." -w 100)"
+  # slock -m "$(figlet -tcf slant "Screen Is Locked. Type Your Password To Unlock." -w 100 | lolcat -ft)"
+  # slock -m "$(figlet -tf small "Bet you can't crack it open.")"
+  slock -m ""
+}
+
+
+main "$@"
