@@ -3,16 +3,16 @@
 #      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s
 #     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles
 #     \__,_/___|_||_|       /__/
-#        _     __  _        __  _         _        _ _      _
-#       | |   / / | |__    / / (_)_ _  __| |_ __ _| | |  __| |_
-#      _| |  / /  | '_ \  / /  | | ' \(_-<  _/ _` | | |_(_-< ' \
-#     (_)_| /_/   |_.__/ /_/   |_|_||_/__/\__\__,_|_|_(_)__/_||_|
+#           ___                _         _        _ _
+#      __ _|_  )_ _ ___ ______(_)_ _  __| |_ __ _| | |
+#     / _` |/ /| ' \___(_-<___| | ' \(_-<  _/ _` | | |
+#     \__,_/___|_||_|  /__/   |_|_||_/__/\__\__,_|_|_|
 #
 # Description:  this is the deployment script of my dotfiles.
 #               assumes basic Arch Linux installation: https://www.youtube.com/watch?v=PQgyW10xD8s
 #               commands taken from: https://www.youtube.com/watch?v=pouX5VvX0_Q
 # Dependencies: pacman, curl
-# License:      https://github.com/a2n-s/dotfiles/LICENSE
+# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 # some color definitions
@@ -796,13 +796,13 @@ help () {
   #
   # the help function.
   #
-  echo "install.sh:"
+  echo "a2n-s-install:"
   echo "     This is the deployment script of my dotfiles"
   echo "     Software will be installed and configuration"
   echo "     files will be moved around the filesystem."
   echo ""
   echo "Usage:"
-  echo "     install.sh [-hsfSrai]"
+  echo "     a2n-s-install [-hsfSrai]"
   echo ""
   echo "Switches:"
   echo "     -h/--help           shows this help."
@@ -821,7 +821,7 @@ help () {
 
 # parse the arguments.
 OPTIONS=$(getopt -o hsrSfaid --long help,nosync,reboot,noshell,nodialog,action,interactive,debug \
-              -n 'install.sh' -- "$@")
+              -n 'a2n-s-install' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 

@@ -4,21 +4,21 @@
 #      / __ `/_/ // __ \   ______   / ___/      github   page: https://github.com/a2n-s 
 #     / /_/ / __// / / /  /_____/  (__  )       my   dotfiles: https://github.com/a2n-s/dotfiles 
 #     \__,_/____/_/ /_/           /____/
-#             __  _       _       _      _
-#      ___   / / | |_  __| |_ __ (_)  __| |_
-#     (_-<  / /  | ' \/ _` | '  \| |_(_-< ' \
-#     /__/ /_/   |_||_\__,_|_|_|_|_(_)__/_||_|
+#           ___                _       _       _
+#      __ _|_  )_ _ ___ ______| |_  __| |_ __ (_)
+#     / _` |/ /| ' \___(_-<___| ' \/ _` | '  \| |
+#     \__,_/___|_||_|  /__/   |_||_\__,_|_|_|_|_|
 #
 # Description:  manages hdmi monitors, increases or decreases the brightness of the screen by giving + or - to the script.
 #               one can use multiple flags, only the last one will be used.
 # Dependencies: xrandr
-# License:      https://github.com/a2n-s/dotfiles/blob/main/LICENSE 
+# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
 # Contributors: WinEunuuchs2Unix at https://askubuntu.com/questions/1150339/increment-brightness-by-value-using-xrandr (original idea)
 #               Stevan Antoine (adaptations)
 
 # parse the arguments.
 OPTIONS=$(getopt -o b:s:dlmrMSnhw --long brightness:,step:,disconnect,left,mirror,right,main,second,notify,restart-wm,help \
-              -n 'hdmi.sh' -- "$@")
+              -n 'a2n-s-hdmi' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -83,14 +83,14 @@ wm_restart () {
 }
 
 notify_brightness () {
-  dunstify "hdmi.sh" "Brightness ($1)\n$2" -h "int:value:$2" -u low --icon="$ICONS/video-brightness.png" --replace="$DUNST_ID"
+  dunstify "a2n-s-hdmi" "Brightness ($1)\n$2" -h "int:value:$2" -u low --icon="$ICONS/video-brightness.png" --replace="$DUNST_ID"
 }
 
 usage () {
   #
   # the usage function.
   #
-  echo "Usage: hdmi.sh [-hdlmrMSn] [-b BRIGHTNESS/DELTA -s STEP]"
+  echo "Usage: a2n-s-hdmi [-hdlmrMSn] [-b BRIGHTNESS/DELTA -s STEP]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -99,12 +99,12 @@ help () {
   #
   # the help function.
   #
-  echo "hdmi.sh:"
+  echo "a2n-s-hdmi:"
   echo "     This script allows the user to easily manage hdmi devices."
   echo "     Do not forget to puth it in your PATH."
   echo ""
   echo "Usage:"
-  echo "     hdmi.sh [-hdlmrMSn] [-b BRIGHTNESS/DELTA -s STEP]"
+  echo "     a2n-s-hdmi [-hdlmrMSn] [-b BRIGHTNESS/DELTA -s STEP]"
   echo ""
   echo "Switches:"
   echo "     -h/--help               shows this help."
@@ -166,11 +166,11 @@ main () {
       fi
       exit 0
       ;;
-    disconnect ) xrandr --output "$MAIN" --auto --output "$SECOND" --off; [ -v WM ] && wm_restart; [ -v NOTIFY ] && dunstify "hdmi.sh" "$SECOND disconnected" --icon="$ICONS/video-monitor-disconnected.png" ;;
-    left )       connect "$MAIN" "$SECOND" "left-of"; [ -v WM ] && wm_restart;  [ -v NOTIFY ] && dunstify "hdmi.sh" "$SECOND is now on the left of $MAIN" --icon="$ICONS/video-monitor-left.png" ;;
-    mirror )     connect "$MAIN" "$SECOND" "same-as"; [ -v WM ] && wm_restart;  [ -v NOTIFY ] && dunstify "hdmi.sh" "$SECOND is now the same as $MAIN" --icon="$ICONS/video-monitor-mirror.png" ;;
-    right )      connect "$MAIN" "$SECOND" "right-of"; [ -v WM ] && wm_restart; [ -v NOTIFY ] && dunstify "hdmi.sh" "$SECOND is now on the right of $MAIN" --icon="$ICONS/video-monitor-right.png" ;;
-    * ) echo "an error occured (got unexpected '$ACTION')"; [ -v NOTIFY ] && dunstify "hdmi.sh" "an error occured (got unexpected '$ACTION')"; break ;;
+    disconnect ) xrandr --output "$MAIN" --auto --output "$SECOND" --off; [ -v WM ] && wm_restart; [ -v NOTIFY ] && dunstify "a2n-s-hdmi" "$SECOND disconnected" --icon="$ICONS/video-monitor-disconnected.png" ;;
+    left )       connect "$MAIN" "$SECOND" "left-of"; [ -v WM ] && wm_restart;  [ -v NOTIFY ] && dunstify "a2n-s-hdmi" "$SECOND is now on the left of $MAIN" --icon="$ICONS/video-monitor-left.png" ;;
+    mirror )     connect "$MAIN" "$SECOND" "same-as"; [ -v WM ] && wm_restart;  [ -v NOTIFY ] && dunstify "a2n-s-hdmi" "$SECOND is now the same as $MAIN" --icon="$ICONS/video-monitor-mirror.png" ;;
+    right )      connect "$MAIN" "$SECOND" "right-of"; [ -v WM ] && wm_restart; [ -v NOTIFY ] && dunstify "a2n-s-hdmi" "$SECOND is now on the right of $MAIN" --icon="$ICONS/video-monitor-right.png" ;;
+    * ) echo "an error occured (got unexpected '$ACTION')"; [ -v NOTIFY ] && dunstify "a2n-s-hdmi" "an error occured (got unexpected '$ACTION')"; break ;;
   esac
 }
 

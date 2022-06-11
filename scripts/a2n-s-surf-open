@@ -3,15 +3,15 @@
 #      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s
 #     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles
 #     \__,_/___|_||_|       /__/
-#             __               __                             _
-#      ___   / /  ____  _ _ _ / _|___ ___ _ __  ___ _ _    __| |_
-#     (_-<  / /  (_-< || | '_|  _|___/ _ \ '_ \/ -_) ' \ _(_-< ' \
-#     /__/ /_/   /__/\_,_|_| |_|     \___/ .__/\___|_||_(_)__/_||_|
-#                                        |_|
+#           ___                             __
+#      __ _|_  )_ _ ___ ______ ____  _ _ _ / _|___ ___ _ __  ___ _ _
+#     / _` |/ /| ' \___(_-<___(_-< || | '_|  _|___/ _ \ '_ \/ -_) ' \
+#     \__,_/___|_||_|  /__/   /__/\_,_|_| |_|     \___/ .__/\___|_||_|
+#                                                     |_|
 #
 # Description:  opens a link or the default homepage in surf tabbed.
 # Dependencies: tabbed, surf
-# License:      https://github.com/a2n-s/dotfiles/blob/main/LICENSE
+# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 xidfile="/tmp/tabbed-surf.xid"

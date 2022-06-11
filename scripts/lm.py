@@ -3,15 +3,15 @@
 #      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s
 #     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles
 #     \__,_/___|_||_|       /__/
-#             __  _            _
-#      ___   / / | |_ __    __| |_
-#     (_-<  / /  | | '  \ _(_-< ' \
-#     /__/ /_/   |_|_|_|_(_)__/_||_|
+#           ___                _
+#      __ _|_  )_ _ ___ ______| |_ __
+#     / _` |/ /| ' \___(_-<___| | '  \
+#     \__,_/___|_||_|  /__/   |_|_|_|_|
 #
 # Description:  prints the list of connected monitors with their positions and geometries.
 #               inspired by https://askubuntu.com/questions/639495/how-can-i-list-connected-monitors-with-xrandr
 # Dependencies: gi module
-# License:      https://github.com/a2n-s/dotfiles/blob/main/LICENSE 
+# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 import gi

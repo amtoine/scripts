@@ -3,15 +3,15 @@
 #      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s
 #     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles
 #     \__,_/___|_||_|       /__/
-#             __  _     __           _
-#      ___   / / | |__ / _|__ _   __| |_
-#     (_-<  / /  | / _|  _/ _` |_(_-< ' \
-#     /__/ /_/   |_\__|_| \__, (_)__/_||_|
-#                         |___/
+#           ___                _     __
+#      __ _|_  )_ _ ___ ______| |__ / _|__ _
+#     / _` |/ /| ' \___(_-<___| / _|  _/ _` |
+#     \__,_/___|_||_|  /__/   |_\__|_| \__, |
+#                                      |___/
 #
 # Description:  a wrapper around lazygit to use it from anywhere on the dotfiles.
 # Dependencies:
-# License:      https://github.com/a2n-s/dotfiles/blob/main/LICENSE
+# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 /usr/bin/lazygit --git-dir="$HOME/.dotfiles" --work-tree="$HOME"
