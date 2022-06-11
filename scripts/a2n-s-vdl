@@ -21,6 +21,7 @@ eval set -- "$OPTIONS"
 # environment variables
 [[ ! -v QUALITY ]] && QUALITY="480"
 
+
 usage () {
   #
   # the usage function.
@@ -29,6 +30,7 @@ usage () {
   echo "Type -h or --help for the full help."
   exit 0
 }
+
 
 help () {
   #
@@ -50,7 +52,11 @@ help () {
   exit 0
 }
 
+
 main () {
+  #
+  # TODO.
+  #
   ACTION="video"
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -67,5 +73,6 @@ main () {
     * ) echo "an error occured (got unexpected '$ACTION')"; exit 1 ;;
   esac
 }
+
 
 main "$@"

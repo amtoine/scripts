@@ -21,6 +21,7 @@ eval set -- "$OPTIONS"
 # allow the user to change the environment variables.
 [[ ! -v DUNST_ID ]] && DUNST_ID=4
 
+
 _compute_progress () {
     # Compute the progress of the current countdown.
     #
@@ -64,6 +65,7 @@ usage () {
   exit 0
 }
 
+
 help () {
   #
   # the help function.
@@ -83,7 +85,11 @@ help () {
   exit 0
 }
 
+
 main () {
+  #
+  # TODO.
+  #
   ACTION=""
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -104,5 +110,6 @@ main () {
       dunstify --urgency critical --timeout 5000 "a2n-s-countdown" "Please provide a time as the only argument"
   fi
 }
+
 
 main "$@"

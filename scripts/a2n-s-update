@@ -24,6 +24,7 @@ eval set -- "$OPTIONS"
 [[ ! -v ICONS ]] && ICONS="/usr/share/icons/a2n-s-icons"
 [[ ! -v TERMINAL ]] && TERMINAL="st -e"
 
+
 check_updates () {
   # Check the system for updates.
   dunstify "a2n-s-update" "pulling updates..."
@@ -35,6 +36,7 @@ check_updates () {
   fi
 }
 
+
 update () {
   # Update the system with pacman in a popup terminal.
   dunstify "a2n-s-update" "please confirm your password in the popup window" --icon="$ICONS/lock-locked.png"
@@ -42,6 +44,7 @@ update () {
   dunstify "a2n-s-update" "update did complete successfully" --icon="$ICONS/lock-unlocked.png"
   check_updates
 }
+
 
 usage () {
   #
@@ -72,7 +75,12 @@ help () {
   echo "     TERMINAL                the terminal to update the system (defaults to 'st -e')"
   exit 0
 }
+
+
 main () {
+  #
+  # TODO.
+  #
   while [[ $# -gt 0 ]]; do
     case "$1" in
       -h | --help )    help ;;
@@ -91,5 +99,6 @@ main () {
     * ) echo "an error occured (got unexpected '$ACTION')"; exit 1 ;;
   esac
 }
+
 
 main "$@"

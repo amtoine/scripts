@@ -13,6 +13,11 @@
 # License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
+# parse the arguments.
+OPTIONS=$(getopt -o huscpt::C:aPbod --long help,update,strip,clean,print,theme::,config:,all,preview,boot,other,dmenu -n 'a2n-s-themes' -- "$@")
+if [ $? != 0 ] ; then usage >&2 ; exit 1 ; fi
+eval set -- "$OPTIONS"
+
 ################################################################################################
 ## Some color definitions ######################################################################
 ################################################################################################
@@ -67,6 +72,7 @@ SDDM="/usr/share/sddm/themes"
 _columns=(name bg fg sel_bg sel_fg 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)
 _nb_colors="$(( ${#_columns[@]}-1 ))"
 
+
 update () {
   #
   # download the themes list from remote.
@@ -81,6 +87,7 @@ update () {
     git -C "$CACHE" pull origin || exit 1;
   fi
 }
+
 
 strip () {
   #
@@ -137,6 +144,7 @@ strip () {
   fi
 }
 
+
 print () {
   #
   # print the whole database.
@@ -152,6 +160,7 @@ print () {
     echo -e "Consider using ${Tip}a2n-s-themes -s${Off} to generate the ${Dst}$colordatabase${Off} database.";
   fi
 }
+
 
 preview () {
   #
@@ -169,6 +178,7 @@ preview () {
   fi
 }
 
+
 clean () {
   #
   # clean the whole cache.
@@ -181,6 +191,7 @@ clean () {
     echo -e "Consider using ${Tip}a2n-s-themes -u${Off} to update the cache.";
   fi
 }
+
 
 qtile_cfg () {
   #
@@ -211,6 +222,7 @@ qtile_cfg () {
   sed -i "s/\(\s\+--Colors \).*/\1$2/" "$CONKY/qtile.conkyrc"
 }
 
+
 dunst_cfg () {
   #
   # change the theme of the dunst notification server.
@@ -237,6 +249,7 @@ dunst_cfg () {
   dunstify "${theme//\.conf$//} (sample progress bar)" -h "int:value:40" -u low --icon="$HOME/.icons/volume.png" -t 10000
 }
 
+
 alacritty_cfg () {
   #
   # change the theme of the alacritty terminal emulator.
@@ -254,6 +267,7 @@ alacritty_cfg () {
   sed -i "s/\(\s*# COLORSCHEME: \).*/\1$2/" "$ALACRITTY"
 }
 
+
 kitty_cfg () {
   #
   # change the theme of the kitty terminal emulator.
@@ -270,6 +284,7 @@ kitty_cfg () {
   sed -i "s/\(^# THEME: \).*/\1$2/" "$KITTY"
 }
 
+
 rofi_cfg () {
   #
   # change the theme of rofi.
@@ -285,6 +300,8 @@ rofi_cfg () {
   # change the name of the theme.
   sed -i "s/\(^\/\/ THEME: \).*/\1$2/" "$ROFI"
 }
+
+
 dmenu_cfg () {
   #
   # change the theme of dmenu.
@@ -307,6 +324,7 @@ dmenu_cfg () {
   cd - > /dev/null || exit 1
 }
 
+
 st_cfg () {
   #
   # change the theme of st.
@@ -328,6 +346,7 @@ st_cfg () {
   [ "$(echo -e "No\nYes" | dmenu -c -l 2 -bw 5 -i -p "Kill all instances of st to apply changes: ")" = "Yes" ] && killall st
 }
 
+
 xresources_cfg () {
   #
   # change the theme of doom emacs and neovim.
@@ -348,6 +367,7 @@ xresources_cfg () {
   [ "$(echo -e "No\nYes" | dmenu -c -l 2 -bw 5 -i -p "Kill all instances of emacs to apply changes: ")" = "Yes" ] && killall emacs
 }
 
+
 grub_cfg () {
   #
   # change the theme of grub
@@ -363,6 +383,7 @@ grub_cfg () {
   [ "$(echo -e "No\nYes" | dmenu -c -l 2 -bw 5 -i -p "Reboot: ")" = "Yes" ] && reboot
 }
 
+
 sddm_cfg () {
   #
   # change the theme of sddm
@@ -373,6 +394,7 @@ sddm_cfg () {
   sudo sed -i "s/^Current=.*/Current=${choice[0]}/" /etc/sddm.conf
   [ "$(echo -e "No\nYes" | dmenu -c -l 2 -bw 5 -i -p "Restart sddm: ")" = "Yes" ] && sudo systemctl restart sddm.service
 }
+
 
 dmenu_support () {
   #
@@ -399,6 +421,7 @@ dmenu_support () {
   [ ! "$choices" ] && { echo -e "${Wrn}User choose to exit${Off}"; return; }
   CONFIGS=("$choices")
 }
+
 
 theme () {
   #
@@ -448,6 +471,7 @@ theme () {
   fi
 }
 
+
 usage () {
   #
   # the usage function.
@@ -456,6 +480,7 @@ usage () {
   echo "Type -h or --help for the full help."
   exit 0
 }
+
 
 help () {
   #
@@ -505,12 +530,11 @@ help () {
   exit 0
 }
 
-# parse the arguments.
-OPTIONS=$(getopt -o huscpt::C:aPbod --long help,update,strip,clean,print,theme::,config:,all,preview,boot,other,dmenu -n 'a2n-s-themes' -- "$@")
-if [ $? != 0 ] ; then usage >&2 ; exit 1 ; fi
-eval set -- "$OPTIONS"
 
 main () {
+  #
+  # TODO.
+  #
   ACTIONS=()
   CONFIGS=()
   while [[ $# -gt 0 ]]; do
@@ -552,5 +576,6 @@ main () {
     esac
   done
 }
+
 
 main "$@"

@@ -29,6 +29,7 @@ bassGain=18 #17 avec les pad "cuir"
 bassCutoff=500 #40
 icon_path="/usr/share/icons/hicolor/scalable/apps/mpv.svg" #for the notification
 
+
 cleanup() {
 	printf "\n\n\t-- cleaning up -- \n\n"
 	pkill -F /tmp/mpv_daemon_pipe_cleaner.pid 2> /dev/null
@@ -39,6 +40,7 @@ cleanup() {
 
 }
 
+
 test_running() {
 	if ! [ -p /tmp/mpv_daemon_in.fifo ]; then
 		echo 'a daemonised mpv session does not seems to be running'
@@ -46,7 +48,6 @@ test_running() {
 		exit 1
 	fi
 }
-
 
 
 for arg in "$@"; do

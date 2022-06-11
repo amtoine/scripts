@@ -27,6 +27,7 @@ eval set -- "$OPTIONS"
 # the environment variables
 [[ ! -v DMFONT ]] && DMFONT="mononoki Nerd Font-20"
 
+
 usage () {
   #
   # the usage function.
@@ -35,6 +36,7 @@ usage () {
   echo "Type -h or --help for the full help."
   exit 0
 }
+
 
 help () {
   #
@@ -55,7 +57,11 @@ help () {
   exit 0
 }
 
+
 main () {
+  #
+  # TODO.
+  #
   while [[ $# -gt 0 ]]; do
     case "$1" in
       -h | --help ) help ;;
@@ -68,5 +74,6 @@ main () {
   [ -z "$2" ] && usage
   [[ $(echo -e "No\nYes" | dmenu -i -p "$1" -fn "$DMFONT") == "Yes" ]] && "$2"
 }
+
 
 main "$@"

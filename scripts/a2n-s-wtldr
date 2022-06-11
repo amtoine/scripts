@@ -21,6 +21,7 @@ export FZF_DEFAULT_OPTS='
 --prompt="TL;DR: "
 --preview="echo {1} | xargs -I{S} tldr {S} 2>/dev/null"'
 
+
 help () {
   #
   # the help function.
@@ -37,7 +38,11 @@ help () {
   exit 0
 }
 
+
 main () {
+  #
+  # TODO.
+  #
   while getopts "h" opt; do
       case "$opt" in
           h ) help;;
@@ -56,5 +61,6 @@ main () {
   [ -z "$help" ] && exit 0
   tldr "$help"
 }
+
 
 main "$@"

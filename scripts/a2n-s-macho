@@ -20,6 +20,7 @@ export FZF_DEFAULT_OPTS='
 --prompt="Manual: "
 --preview="echo {1} | sed -E \"s/^\((.+)\)/\1/\" | xargs -I{S} man -Pcat {S} {2} 2>/dev/null"'
 
+
 help () {
   #
   # the help function.
@@ -37,7 +38,11 @@ help () {
   exit 0
 }
 
+
 main () {
+  #
+  # TODO.
+  #
   while getopts ":s:h" opt; do
       case "$opt" in
           h ) help;;
@@ -58,5 +63,6 @@ main () {
   [ -z "$manual" ] && exit 0
   man "$manual"
 }
+
 
 main "$@"

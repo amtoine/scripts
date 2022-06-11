@@ -23,6 +23,7 @@ eval set -- "$OPTIONS"
 [[ ! -v TERMINAL ]] && TERMINAL="kitty"
 [[ ! -v BROWSER ]] && BROWSER="surf"
 
+
 usage () {
   #
   # the usage function.
@@ -31,6 +32,7 @@ usage () {
   echo "Type -h or --help for the full help."
   exit 0
 }
+
 
 help () {
   #
@@ -52,7 +54,11 @@ help () {
   exit 0
 }
 
+
 main () {
+  #
+  # TODO.
+  #
   while [[ $# -gt 0 ]]; do
     case "$1" in
       -h | --help ) help ;;
@@ -70,5 +76,6 @@ main () {
     *) exit 1;;
   esac
 }
+
 
 main "$@"

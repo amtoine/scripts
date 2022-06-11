@@ -23,6 +23,7 @@ eval set -- "$OPTIONS"
 [[ ! -v DMFONT ]] && DMFONT="mononoki Nerd Font-20"
 [[ ! -v PEDITOR ]] && PEDITOR="emacs"
 
+
 help () {
   #
   # the help function.
@@ -43,7 +44,11 @@ help () {
   exit 0
 }
 
+
 main () {
+  #
+  # TODO.
+  #
   while [[ $# -gt 0 ]]; do
     case "$1" in
       -h | --help ) help ;;
@@ -61,5 +66,6 @@ main () {
 
   EDITOR="$PEDITOR" pass edit "$pass_entry"
 }
+
 
 main "$@"

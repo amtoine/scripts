@@ -20,6 +20,7 @@ from gi.repository import Gdk
 
 
 def fetch_monitors():
+    """TODO."""
     allmonitors = []
 
     gdkdsp = Gdk.Display.get_default()

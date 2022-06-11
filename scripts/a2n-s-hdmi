@@ -17,7 +17,8 @@
 #               Stevan Antoine (adaptations)
 
 # parse the arguments.
-OPTIONS=$(getopt -o b:s:dlmrMSnhw --long brightness:,step:,disconnect,left,mirror,right,main,second,notify,restart-wm,help \
+OPTIONS=$(getopt -o b:s:dlmrMSnhw \
+              --long brightness:,step:,disconnect,left,mirror,right,main,second,notify,restart-wm,help \
               -n 'a2n-s-hdmi' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
@@ -30,12 +31,19 @@ eval set -- "$OPTIONS"
 
 
 get_curr_bright() {
+  #
+  # TODO.
+  #
   curr_bright=$(xrandr --verbose --current | grep ^"$1" -A5 | tail -n1 | sed 's/.*Brightness: \(.*\)/\1/' )
   curr_bright=$(awk -vb="$curr_bright" 'BEGIN{printf "%.2f" ,b * 100}')
   echo "$curr_bright"
 }
 
+
 change_brightness () {
+  #
+  # TODO.
+  #
   SIDE="$2"
   STEP="$3"
 
@@ -65,7 +73,11 @@ change_brightness () {
   xrandr --output "$1" --brightness "$final_bright"
 }
 
+
 connect () {
+  #
+  # TODO.
+  #
   MAIN="$1"
   SECOND="$2"
   METHOD="$3"
@@ -74,7 +86,11 @@ connect () {
   change_brightness "$SECOND" .2
 }
 
+
 wm_restart () {
+  #
+  # TODO.
+  #
   if pgrep qtile &> /dev/null;
   then
     qtile cmd-obj -o cmd -f restart;
@@ -82,9 +98,14 @@ wm_restart () {
   fi
 }
 
+
 notify_brightness () {
+  #
+  # TODO.
+  #
   dunstify "a2n-s-hdmi" "Brightness ($1)\n$2" -h "int:value:$2" -u low --icon="$ICONS/video-brightness.png" --replace="$DUNST_ID"
 }
+
 
 usage () {
   #
@@ -94,6 +115,7 @@ usage () {
   echo "Type -h or --help for the full help."
   exit 0
 }
+
 
 help () {
   #
@@ -129,7 +151,11 @@ help () {
   exit 0
 }
 
+
 main () {
+  #
+  # TODO.
+  #
   while [[ $# -gt 0 ]]; do
     case "$1" in
       -h | --help )       help ;;
@@ -173,5 +199,6 @@ main () {
     * ) echo "an error occured (got unexpected '$ACTION')"; [ -v NOTIFY ] && dunstify "a2n-s-hdmi" "an error occured (got unexpected '$ACTION')"; break ;;
   esac
 }
+
 
 main "$@"

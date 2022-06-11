@@ -29,16 +29,27 @@ eval set -- "$OPTIONS"
 
 
 bluetooth_on () {
+  #
+  # TODO.
+  #
     echo "device ($1) on"
     pacmd set-card-profile "$1" $ON
 }
 
+
 bluetooth_off () {
+  #
+  # TODO.
+  #
     echo "device ($1) off"
     pacmd set-card-profile "$1" $OFF
 }
 
+
 bluetooth_toggle () {
+  #
+  # TODO.
+  #
     CARD=$(pacmd list-cards | grep -B5 "$DEVICE" | head -1 | sed 's/\s\+index: //')
     if pacmd list-cards | grep -B5 "$DEVICE" | grep 'active profile'
     then
@@ -48,11 +59,20 @@ bluetooth_toggle () {
     fi
 }
 
+
 notify () {
+  #
+  # TODO.
+  #
   _volume=$(amixer sget "$1" | grep 'Right:' | awk -F'[][]' '{ print $2 }' | sed 's/%//')
   dunstify "volume on $1" "$_volume %" -h "int:value:$_volume" -u low --icon="$ICONS/audio-volume.png" --replace "$DUNST_ID"
 }
+
+
 mute_notify () {
+  #
+  # TODO.
+  #
   if amixer sget "$1" | grep "\[on\]" > /dev/null; then
     _volume=$(amixer sget "$1" | grep 'Right:' | awk -F'[][]' '{ print $2 }' | sed 's/%//')
     dunstify -u low "$1" "Device unmuted\n$_volume %" -h "int:value:$_volume"  --icon="$ICONS/audio-unmute.png" --replace "$DUNST_ID"
@@ -60,7 +80,12 @@ mute_notify () {
     dunstify -u low "$1" "Device muted"  --icon="$ICONS/audio-mute.png" --replace "$DUNST_ID"
   fi
 }
+
+
 bluetooth_notify () {
+  #
+  # TODO.
+  #
   if pacmd list-cards | grep -B5 "$DEVICE" | grep 'active profile'
   then
     dunstify "Bluetooth" "$DEVICE active"  --icon="$ICONS/bluetooth-active.png"
@@ -68,6 +93,7 @@ bluetooth_notify () {
     dunstify "Bluetooth" "$DEVICE disabled"  --icon="$ICONS/bluetooth-disabled.png"
   fi
 }
+
 
 usage () {
   #
@@ -77,6 +103,7 @@ usage () {
   echo "Type -h or --help for the full help."
   exit 0
 }
+
 
 help () {
   #
@@ -108,7 +135,11 @@ help () {
   exit 0
 }
 
+
 main () {
+  #
+  # TODO.
+  #
   while [[ $# -gt 0 ]]; do
     case "$1" in
       -h | --help )      help ;;
@@ -139,5 +170,6 @@ main () {
     * ) echo "an error occured (got unexpected '$ACTION')"; exit 1 ;;
   esac
 }
+
 
 main "$@"

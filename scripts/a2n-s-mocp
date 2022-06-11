@@ -26,6 +26,7 @@ eval set -- "$OPTIONS"
 [[ ! -v FOLLOW_SLEEP ]] && FOLLOW_SLEEP=1
 [[ ! -v FOLLOW_LOOPS ]] && FOLLOW_LOOPS=10
 
+
 _get_mocp_info () {
     # Get a keyword info from the moc server.
     #
@@ -76,6 +77,7 @@ _compute_icon () {
     echo "$icon"
 }
 
+
 show_moc_server_once () {
     # Throw one notification with the state of the MOC server.
     total_sec=$(_get_mocp_info "TotalSec")
@@ -86,6 +88,7 @@ show_moc_server_once () {
     dunstify "a2n-s-mocp" "$title\n$current_time/$total_time" -h "int:value:$progress" -u low --icon="$icon" --replace="$DUNST_ID"
 }
 
+
 follow () {
     # Show the MOC server once... but for many times.
     for _ in $(seq "$FOLLOW_LOOPS"); do
@@ -95,6 +98,7 @@ follow () {
     dunstify --close="$DUNST_ID"
 }
 
+
 usage () {
   #
   # the usage function.
@@ -103,6 +107,7 @@ usage () {
   echo "Type -h or --help for the full help."
   exit 0
 }
+
 
 help () {
   #
@@ -126,7 +131,11 @@ help () {
   exit 0
 }
 
+
 main () {
+  #
+  # TODO.
+  #
   ACTION=""
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -152,5 +161,6 @@ main () {
       show_moc_server_once
     fi
 }
+
 
 main "$@"

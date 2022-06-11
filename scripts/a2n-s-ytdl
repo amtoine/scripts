@@ -22,6 +22,7 @@ eval set -- "$OPTIONS"
 # allow the user to change the environment variables.
 [[ ! -v MUSIC_DIR ]] && MUSIC_DIR="$HOME/music"
 
+
 usage () {
      #
      # the usage function.
@@ -30,6 +31,7 @@ usage () {
      echo "Type -h or --help for the full help."
      exit 0
 }
+
 
 help () {
      #
@@ -51,7 +53,11 @@ help () {
      exit 0
 }
 
+
 main () {
+  #
+  # TODO.
+  #
      ACTION=""
      while [[ $# -gt 0 ]]; do
      case "$1" in
@@ -84,5 +90,6 @@ main () {
      #     --exec 'ffmpeg -y -loglevel repeat+info -i 'file:{}' -c copy -metadata 'album=DL31' 'file:{}.tmp'' \
      #     $1
 }
+
 
 main "$@"

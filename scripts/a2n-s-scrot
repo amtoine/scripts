@@ -25,6 +25,7 @@ eval set -- "$OPTIONS"
 [[ ! -v FORMAT ]] && FORMAT='scrot_%Y-%m-%d_%H-%M-%S_$wx$h'
 [[ ! -v ICONS ]] && ICONS="/usr/share/icons/a2n-s-icons"
 
+
 usage () {
   #
   # the usage function.
@@ -33,6 +34,7 @@ usage () {
   echo "Type -h or --help for the full help."
   exit 0
 }
+
 
 help () {
   #
@@ -62,7 +64,11 @@ help () {
   exit 0
 }
 
+
 main () {
+  #
+  # TODO.
+  #
   while [[ $# -gt 0 ]]; do
     case "$1" in
       -h | --help ) help ;;
@@ -87,5 +93,6 @@ main () {
   echo "name: $name"
   [ -n "$name" ] && [ -v NOTIFY ] && dunstify "a2n-s-scrot" "$1 screenshot at\n$name" --icon="$ICONS/camera.png"
 }
+
 
 main "$@"

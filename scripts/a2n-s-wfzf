@@ -28,6 +28,7 @@ export FZF_DEFAULT_OPTS="
 --preview-window=\"down,75%\"
 --preview=\"catimg $WALLPAPERS/{1} -H 100 -r 2\""
 
+
 help () {
   #
   # the help function.
@@ -49,7 +50,11 @@ help () {
   exit 0
 }
 
+
 main () {
+  #
+  # TODO.
+  #
   command="fzf --prompt"
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -78,5 +83,6 @@ main () {
   done
   feh --bg-fill "${wallpapers[@]}"
 }
+
 
 main "$@"

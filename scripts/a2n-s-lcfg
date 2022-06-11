@@ -23,6 +23,7 @@ eval set -- "$OPTIONS"
 [[ ! -v GIT_DIR ]] && GIT_DIR="$HOME/.dotfiles"
 [[ ! -v WORK_TREE ]] && WORK_TREE="$HOME"
 
+
 usage () {
   #
   # the usage function.
