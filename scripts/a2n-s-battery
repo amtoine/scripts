@@ -104,7 +104,7 @@ print_battery () {
     else
         icon="full"
     fi
-    dunstify --urgency low "a2n-s-battery" "$BATTERY is $status at $level" --icon="$ICONS/battery-$icon.png" --timeout 5000
+    dunstify --urgency low "a2n-s-battery" "$BATTERY is $status at $level" --icon="$ICONS/battery-$icon.png" --timeout 5000 --replace="$DUNST_ID"
 }
 
 
@@ -125,8 +125,7 @@ check_battery () {
         elif [ "$state" = "high" ]; then
             icon="$ICONS/battery-full.png"
         fi
-        dunstify --urgency critical "a2n-s-battery" "$BATTERY is $state" --icon="$icon" --replace="$DUNST_ID";
-        print_battery "$status" "$level"
+        dunstify --urgency critical "a2n-s-battery" "$BATTERY is $state\n($status at $level%)" --icon="$icon" --replace="$DUNST_ID";
     else
         dunstify --close="$DUNST_ID";
     fi
