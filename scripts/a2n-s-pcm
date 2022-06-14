@@ -20,7 +20,7 @@ if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
 # environment variables
-[[ ! -v ICONS ]] && ICONS="/usr/share/icons/a2n-s-icons"
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/a2n-s-icons-git"
 
 
 usage () {
@@ -51,7 +51,7 @@ help () {
   echo "     -n/--notify     enable notifications"
   echo ""
   echo "Environment variables:"
-  echo "     ICONS           the path the the icons (defaults to '/usr/share/icons/a2n-s-icons')"
+  echo "     ICONS           the path the the icons (defaults to '/usr/share/icons/a2n-s-icons-git')"
   exit 0
 }
 

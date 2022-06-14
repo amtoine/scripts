@@ -20,7 +20,7 @@ if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
 # allow the user to change the environment variables.
-[[ ! -v ICONS ]] && ICONS="/usr/share/icons/a2n-s-icons"
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/a2n-s-icons-git"
 [[ ! -v PLACES ]] && PLACES="Paris,Seoul,Nantes"
 
 
@@ -48,7 +48,7 @@ help () {
   echo "     -h/--help             shows this help."
   echo ""
   echo "Environment variables:"
-  echo "     ICONS                 TODO (defaults to \"/usr/share/icons/a2n-s-icons\")"
+  echo "     ICONS                 TODO (defaults to \"/usr/share/icons/a2n-s-icons-git\")"
   echo "     PLACES                TODO (defaults to \"Paris,Seoul,Nantes\")"
   exit 0
 }
