@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+main () {
+    mocp -S
+
+    # TODO.
+    declare -A options
+
+    options["Toggle pause"]="mocp --toggle-pause"
+    options["Next song"]="mocp --next"
+    options["Previous song"]="mocp --previous"
+    options["Pause current song"]="mocp --pause"
+    options["Unpause"]="mocp --unpause"
+    options["Stop playing"]="mocp --stop"
+    options["Stop the server"]="mocp --exit"
+    # options["Open"]="mocp"
+    options["Toggle repeat"]="mocp --toggle repeat"
+    options["Toggle shuffle"]="mocp --toggle shuffle"
+    options["Go forward ${SEEK}s"]="mocp --seek +10"
+    options["Go backward ${SEEK}s"]="mocp --seek -10"
+
+    choice=$(printf '%s\n' "${!options[@]}" | rofi -dmenu -i -p "MOC: ")
+
+    if [ "${choice}" ]; then
+        bash -c $(printf '%s\n' "${options["${choice}"]}")
+    else
+        echo "Program terminated." && exit 0
+    fi
+}
+
+
+main
