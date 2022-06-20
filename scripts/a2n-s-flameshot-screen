@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+screens=($(polybar -m | awk -F: '{print $1}'))
+n="${#screens[@]}"
+choice=$(echo "${screens[@]}" | tr ' ' '\n' | dmenu -c -l 4 -bw 5 -p "Choose a screen: ")
+for i in $(seq 0 $((n))); do
+    [ "${screens[i]}" = "$choice" ] && { echo "$i"; flameshot screen -n "$i"; exit 0; }
+done
+echo "error"
