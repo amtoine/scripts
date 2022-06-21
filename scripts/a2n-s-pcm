@@ -21,6 +21,7 @@ eval set -- "$OPTIONS"
 
 # environment variables
 [[ ! -v ICONS ]] && ICONS="/usr/share/icons/a2n-s-icons-git"
+[[ ! -v DUNST_ID ]] && DUNST_ID=6
 
 
 usage () {
@@ -52,6 +53,7 @@ help () {
   echo ""
   echo "Environment variables:"
   echo "     ICONS           the path the the icons (defaults to '/usr/share/icons/a2n-s-icons-git')"
+  echo "     DUNST_ID        the id of the dunst notification to be replaced (defaults to 6)"
   exit 0
 }
 
@@ -76,19 +78,19 @@ main () {
       if pgrep -x "picom" > /dev/null
       then
         killall picom
-        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "picom killed" --icon="$ICONS/video-compositor-off.png"
+        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "picom killed" --icon="$ICONS/video-compositor-off.png" --replace "$DUNST_ID"
       else
         picom --experimental-backends -b
-        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "picom started" --icon="$ICONS/video-compositor-off.png"
+        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "picom started" --icon="$ICONS/video-compositor-off.png" --replace "$DUNST_ID"
       fi;;
     blur )
       if grep "^#blur-method" ~/.config/picom/picom.conf > /dev/null
       then
         sed -i 's/^#\?blur-method/blur-method/' ~/.config/picom/picom.conf
-        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "blur ON" --icon="$ICONS/video-blur-on.png"
+        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "blur ON" --icon="$ICONS/video-blur-on.png" --replace "$DUNST_ID"
       else
         sed -i 's/^#\?blur-method/#blur-method/' ~/.config/picom/picom.conf
-        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "blur OFF" --icon="$ICONS/video-blur-off.png"
+        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "blur OFF" --icon="$ICONS/video-blur-off.png" --replace "$DUNST_ID"
       fi;;
     * ) echo "an error occured (got unexpected '$ACTION')" ;;
   esac
