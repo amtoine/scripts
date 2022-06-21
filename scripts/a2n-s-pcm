@@ -20,6 +20,7 @@ if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
 # environment variables
+[[ ! -v PICOM_EXTRA_FLAGS ]] && PICOM_EXTRA_FLAGS="--experimental-backends"
 [[ ! -v ICONS ]] && ICONS="/usr/share/icons/a2n-s-icons-git"
 
 
@@ -52,6 +53,8 @@ help () {
   echo ""
   echo "Environment variables:"
   echo "     ICONS           the path the the icons (defaults to '/usr/share/icons/a2n-s-icons-git')"
+  echo "     PICOM_EXTRA_FLAGS     extra flags to pass to \`picom\` (defaults to '--experimental-backends')"
+
   exit 0
 }
 
@@ -78,7 +81,7 @@ main () {
         killall picom
         [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "picom killed" --icon="$ICONS/video-compositor-off.png"
       else
-        picom --experimental-backends -b
+        picom  --daemon $PICOM_EXTRA_FLAGS
         [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "picom started" --icon="$ICONS/video-compositor-off.png"
       fi;;
     blur )
