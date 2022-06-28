@@ -20,7 +20,7 @@ if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
 # allow the user to change the environment variables.
-[[ ! -v ICONS ]] && ICONS="/usr/share/icons/a2n-s-icons-git"
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/a2n-s-icons-git/dark/128x128"
 
 
 usage () {
@@ -47,7 +47,7 @@ help () {
   echo "     -h/--help             shows this help."
   echo ""
   echo "Environment variables:"
-  echo "     ICONS                 TODO (defaults to \"/usr/share/icons/a2n-s-icons-git\")"
+  echo "     ICONS                 TODO (defaults to \"/usr/share/icons/a2n-s-icons-git/dark/128x128\")"
   exit 0
 }
 
@@ -64,15 +64,15 @@ main () {
     esac
   done
 
-  dunstify "a2n-s-sys-stats" "polling the system for information..." --icon="$ICONS/gears.png"
+  dunstify "a2n-s-sys-stats" "polling the system for information..." --icon="$ICONS/misc/gears.png"
 
   memory=$(free -m | awk 'NR==2{printf "%s/%sMB (%.2f%%)\n", $3,$2,$3*100/$2 }')
   load=$(top -bn1 | grep load | awk '{printf "%.2f\n", $(NF-2)}')
   cpu_temp=$(sensors | grep 'Core .:' | awk -F' ' '{ print $3 }')
 
-  dunstify "Usage" "$memory" --icon="$ICONS/usage-chart.png"
-  dunstify "Load" "$load" --icon="$ICONS/brain-machine.png"
-  dunstify "CPU" "$cpu_temp" --icon="$ICONS/temperature.png"
+  dunstify "Usage" "$memory" --icon="$ICONS/misc/usage-chart.png"
+  dunstify "Load" "$load" --icon="$ICONS/misc/brain-machine.png"
+  dunstify "CPU" "$cpu_temp" --icon="$ICONS/misc/temperature.png"
 }
 
 

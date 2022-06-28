@@ -21,7 +21,7 @@ if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
 # environment variables.
-[[ ! -v ICONS ]] && ICONS="/usr/share/icons/a2n-s-icons-git"
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/a2n-s-icons-git/dark/128x128"
 [[ ! -v DUNST_ID ]] && DUNST_ID=3
 [[ ! -v FOLLOW_SLEEP ]] && FOLLOW_SLEEP=1
 [[ ! -v FOLLOW_LOOPS ]] && FOLLOW_LOOPS=10
@@ -68,11 +68,11 @@ _compute_icon () {
     #   icons: the appropriate icon.
     state="$1"
     if [ "$state" = "PLAY" ]; then
-        icon="$ICONS/audio-music.png"
+        icon="$ICONS/audio/music.png"
     elif [ "$state" = "PAUSE" ]; then
-        icon="$ICONS/audio-stop.png"
+        icon="$ICONS/audio/stop.png"
     else
-        icon="$ICONS/notification-critical.png"
+        icon="$ICONS/notification/critical.png"
     fi
     echo "$icon"
 }
@@ -124,7 +124,7 @@ help () {
   echo "     -f/--follow             follow the song instead of showing a single notification."
   echo ""
   echo "Environment variables:"
-  echo "     ICONS                   the path the the icons (defaults to '/usr/share/icons/a2n-s-icons-git')"
+  echo "     ICONS                   the path the the icons (defaults to '/usr/share/icons/a2n-s-icons-git/dark/128x128')"
   echo "     DUNST_ID                the id of the dunst notification to be replaced (defaults to 3)"
   echo "     FOLLOW_SLEEP            the time to sleep between two server polls when following (defaults to 1)"
   echo "     FOLLOW_LOOPS            the number of time to follow the server (defaults to 10)"
@@ -151,7 +151,7 @@ main () {
   title=$(_get_mocp_info "Title")
 
   # state won't be set if the server is not running, quit properly.
-  [ -z "$state" ] && { dunstify "a2n-s-mocp" "server is not running" -u critical -t 5000 --icon="$ICONS/audio-mute.png"; exit 1; }
+  [ -z "$state" ] && { dunstify "a2n-s-mocp" "server is not running" -u critical -t 5000 --icon="$ICONS/audio/mute.png"; exit 1; }
 
   # otherwise show a nice notification.
   icon="$(_compute_icon "$state")"
