@@ -21,7 +21,7 @@ if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
 # environment variables
-[[ ! -v ICONS ]] && ICONS="/usr/share/icons/a2n-s-icons-git"
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/a2n-s-icons-git/dark/128x128"
 [[ ! -v TERMINAL ]] && TERMINAL="st -e"
 
 
@@ -30,18 +30,18 @@ check_updates () {
   dunstify "a2n-s-update" "pulling updates..."
   updates=$(checkupdates | wc -l)
   if [ "$updates" -eq "0" ]; then
-    dunstify "a2n-s-update" "everything is up to date!" --icon="$ICONS/ok.png"
+    dunstify "a2n-s-update" "everything is up to date!" --icon="$ICONS/misc/ok.png"
   else
-    dunstify "a2n-s-update" "there are $updates updates." --icon="$ICONS/package.png"
+    dunstify "a2n-s-update" "there are $updates updates." --icon="$ICONS/misc/package.png"
   fi
 }
 
 
 update () {
   # Update the system with pacman in a popup terminal.
-  dunstify "a2n-s-update" "please confirm your password in the popup window" --icon="$ICONS/lock-locked.png"
+  dunstify "a2n-s-update" "please confirm your password in the popup window" --icon="$ICONS/lock/locked.png"
   $TERMINAL sudo pacman -Syyu
-  dunstify "a2n-s-update" "update did complete successfully" --icon="$ICONS/lock-unlocked.png"
+  dunstify "a2n-s-update" "update did complete successfully" --icon="$ICONS/lock/unlocked.png"
   check_updates
 }
 
@@ -71,7 +71,7 @@ help () {
   echo "     -u/--update           update the system."
   echo ""
   echo "Environment variables:"
-  echo "     ICONS                   the path the the icons (defaults to '/usr/share/icons/a2n-s-icons-git')"
+  echo "     ICONS                   the path the the icons (defaults to '/usr/share/icons/a2n-s-icons-git/dark/128x128')"
   echo "     TERMINAL                the terminal to update the system (defaults to 'st -e')"
   exit 0
 }

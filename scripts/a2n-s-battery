@@ -27,7 +27,7 @@ eval set -- "$OPTIONS"
 [ -z "$BATTERY" ] && BATTERY="BAT0"
 [ -z "$LOW" ] && LOW=15
 [ -z "$HIGH" ] && HIGH=85
-[ -z "$ICONS" ] && ICONS="/usr/share/icons/a2n-s-icons-git"
+[ -z "$ICONS" ] && ICONS="/usr/share/icons/a2n-s-icons-git/dark/128x128"
 [ -z "$DUNST_ID" ] && DUNST_ID=1
 
 # the location of the battery information files
@@ -104,7 +104,7 @@ print_battery () {
     else
         icon="full"
     fi
-    dunstify --urgency low "a2n-s-battery" "$BATTERY is $status at $level" --icon="$ICONS/battery-$icon.png" --timeout 5000 --replace="$DUNST_ID"
+    dunstify --urgency low "a2n-s-battery" "$BATTERY is $status at $level" --icon="$ICONS/battery/$icon.png" --timeout 5000 --replace="$DUNST_ID"
 }
 
 
@@ -121,9 +121,9 @@ check_battery () {
     # throw a notification only if required.
     if [ -n "$state" ]; then
         if [ "$state" = "low" ]; then
-            icon="$ICONS/battery-critical.png"
+            icon="$ICONS/battery/critical.png"
         elif [ "$state" = "high" ]; then
-            icon="$ICONS/battery-full.png"
+            icon="$ICONS/battery/full.png"
         fi
         dunstify --urgency critical "a2n-s-battery" "$BATTERY is $state\n($status at $level%)" --icon="$icon" --replace="$DUNST_ID";
     else
@@ -161,7 +161,7 @@ help () {
   echo "     BATTERY               the name of the battery to check, inside '/sys/class/power_supply'(defaults to 'BAT0')"
   echo "     LOW                   the threshold below which a discharging battery is considered critical (defaults to 15)"
   echo "     HIGH                  the threshold above which a charging battery is considered critical (defaults to 85)"
-  echo "     ICONS                 the path the the icons (defaults to '/usr/share/icons/a2n-s-icons-git')"
+  echo "     ICONS                 the path the the icons (defaults to '/usr/share/icons/a2n-s-icons-git/dark/128x128')"
   echo "     DUNST_ID              the id of the sound notification, to replace them properly (defaults to 1)"
   exit 0
 }
