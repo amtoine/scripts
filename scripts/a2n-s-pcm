@@ -20,6 +20,7 @@ if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
 # environment variables
+[[ ! -v DUNST_ID ]] && DUNST_ID=6
 [[ ! -v PICOM_EXTRA_FLAGS ]] && PICOM_EXTRA_FLAGS="--experimental-backends"
 [[ ! -v ICONS ]] && ICONS="/usr/share/icons/a2n-s-icons-git/dark/128x128"
 
@@ -52,6 +53,7 @@ help () {
   echo "     -n/--notify     enable notifications"
   echo ""
   echo "Environment variables:"
+  echo "     DUNST_ID        the id of the dunst notification to be replaced (defaults to 6)"
   echo "     ICONS           the path the the icons (defaults to '/usr/share/icons/a2n-s-icons-git/dark/128x128')"
   echo "     PICOM_EXTRA_FLAGS     extra flags to pass to \`picom\` (defaults to '--experimental-backends')"
 
@@ -79,19 +81,19 @@ main () {
       if pgrep -x "picom" > /dev/null
       then
         killall picom
-        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "picom killed" --icon="$ICONS/video/compositor-off.png"
+        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "picom killed" --icon="$ICONS/video/compositor-off.png" --replace "$DUNST_ID"
       else
         picom  --daemon $PICOM_EXTRA_FLAGS
-        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "picom started" --icon="$ICONS/video/compositor-off.png"
+        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "picom started" --icon="$ICONS/video/compositor-off.png" --replace "$DUNST_ID"
       fi;;
     blur )
       if grep "^#blur-method" ~/.config/picom/picom.conf > /dev/null
       then
         sed -i 's/^#\?blur-method/blur-method/' ~/.config/picom/picom.conf
-        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "blur ON" --icon="$ICONS/video/blur/on.png"
+        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "blur ON" --icon="$ICONS/video/blur/on.png" --replace "$DUNST_ID"
       else
         sed -i 's/^#\?blur-method/#blur-method/' ~/.config/picom/picom.conf
-        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "blur OFF" --icon="$ICONS/video/blur/off.png"
+        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "blur OFF" --icon="$ICONS/video/blur/off.png" --replace "$DUNST_ID"
       fi;;
     * ) echo "an error occured (got unexpected '$ACTION')" ;;
   esac
