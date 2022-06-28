@@ -21,7 +21,7 @@ eval set -- "$OPTIONS"
 
 # environment variables
 [[ ! -v PICOM_EXTRA_FLAGS ]] && PICOM_EXTRA_FLAGS="--experimental-backends"
-[[ ! -v ICONS ]] && ICONS="/usr/share/icons/a2n-s-icons-git"
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/a2n-s-icons-git/dark/128x128"
 
 
 usage () {
@@ -52,7 +52,7 @@ help () {
   echo "     -n/--notify     enable notifications"
   echo ""
   echo "Environment variables:"
-  echo "     ICONS           the path the the icons (defaults to '/usr/share/icons/a2n-s-icons-git')"
+  echo "     ICONS           the path the the icons (defaults to '/usr/share/icons/a2n-s-icons-git/dark/128x128')"
   echo "     PICOM_EXTRA_FLAGS     extra flags to pass to \`picom\` (defaults to '--experimental-backends')"
 
   exit 0
@@ -79,19 +79,19 @@ main () {
       if pgrep -x "picom" > /dev/null
       then
         killall picom
-        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "picom killed" --icon="$ICONS/video-compositor-off.png"
+        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "picom killed" --icon="$ICONS/video/compositor-off.png"
       else
         picom  --daemon $PICOM_EXTRA_FLAGS
-        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "picom started" --icon="$ICONS/video-compositor-off.png"
+        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "picom started" --icon="$ICONS/video/compositor-off.png"
       fi;;
     blur )
       if grep "^#blur-method" ~/.config/picom/picom.conf > /dev/null
       then
         sed -i 's/^#\?blur-method/blur-method/' ~/.config/picom/picom.conf
-        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "blur ON" --icon="$ICONS/video-blur-on.png"
+        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "blur ON" --icon="$ICONS/video/blur/on.png"
       else
         sed -i 's/^#\?blur-method/#blur-method/' ~/.config/picom/picom.conf
-        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "blur OFF" --icon="$ICONS/video-blur-off.png"
+        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "blur OFF" --icon="$ICONS/video/blur/off.png"
       fi;;
     * ) echo "an error occured (got unexpected '$ACTION')" ;;
   esac

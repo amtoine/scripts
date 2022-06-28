@@ -23,7 +23,7 @@ eval set -- "$OPTIONS"
 # the environment variables
 [[ ! -v SCREENSHOT_PATH ]] && SCREENSHOT_PATH="$HOME/images/scrot"
 [[ ! -v FORMAT ]] && FORMAT='%Y-%m-%d_%H-%M-%S_$wx$h'
-[[ ! -v ICONS ]] && ICONS="/usr/share/icons/a2n-s-icons-git"
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/a2n-s-icons-git/dark/128x128"
 
 usage () {
   #
@@ -59,7 +59,7 @@ help () {
   echo "Environment variables:"
   echo "     SCREENSHOT_PATH       the place where to store screenshots (defaults to '~/images/scrot')"
   echo "     FORMAT                the format for the filenames (defaults to '%Y-%m-%d_%H-%M-%S_\$wx\$h')"
-  echo "     ICONS                 the path the the icons (defaults to '/usr/share/icons/a2n-s-icons-git')"
+  echo "     ICONS                 the path the the icons (defaults to '/usr/share/icons/a2n-s-icons-git/dark/128x128')"
   exit 0
 }
 
@@ -84,7 +84,7 @@ main () {
 		name=$(scrot -m "$FORMAT.png" -e "echo \$f; mv \$f $SCREENSHOT_PATH/$name");
 		;;
 	window)
-    [ -v NOTIFY ] && dunstify "a2n-s-scrot" "please select a window" --icon="$ICONS/camera.png";
+    [ -v NOTIFY ] && dunstify "a2n-s-scrot" "please select a window" --icon="$ICONS/misc/camera.png";
 		name=$(scrot -s "$FORMAT.png" -e "echo \$f; mv \$f $SCREENSHOT_PATH/$name");
 		;;
 	*) usage
@@ -92,7 +92,7 @@ main () {
 	esac;
 
   echo "name: $SCREENSHOT_PATH/$name"
-  [ -n "$name" ] && [ -v NOTIFY ] && dunstify "a2n-s-scrot" "$1 screenshot at\n$SCREENSHOT_PATH/$name" --icon="$ICONS/camera.png"
+  [ -n "$name" ] && [ -v NOTIFY ] && dunstify "a2n-s-scrot" "$1 screenshot at\n$SCREENSHOT_PATH/$name" --icon="$ICONS/misc/camera.png"
 }
 
 

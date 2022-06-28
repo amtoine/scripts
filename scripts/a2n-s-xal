@@ -20,7 +20,7 @@ if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
 # environment variables
-[[ ! -v ICONS ]] && ICONS="/usr/share/icons/a2n-s-icons-git"
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/a2n-s-icons-git/dark/128x128"
 
 
 usage () {
@@ -51,7 +51,7 @@ help () {
   echo "     -n/--notify             enable notifications"
   echo ""
   echo "Environment variables:"
-  echo "     ICONS                   the path the the icons (defaults to '/usr/share/icons/a2n-s-icons-git')"
+  echo "     ICONS                   the path the the icons (defaults to '/usr/share/icons/a2n-s-icons-git/dark/128x128')"
   exit 0
 }
 
@@ -72,8 +72,8 @@ main () {
   done
   [ -z "$ACTION" ] && usage
   case "$ACTION" in
-    disable ) xautolock -disable; [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-xal" "xautolock disabled" --icon="$ICONS/lock-unlocked.png" ;;
-    enable) xautolock -enable; [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-xal" "xautolock enabled" --icon="$ICONS/lock-locked.png" ;;
+    disable ) xautolock -disable; [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-xal" "xautolock disabled" --icon="$ICONS/lock/unlocked.png" ;;
+    enable) xautolock -enable; [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-xal" "xautolock enabled" --icon="$ICONS/lock/locked.png" ;;
     * ) echo "an error occured (got unexpected '$ACTION')" ;;
   esac
 }
