@@ -1,0 +1,161 @@
+#!/usr/bin/env python3
+
+import argparse
+import numpy as np
+from tqdm import trange
+
+Color = str
+
+
+def is_valid_color(color: Color) -> bool:
+    return color.startswith("#") and len(color) == 7
+
+
+def is_valid_rgb(red: int, green: int, blue: int) -> bool:
+    return (0 <= red <= 255) and (0 <= green <= 255) and (0 <= blue <= 255)
+
+
+def make_random_color() -> Color:
+    return int_to_color(
+        np.random.randint(0, 256), np.random.randint(0, 256), np.random.randint(0, 256)
+    )
+
+
+def int_to_color(red: int, green: int, blue: int) -> Color:
+    if not is_valid_rgb(red, green, blue):
+        raise ValueError(
+            "Channels should be between 0 and 255, "
+            f"got '{red}', '{green}' and '{blue}'."
+        )
+
+    color = hex((red << 16) + (green << 8) + (blue << 0)).replace("0x", "")
+    return f"#{color:>06}"
+
+
+def color_to_int(color: Color) -> (int, int, int):
+    if not is_valid_color(color):
+        raise ValueError(f"'color' is not valid, got '{color}'")
+    return (
+        int(f"0x{color[1:3]}", base=16),
+        int(f"0x{color[3:5]}", base=16),
+        int(f"0x{color[5:7]}", base=16),
+    )
+
+
+def compute_color_gradient(
+    c1: Color,
+    c2: Color,
+    *,
+    nb_colors: int = 2,
+    reverse: bool = False,
+    verbose: bool = False,
+):
+    if nb_colors < 2:
+        raise ValueError(f"'nb_colors' should be at least 2, got '{nb_colors}'.")
+    r1, g1, b1 = color_to_int(c1)
+    r2, g2, b2 = color_to_int(c2)
+    if verbose:
+        print(f"{c1} -> ({r1}, {g1}, {b1})")
+        print(f"{c2} -> ({r2}, {g2}, {b2})")
+    red_gradient = np.linspace(r1, r2, nb_colors).astype(int)
+    green_gradient = np.linspace(g1, g2, nb_colors).astype(int)
+    blue_gradient = np.linspace(b1, b2, nb_colors).astype(int)
+    if verbose:
+        print(f"red: {red_gradient}")
+        print(f"green: {green_gradient}")
+        print(f"blue: {blue_gradient}")
+    ziped_gradients = list(zip(red_gradient, green_gradient, blue_gradient))
+    if reverse:
+        ziped_gradients = reversed(ziped_gradients)
+    return [int_to_color(r, g, b) for (r, g, b) in ziped_gradients]
+
+
+def test():
+    for r in trange(256, desc="Testing the color conversions"):
+        for g in range(256):
+            for b in range(256):
+                assert (r, g, b) == color_to_int(int_to_color(r, g, b))
+    print("Tests are successful!!")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-1",
+        "--color_1",
+        type=str,
+        default="#ff0000",
+        help=(
+            "the first color of the gradient of the form '#rrggbb' "
+            "(defaults to red, i.e '#ff0000')."
+        ),
+    )
+    parser.add_argument(
+        "-2",
+        "--color_2",
+        type=str,
+        default="#00ff00",
+        help=(
+            "the first color of the gradient of the form '#rrggbb' "
+            "(defaults to green, i.e '#00ff00')."
+        ),
+    )
+    parser.add_argument(
+        "-n",
+        "--nb_colors",
+        type=int,
+        default=8,
+        help=(
+            "the total number of colors in the gradient, including the two "
+            "end colors (defaults to '8')."
+        ),
+    )
+    parser.add_argument(
+        "-r",
+        "--reverse",
+        action="store_true",
+        help="print the gradient in reverse (defaults to 'False').",
+    )
+    parser.add_argument(
+        "-R",
+        "--random_colors",
+        action="store_true",
+        help=(
+            "use random colors for the two ends of the gradient "
+            "(defaults to 'False'). Overwrites -1 and -2."
+        ),
+    )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="be more verbose (defaults to 'False').",
+    )
+    parser.add_argument(
+        "-t",
+        "--test",
+        action="store_true",
+        help="run the tests (defaults to 'False').",
+    )
+
+    args = parser.parse_args()
+
+    if args.test:
+        test()
+    else:
+        if args.random_colors:
+            color_1 = make_random_color()
+            color_2 = make_random_color()
+        else:
+            color_1 = args.color_1
+            color_2 = args.color_2
+
+        color_gradient = compute_color_gradient(
+            color_1,
+            color_2,
+            nb_colors=args.nb_colors,
+            reverse=args.reverse,
+            verbose=args.verbose,
+        )
+
+        print(" ".join(color_gradient))
