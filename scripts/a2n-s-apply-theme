@@ -1,0 +1,159 @@
+#!/usr/bin/env bash
+
+OPTIONS=$(getopt -o h --long help -n 'a2n-s-apply-theme' -- "$@")
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+eval set -- "$OPTIONS"
+
+# some constants.
+BEGIN_MARKER="#+ BEGIN:color-theme"
+END_MARKER="#+ END:color-theme"
+MISSING_MARKER_ERROR_CODE=1
+MISPLACED_MARKERS_ERROR_CODE=2
+MISSING_FIELD_ERROR_CODE=3
+BAD_ARGUMENTS_ERROR_CODE=4
+ARRAY_SIZE_MISMATCH=5
+
+
+terminate () {
+    echo "Terminating...";
+    exit "$1"
+}
+
+
+apply_theme() {
+    theme_file="$1"
+    colors=($(echo "$2" | tr ',' ' '))
+
+    [ ! -f "$theme_file" ] && {
+        echo "$0: '$theme_file': No such file or directory";
+        terminate "$BAD_ARGUMENTS_ERROR_CODE";
+    }
+
+    # assert color-theme markers exist.
+    begin_markers=($(grep "^$BEGIN_MARKER$" "$theme_file" -n | awk -F: '{print $1}'))
+    end_markers=($(grep "^$END_MARKER$" "$theme_file" -n | awk -F: '{print $1}'))
+    [ "${#begin_markers[@]}" -ne 1 ] && {
+        echo "There should be exactly 1 '$BEGIN_MARKER' marker in '$theme_file'."
+        echo "Got ${#begin_markers[@]} markers on lines ${begin_markers[*]}.";
+        terminate "$MISSING_MARKER_ERROR_CODE";
+    }
+    [ "${#end_markers[@]}" -ne 1 ] && {
+        echo "There should be exactly 1 '$END_MARKER' marker in '$theme_file'."
+        echo "Got ${#end_markers[@]} markers on lines ${end_markers[*]}.";
+        terminate "$MISSING_MARKER_ERROR_CODE";
+    }
+
+    # assert color-theme markers are placed correctly.
+    line_begin_marker=${begin_markers[0]}
+    line_end_marker=${end_markers[0]}
+    [ "$line_begin_marker" -gt "$line_end_marker" ] && {
+        echo "The '$END_MARKER' marker should come after '$BEGIN_MARKER'.";
+        echo "'$END_MARKER' found on line $line_end_marker";
+        echo "'$BEGIN_MARKER' found on line $line_begin_marker";
+        terminate "$MISPLACED_MARKERS_ERROR_CODE";
+    }
+
+    # extract meta data from the color-theme marker
+    marker=$(sed -n "/^$BEGIN_MARKER$/,/^$END_MARKER$/p" "$theme_file")
+
+    format=$(echo "$marker" | grep "^#+ format:.*" | cut -d: -f2-)
+    [ -z "$format" ] && {
+        echo "No format found between lines $line_begin_marker and $line_end_marker of $theme_file...";
+        echo "Please make sur the '#+ format' field is correct.";
+        terminate "$MISSING_FIELD_ERROR_CODE";
+    }
+    [ -z "$(echo "$format" | grep "{name}" )" ] && {
+        echo "missing 'name' key in format '$format' between lines $line_begin_marker and $line_end_marker of $theme_file...";
+        terminate "$MISSING_FIELD_ERROR_CODE";
+    }
+    [ -z "$(echo "$format" | grep "{color}" )" ] && {
+        echo "missing 'color' key in format '$format' between lines $line_begin_marker and $line_end_marker of $theme_file...";
+        terminate "$MISSING_FIELD_ERROR_CODE";
+    }
+
+    names=($(echo "$marker" | grep "^#+ names:.*" | awk -F: '{print $2}' | tr ',' ' '))
+    [ "${#names[@]}" -eq 0 ] && {
+        echo "No names found between lines $line_begin_marker and $line_end_marker of $theme_file...";
+        echo "Please make sur the '#+ names' field is correct.";
+        terminate "$MISSING_FIELD_ERROR_CODE";
+    }
+
+    [ "${#colors[@]}" -ne "${#names[@]}" ] && {
+        echo "Not the same number of colors and names...";
+        echo "Computed ${#colors[@]} colors: ${colors[*]}";
+        echo "Found ${#names[@]} names in $theme_file: ${names[*]}.";
+        terminate "$ARRAY_SIZE_MISMATCH";
+    }
+
+    # remove the colors inbetween the markers.
+    file_no_colors=$(sed -e "/^$BEGIN_MARKER$/,/^$END_MARKER$/{//!d}" "$theme_file")
+    # add the colors.
+    for ((i=(("${#colors[@]}"-1)); i>=0; i--)) ;
+    do
+        line=$(echo "$format" | sed -e "s/{name}/${names[$i]}/g" -e "s/{color}/${colors[$i]}/g")
+        file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER/a $line")
+    done
+    # add the fields back.
+    file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER/a #+ names:$(echo "${names[*]}" | tr ' ' ',')")
+    file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER/a #+ format:$format")
+    echo "$file_no_colors" > "$theme_file"
+}
+
+
+usage () {
+  #
+  # the usage function.
+  #
+  echo "Usage: a2n-s-apply-theme [-h] CONFIG_FILE COLOR_PALETTE"
+  echo "Type -h or --help for the full help."
+}
+
+
+help () {
+  #
+  # the help function.
+  #
+  echo "a2n-s-apply-theme:"
+  echo "     This script allows the user to easily apply a theme to a config file."
+  echo "     Do not forget to put it in your PATH."
+  echo ""
+  echo "Usage:"
+  echo "     a2n-s-apply-theme [-h] CONFIG_FILE COLOR_PALETTE"
+  echo ""
+  echo "          - CONFIG_FILE is the path to the config file to edit"
+  echo "          - COLOR_PALETTE is the list of colors to apply to the config file"
+  echo ""
+  echo "Switches:"
+  echo "     -h/--help               shows this help."
+  exit 0
+}
+
+
+main () {
+  #
+  # TODO.
+  #
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h | --help ) help ;;
+      -- ) shift; break ;;
+      * ) break ;;
+    esac
+  done
+
+  [ -z "$1" ] && {
+      echo "no file to edit given as first positional argument...";
+      usage;
+      exit "$BAD_ARGUMENTS_ERROR_CODE";
+  }
+  [ -z "$2" ] && {
+      echo "no colors to apply given as second positional argument...";
+      usage;
+      exit "$BAD_ARGUMENTS_ERROR_CODE";
+  }
+
+  apply_theme "$1" "$2"
+}
+
+
+main "$@"
