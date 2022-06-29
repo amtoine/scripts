@@ -7,6 +7,8 @@ eval set -- "$OPTIONS"
 # some constants.
 BEGIN_MARKER="#+ BEGIN:color-theme"
 END_MARKER="#+ END:color-theme"
+FORMAT_MARKER="#+ format"
+NAMES_MARKER="#+ names"
 MISSING_MARKER_ERROR_CODE=1
 MISPLACED_MARKERS_ERROR_CODE=2
 MISSING_FIELD_ERROR_CODE=3
@@ -56,10 +58,10 @@ apply_theme() {
     # extract meta data from the color-theme marker
     marker=$(sed -n "/^$BEGIN_MARKER$/,/^$END_MARKER$/p" "$theme_file")
 
-    format=$(echo "$marker" | grep "^#+ format:.*" | cut -d: -f2-)
+    format=$(echo "$marker" | grep "^$FORMAT_MARKER:.*" | cut -d: -f2-)
     [ -z "$format" ] && {
         echo "No format found between lines $line_begin_marker and $line_end_marker of $theme_file...";
-        echo "Please make sur the '#+ format' field is correct.";
+        echo "Please make sur the '$FORMAT_MARKER' field is correct.";
         terminate "$MISSING_FIELD_ERROR_CODE";
     }
     [ -z "$(echo "$format" | grep "{name}" )" ] && {
@@ -71,10 +73,10 @@ apply_theme() {
         terminate "$MISSING_FIELD_ERROR_CODE";
     }
 
-    names=($(echo "$marker" | grep "^#+ names:.*" | awk -F: '{print $2}' | tr ',' ' '))
+    names=($(echo "$marker" | grep "^$NAMES_MARKER:.*" | awk -F: '{print $2}' | tr ',' ' '))
     [ "${#names[@]}" -eq 0 ] && {
         echo "No names found between lines $line_begin_marker and $line_end_marker of $theme_file...";
-        echo "Please make sur the '#+ names' field is correct.";
+        echo "Please make sur the '$NAMES_MARKER' field is correct.";
         terminate "$MISSING_FIELD_ERROR_CODE";
     }
 
@@ -94,8 +96,8 @@ apply_theme() {
         file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER/a $line")
     done
     # add the fields back.
-    file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER/a #+ names:$(echo "${names[*]}" | tr ' ' ',')")
-    file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER/a #+ format:$format")
+    file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER/a $NAMES_MARKER:$(echo "${names[*]}" | tr ' ' ',')")
+    file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER/a $FORMAT_MARKER:$format")
     echo "$file_no_colors" > "$theme_file"
 }
 
