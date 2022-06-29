@@ -117,12 +117,21 @@ if __name__ == "__main__":
         help="print the gradient in reverse (defaults to 'False').",
     )
     parser.add_argument(
-        "-R",
-        "--random_colors",
+        "-G",
+        "--random_gradient",
         action="store_true",
         help=(
             "use random colors for the two ends of the gradient "
             "(defaults to 'False'). Overwrites -1 and -2."
+        ),
+    )
+    parser.add_argument(
+        "-R",
+        "--random_colors",
+        action="store_true",
+        help=(
+            "use random colors for the whole gradient "
+            "(defaults to 'False'). Overwrites -G, -1 and -2."
         ),
     )
     parser.add_argument(
@@ -144,18 +153,21 @@ if __name__ == "__main__":
         test()
     else:
         if args.random_colors:
-            color_1 = make_random_color()
-            color_2 = make_random_color()
+            color_gradient = [make_random_color() for _ in range(args.nb_colors)]
         else:
-            color_1 = args.color_1
-            color_2 = args.color_2
+            if args.random_gradient:
+                color_1 = make_random_color()
+                color_2 = make_random_color()
+            else:
+                color_1 = args.color_1
+                color_2 = args.color_2
 
-        color_gradient = compute_color_gradient(
-            color_1,
-            color_2,
-            nb_colors=args.nb_colors,
-            reverse=args.reverse,
-            verbose=args.verbose,
-        )
+            color_gradient = compute_color_gradient(
+                color_1,
+                color_2,
+                nb_colors=args.nb_colors,
+                reverse=args.reverse,
+                verbose=args.verbose,
+            )
 
         print(" ".join(color_gradient))
