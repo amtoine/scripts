@@ -99,6 +99,7 @@ strip () {
     [ -f "$colorpreview" ] && rm "$colorpreview"
     echo "${_columns[@]}" | tr ' ' ',' | tee "$colordatabase" -a > /dev/null
     themes=($(ls "$CACHE/themes" | sed 's/\.conf$//g'))
+    failed_themes=()
     for (( i = 0; i < "${#themes[@]}"; i++ ));
     do
       theme="${themes[$i]}"
@@ -117,27 +118,26 @@ strip () {
         _gencols.fish "$(echo "$theme,$colors")" | tee "$colorpreview" -a > /dev/null
         echo -e "${Ok}ok${Off}"
       else
+        failed_themes+=("$theme")
         # explain a bit the error to the user.
         echo -e "${Err}not ok${Off} (${Wrn}expected $_nb_colors colors but got $nb_lines${Off})"
-        if ! echo "$colors" | grep -e "bg" -q;
-        then
-          echo -e "${Wrn}  missing bg${Off}"
-        fi
-        if ! echo "$colors" | grep -e "fg" -q;
-        then
-          echo -e "${Wrn}  missing fg${Off}"
-        fi
-        if ! echo "$colors" | grep -e "sel_bg" -q;
-        then
-          echo -e "${Wrn}  missing sel_bg${Off}"
-        fi
-        if ! echo "$colors" | grep -e "sel_fg" -q;
-        then
-          echo -e "${Wrn}  missing sel_fg${Off}"
-        fi
+        for ((j = 1; j < "${#_columns[@]}"; j++));
+        do
+          if ! echo "$colors" | grep -e "${_columns[$j]}" -q;
+          then
+            echo -e "${Wrn}  missing color ${_columns[$j]}${Off}"
+          fi
+        done
       fi
     done
-    echo "${Dst}Done${Off}"
+    echo "${Dst}################${Off}"
+    echo "${Dst}##### Done #####${Off}"
+    echo "${Dst}################${Off}"
+    echo "List of themes whose parsing failed:"
+    for failed_theme in "${failed_themes[@]}";
+    do
+      echo -e "\t${Err}$failed_theme${Off}"
+    done
   else
     echo -e "No cache to clean at ${Pmt}$CACHE${Off}."
     echo -e "Consider using ${Tip}a2n-s-themes -u${Off} to update the cache.";
@@ -320,7 +320,7 @@ dmenu_cfg () {
   # change the name of the theme.
   sed -i "s/\(^\/\/ THEME: \).*/\1$2/" "$SUCKLESS/dmenu/config.h"
   cd "$SUCKLESS/dmenu" > /dev/null || exit 1
-  sudo make clean install
+  SUDO_ASKPASS=$(which zenity_pass) sudo make clean install
   cd - > /dev/null || exit 1
 }
 
@@ -341,7 +341,7 @@ st_cfg () {
   # change the name of the theme.
   sed -i "s/\(^\/\/ THEME: \).*/\1$2/" "$SUCKLESS/st/config.h"
   cd "$SUCKLESS/st" > /dev/null || exit 1
-  sudo make clean install
+  SUDO_ASKPASS=$(which zenity_pass) sudo make clean install
   cd - > /dev/null || exit 1
   [ "$(echo -e "No\nYes" | dmenu -c -l 2 -bw 5 -i -p "Kill all instances of st to apply changes: ")" = "Yes" ] && killall st
 }
@@ -377,8 +377,8 @@ grub_cfg () {
   [ ! "$choices" ] && { echo -e "${Wrn}No theme selected for grub${Off}"; return; }
   choice="${choices[0]}"
   [ ! -f "$GRUB/$choice/theme.txt" ] && { echo -e "${Wrn}No theme.txt found in $GRUB/$choice${Off}"; return; }
-  sudo sed -i "s|^GRUB_THEME=\"$GRUB/.*/theme.txt\"|GRUB_THEME=\"$GRUB/$choice/theme.txt\"|" /etc/default/grub
-  sudo grub-mkconfig -o /boot/grub/grub.cfg
+  SUDO_ASKPASS=$(which zenity_pass) sudo sed -i "s|^GRUB_THEME=\"$GRUB/.*/theme.txt\"|GRUB_THEME=\"$GRUB/$choice/theme.txt\"|" /etc/default/grub
+  SUDO_ASKPASS=$(which zenity_pass) sudo grub-mkconfig -o /boot/grub/grub.cfg
 
   [ "$(echo -e "No\nYes" | dmenu -c -l 2 -bw 5 -i -p "Reboot: ")" = "Yes" ] && reboot
 }
@@ -391,8 +391,8 @@ sddm_cfg () {
   echo -e "Changing ${Dst}sddm${Off}' theme${Off}"
   choice=($(ls "$SDDM" | dmenu -c -l 8 -bw 5 -p "Pick a theme from $SDDM: "))
   [ ! "$choice" ] && { echo -e "${Wrn}No theme selected for sddm${Off}"; exit 0; }
-  sudo sed -i "s/^Current=.*/Current=${choice[0]}/" /etc/sddm.conf
-  [ "$(echo -e "No\nYes" | dmenu -c -l 2 -bw 5 -i -p "Restart sddm: ")" = "Yes" ] && sudo systemctl restart sddm.service
+  SUDO_ASKPASS=$(which zenity_pass) sudo sed -i "s/^Current=.*/Current=${choice[0]}/" /etc/sddm.conf
+  [ "$(echo -e "No\nYes" | dmenu -c -l 2 -bw 5 -i -p "Restart sddm: ")" = "Yes" ] && SUDO_ASKPASS=$(which zenity_pass) sudo systemctl restart sddm.service
 }
 
 
