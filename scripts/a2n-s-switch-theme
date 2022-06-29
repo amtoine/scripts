@@ -1,0 +1,158 @@
+#!/usr/bin/env bash
+#           ___                 personal page: https://a2n-s.github.io/
+#      __ _|_  )_ _ ___ ___     github   page: https://github.com/a2n-s
+#     / _` |/ /| ' \___(_-<     my   dotfiles: https://github.com/a2n-s/dotfiles
+#     \__,_/___|_||_|  /__/
+#           ___                          _ _      _       _   _
+#      __ _|_  )_ _ ___ ______ ____ __ _(_) |_ __| |_ ___| |_| |_  ___ _ __  ___
+#     / _` |/ /| ' \___(_-<___(_-< V  V / |  _/ _| ' \___|  _| ' \/ -_) '  \/ -_)
+#     \__,_/___|_||_|  /__/   /__/\_/\_/|_|\__\__|_||_|   \__|_||_\___|_|_|_\___|
+#
+# Description:  TODO.
+# Dependencies: TODO.
+# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
+# Contributors: Stevan Antoine
+
+
+# environment variables
+[ -z "$DUNST_ID" ] && DUNST_ID=7
+
+CACHE="$HOME/.cache";
+
+REMOTE_DATABASE="https://github.com/kovidgoyal/kitty-themes.git";
+LOCAL_DATABASE="$CACHE/a2n-s-switch-theme/themes";
+
+RED="$(tput setaf 1)"
+GRN="$(tput setaf 2)"
+YLW="$(tput setaf 3)"
+BLU="$(tput setaf 4)"
+MGT="$(tput setaf 5)"
+CYN="$(tput setaf 6)"
+OFF="$(tput sgr0)"
+
+SEP="---"
+
+
+log_err () {
+    echo "${RED}[ERROR]${OFF} $1" > /dev/stderr;
+}
+
+
+log_warning () {
+    echo "${YLW}[WARNING]${OFF} $1" > /dev/stderr;
+}
+
+
+log_debug () {
+    echo "${MGT}[DEBUG]${OFF} $1" > /dev/stderr;
+}
+
+
+log_info () {
+    echo "${CYN}[INFO]${OFF} $1" > /dev/stderr;
+}
+
+
+log_ok () {
+    echo "${GRN}[OK]${OFF} $1" > /dev/stderr;
+}
+
+
+sync_themes () {
+    did_things="false"
+    [ ! -d "$LOCAL_DATABASE" ] && {
+        log_warning "No local database found..."
+        log_warning "$LOCAL_DATABASE: No such file or directory."
+        log_info "Cloning the remote database..."
+        git clone "$REMOTE_DATABASE" "$LOCAL_DATABASE"
+        did_things="clone"
+    }
+    [ ! -d "$LOCAL_DATABASE/database" ] && {
+        log_warning "$LOCAL_DATABASE/database: No such file or directory."
+        log_info "Creating the local database..."
+        mkdir -p "$LOCAL_DATABASE/database"
+        did_things="mkdir"
+    }
+    if [ "$did_things" == "false" ];
+    then
+        log_info "Updating the local database..."
+        git -C "$LOCAL_DATABASE" pull origin
+    fi
+    log_ok "Database successfully synched with remote."
+}
+
+
+parse_themes () {
+    nb_themes="${#themes[@]}";
+    for ((i=0; i<"$nb_themes"; i++));
+    do
+        theme="${themes[$i]}";
+        echo -n "${MGT}[$i / $nb_themes]${OFF} ${CYN}$theme${OFF}... ";
+        if [ ! -f "$LOCAL_DATABASE/database/$theme.db" ] || [ "$1" == "force" ];
+        then
+            grep -v "^\s*#.*$" "$LOCAL_DATABASE/themes/$theme.conf" | grep -v "^\s*$" | sed 's/^\s*\(.*\)\s*$/\1/g; s/\s\+/:/g' | tee "$LOCAL_DATABASE/database/$theme.db" > /dev/null;
+            echo "${GRN}ok${OFF}";
+        else
+            echo "${YLW}skip${OFF} (already parsed)";
+        fi
+    done
+}
+
+
+menu_once () {
+    options=$1
+    choices=$( echo -e "$options" | dmenu -c -l 10 -bw 5 -i -p "Choose a theme: " | sort -u)
+    [ -z "$choices" ] && { echo "back"; exit 0; }
+    [ "$(echo "$choices" | wc -l)" -ne 1 ] && { echo "none"; exit 0; }
+    choice="$choices"
+    case "$choice" in
+        "$SEP") echo "none" ;;
+        *) echo "$choice";;
+    esac
+}
+
+menu () {
+    options=$1
+    loop="true"
+    while [ "$loop" == "true" ];
+    do
+        choice=$(menu_once "$options")
+        if [ "$choice" != "none" ];
+        then
+           loop="false"
+        fi
+    done
+    echo "$choice"
+}
+
+
+main () {
+    options="sync\nparse\nparse (force)\n$SEP\nexit"
+
+    loop="true"
+    while [ "$loop" == "true" ];
+    do
+        choice=$(menu "$options")
+        case "$choice" in
+            "sync")
+                dunstify "a2n-s-switch-theme" "Syncing the database";
+                sync_themes ;;
+            "parse")
+                dunstify "a2n-s-switch-theme" "Parsing the themes"
+                themes=($(find "$LOCAL_DATABASE/themes" -type f -name "*.conf" | sort | xargs -I {} basename {} | sed 's/\.conf$//g'));
+                parse_themes ""
+                ;;
+            "parse (force)")
+                dunstify "a2n-s-switch-theme" "Parsing the themes"
+                themes=($(find "$LOCAL_DATABASE/themes" -type f -name "*.conf" | sort | xargs -I {} basename {} | sed 's/\.conf$//g'));
+                parse_themes "force"
+                ;;
+            "exit"|"back") exit 0 ;;
+            *) log_err "'$choice' is an unknown choice...";;
+        esac
+    done
+}
+
+
+main "$@"
+exit 0
