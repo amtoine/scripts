@@ -4,11 +4,14 @@ OPTIONS=$(getopt -o h --long help -n 'a2n-s-apply-theme' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
+# environment variables.
+[ -z "$COMMENT_SYMBOL" ] && COMMENT_SYMBOL="#"
+
 # some constants.
-BEGIN_MARKER="#+ BEGIN:color-theme"
-END_MARKER="#+ END:color-theme"
-FORMAT_MARKER="#+ format"
-NAMES_MARKER="#+ names"
+BEGIN_MARKER="$COMMENT_SYMBOL+ BEGIN:color-theme"
+END_MARKER="$COMMENT_SYMBOL+ END:color-theme"
+FORMAT_MARKER="$COMMENT_SYMBOL+ format"
+NAMES_MARKER="$COMMENT_SYMBOL+ names"
 MISSING_MARKER_ERROR_CODE=1
 MISPLACED_MARKERS_ERROR_CODE=2
 MISSING_FIELD_ERROR_CODE=3
@@ -127,6 +130,9 @@ help () {
   echo ""
   echo "Switches:"
   echo "     -h/--help               shows this help."
+  echo ""
+  echo "Environment variables:"
+  echo "     COMMENT_SYMBOL          the symbol used to begin comment in the config file (defaults to '#', e.g. for \`bash\` or \`python\`)"
   exit 0
 }
 
