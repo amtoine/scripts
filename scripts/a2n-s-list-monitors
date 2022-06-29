@@ -17,6 +17,7 @@
 import gi
 gi.require_version("Gdk", "3.0")
 from gi.repository import Gdk
+import argparse
 
 
 def fetch_monitors():
@@ -38,4 +39,7 @@ def fetch_monitors():
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+
+    args = parser.parse_args()
     fetch_monitors()
