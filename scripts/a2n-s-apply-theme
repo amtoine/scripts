@@ -8,8 +8,8 @@ eval set -- "$OPTIONS"
 [ -z "$COMMENT_SYMBOL" ] && COMMENT_SYMBOL="#"
 
 # some constants.
-BEGIN_MARKER="$COMMENT_SYMBOL+ BEGIN:color-theme"
-END_MARKER="$COMMENT_SYMBOL+ END:color-theme"
+BEGIN_MARKER="$COMMENT_SYMBOL+ BEGIN"
+END_MARKER="$COMMENT_SYMBOL+ END"
 FORMAT_MARKER="$COMMENT_SYMBOL+ format"
 NAMES_MARKER="$COMMENT_SYMBOL+ names"
 TEMP_MARKER="%%%"  # a temporary marker to ensure blank characters are taken into account.
@@ -23,7 +23,7 @@ ARRAY_SIZE_MISMATCH_ERROR_CODE=5
 
 terminate () {
     echo "Terminating..." > /dev/stderr;
-    exit "$1"
+    exit "$1";
 }
 
 
@@ -37,19 +37,17 @@ assert_file_exist () {
 
 check_markers () {
     local theme_file=$1
+    local name=$2
     # assert color-theme markers exist.
-    local begin_markers=($(grep "^$BEGIN_MARKER$" "$theme_file" -n | awk -F: '{print $1}'))
-    local end_markers=($(grep "^$END_MARKER$" "$theme_file" -n | awk -F: '{print $1}'))
-    # grep "^$BEGIN_MARKER$" "$theme_file" -n
-    # echo "begin_markers: ${begin_markers[@]}"
-    # echo "end_markers: ${end_markers[@]}"
+    local begin_markers=($(grep "^$BEGIN_MARKER:$name$" "$theme_file" -n | awk -F: '{print $1}'))
+    local end_markers=($(grep "^$END_MARKER:$name$" "$theme_file" -n | awk -F: '{print $1}'))
     [ "${#begin_markers[@]}" -ne 1 ] && {
-        echo "There should be exactly 1 '$BEGIN_MARKER' marker in '$theme_file'." > /dev/stderr;
+        echo "There should be exactly 1 '$BEGIN_MARKER:$name' marker in '$theme_file'." > /dev/stderr;
         echo "Got ${#begin_markers[@]} markers on lines ${begin_markers[*]}." > /dev/stderr;
         terminate "$MISSING_MARKER_ERROR_CODE";
     }
     [ "${#end_markers[@]}" -ne 1 ] && {
-        echo "There should be exactly 1 '$END_MARKER' marker in '$theme_file'." > /dev/stderr;
+        echo "There should be exactly 1 '$END_MARKER:$name' marker in '$theme_file'." > /dev/stderr;
         echo "Got ${#end_markers[@]} markers on lines ${end_markers[*]}." > /dev/stderr;
         terminate "$MISSING_MARKER_ERROR_CODE";
     }
@@ -58,9 +56,9 @@ check_markers () {
     local line_begin_marker=${begin_markers[0]}
     local line_end_marker=${end_markers[0]}
     [ "$line_begin_marker" -gt "$line_end_marker" ] && {
-        echo "The '$END_MARKER' marker should come after '$BEGIN_MARKER'." > /dev/stderr;
-        echo "'$END_MARKER' found on line $line_end_marker" > /dev/stderr;
-        echo "'$BEGIN_MARKER' found on line $line_begin_marker" > /dev/stderr;
+        echo "The '$END_MARKER:$name' marker should come after '$BEGIN_MARKER:$name'." > /dev/stderr;
+        echo "'$END_MARKER:$name' found on line $line_end_marker" > /dev/stderr;
+        echo "'$BEGIN_MARKER:$name' found on line $line_begin_marker" > /dev/stderr;
         terminate "$MISPLACED_MARKERS_ERROR_CODE";
     }
 
@@ -70,7 +68,7 @@ check_markers () {
 
 # extract meta data from the color-theme marker
 get_marker_zone () {
-  sed -n "/^$BEGIN_MARKER$/,/^$END_MARKER$/p" "$1"
+  sed -n "/^$BEGIN_MARKER:$2$/,/^$END_MARKER:$2$/p" "$1"
 }
 
 
@@ -123,33 +121,46 @@ assert_name_and_color_sizes () {
 
 apply_theme() {
     theme_file="$1"
-    local colors=($(echo "$2" | tr ',' ' '))
+    shift 1
 
     assert_file_exist "$theme_file"
 
-    res=$(check_markers "$theme_file")
-    line_begin_marker=$(echo "$res" | cut -d' ' -f1)
-    line_end_marker=$(echo "$res" | cut -d' ' -f2)
-
-    marker_zone=$(get_marker_zone "$theme_file")
-
-    format=$(get_format_from_marker_zone "$marker_zone" "$line_begin_marker" "$line_end_marker" "$theme_file")
-    names=($(get_names_from_marker_zone "$marker_zone" "$line_begin_marker" "$line_end_marker" "$theme_file"))
-
-    assert_name_and_color_sizes "${#colors[@]}" "${#names[@]}" "$theme_file"
-
-    # remove the colors inbetween the markers.
-    file_no_colors=$(sed -e "/^$BEGIN_MARKER$/,/^$END_MARKER$/{//!d}" "$theme_file")
-    # add the colors.
-    for ((i=(("${#colors[@]}"-1)); i>=0; i--)) ;
+    declare -A palettes
+    for arg in "$@";
     do
-        line=$(echo "$format" | sed -e "s/{name}/${names[$i]}/g" -e "s/{color}/${colors[$i]}/g")
-        file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER/a $TEMP_MARKER$line" | sed "s/^$TEMP_MARKER//")
+      name=$(echo "$arg" | cut -d= -f1)
+      value=$(echo "$arg" | cut -d= -f2)
+      palettes["$name"]="$value"
     done
-    # add the fields back.
-    file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER/a $NAMES_MARKER:$(echo "${names[*]}" | tr ' ' ',')")
-    file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER/a $FORMAT_MARKER:$format")
-    echo "$file_no_colors" > "$theme_file"
+
+    for name in "${!palettes[@]}";
+    do
+        palette=(${palettes[$name]})
+
+        res=$(check_markers "$theme_file" "$name")
+        line_begin_marker=$(echo "$res" | cut -d' ' -f1)
+        line_end_marker=$(echo "$res" | cut -d' ' -f2)
+
+        marker_zone=$(get_marker_zone "$theme_file" "$name")
+
+        format=$(get_format_from_marker_zone "$marker_zone" "$line_begin_marker" "$line_end_marker" "$theme_file")
+        names=($(get_names_from_marker_zone "$marker_zone" "$line_begin_marker" "$line_end_marker" "$theme_file"))
+
+        assert_name_and_color_sizes "${#palette[@]}" "${#names[@]}" "$theme_file"
+
+        # remove the colors inbetween the markers.
+        file_no_colors=$(sed -e "/^$BEGIN_MARKER:$name$/,/^$END_MARKER:$name$/{//!d}" "$theme_file")
+        # add the colors.
+        for ((i=(("${#palette[@]}"-1)); i>=0; i--)) ;
+        do
+            line=$(echo "$format" | sed -e "s/{name}/${names[$i]}/g" -e "s/{color}/${palette[$i]}/g")
+            file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER:$name/a $TEMP_MARKER$line" | sed "s/^$TEMP_MARKER//")
+        done
+        # add the fields back.
+        file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER:$name/a $NAMES_MARKER:$(echo "${names[*]}" | tr ' ' ',')")
+        file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER:$name/a $FORMAT_MARKER:$format")
+        echo "$file_no_colors" > "$theme_file"
+    done
 }
 
 
