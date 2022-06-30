@@ -121,6 +121,49 @@ assert_name_and_color_sizes () {
         echo "Found $2 names in $3". > /dev/stderr;
         terminate "$ARRAY_SIZE_MISMATCH_ERROR_CODE";
     }
+    return 0
+}
+
+
+apply_palette_to_hunk () {
+    theme_file=$1
+    name=$2
+    shift 2
+    palette=($@)
+
+    res=$(check_markers "$theme_file" "$name")
+    code=$?
+    [ $code -ne 0 ] && return "$code"
+    line_begin_marker=$(echo "$res" | cut -d' ' -f1)
+    line_end_marker=$(echo "$res" | cut -d' ' -f2)
+
+    marker_zone=$(get_marker_zone "$theme_file" "$name")
+    code=$?
+    [ $code -ne 0 ] && return "$code"
+
+    format=$(get_format_from_marker_zone "$marker_zone" "$line_begin_marker" "$line_end_marker" "$theme_file")
+    code=$?
+    [ $code -ne 0 ] && return "$code"
+    names=($(get_names_from_marker_zone "$marker_zone" "$line_begin_marker" "$line_end_marker" "$theme_file"))
+    code=$?
+    [ $code -ne 0 ] && return "$code"
+
+    assert_name_and_color_sizes "${#palette[@]}" "${#names[@]}" "$theme_file"
+    code=$?
+    [ $code -ne 0 ] && return "$code"
+
+    # remove the colors inbetween the markers.
+    file_no_colors=$(sed -e "/^$BEGIN_MARKER:$name$/,/^$END_MARKER:$name$/{//!d}" "$theme_file")
+    # add the colors.
+    for ((i=(("${#palette[@]}"-1)); i>=0; i--)) ;
+    do
+        line=$(echo "$format" | sed -e "s/{name}/${names[$i]}/g" -e "s/{color}/${palette[$i]}/g")
+        file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER:$name/a $TEMP_MARKER$line" | sed "s/^$TEMP_MARKER//")
+    done
+    # add the fields back.
+    file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER:$name/a $NAMES_MARKER:$(echo "${names[*]}" | tr ' ' ',')")
+    file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER:$name/a $FORMAT_MARKER:$format")
+    echo "$file_no_colors" > "$theme_file"
 }
 
 
@@ -140,31 +183,7 @@ apply_theme() {
 
     for name in "${!palettes[@]}";
     do
-        palette=(${palettes[$name]})
-
-        res=$(check_markers "$theme_file" "$name")
-        line_begin_marker=$(echo "$res" | cut -d' ' -f1)
-        line_end_marker=$(echo "$res" | cut -d' ' -f2)
-
-        marker_zone=$(get_marker_zone "$theme_file" "$name")
-
-        format=$(get_format_from_marker_zone "$marker_zone" "$line_begin_marker" "$line_end_marker" "$theme_file")
-        names=($(get_names_from_marker_zone "$marker_zone" "$line_begin_marker" "$line_end_marker" "$theme_file"))
-
-        assert_name_and_color_sizes "${#palette[@]}" "${#names[@]}" "$theme_file"
-
-        # remove the colors inbetween the markers.
-        file_no_colors=$(sed -e "/^$BEGIN_MARKER:$name$/,/^$END_MARKER:$name$/{//!d}" "$theme_file")
-        # add the colors.
-        for ((i=(("${#palette[@]}"-1)); i>=0; i--)) ;
-        do
-            line=$(echo "$format" | sed -e "s/{name}/${names[$i]}/g" -e "s/{color}/${palette[$i]}/g")
-            file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER:$name/a $TEMP_MARKER$line" | sed "s/^$TEMP_MARKER//")
-        done
-        # add the fields back.
-        file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER:$name/a $NAMES_MARKER:$(echo "${names[*]}" | tr ' ' ',')")
-        file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER:$name/a $FORMAT_MARKER:$format")
-        echo "$file_no_colors" > "$theme_file"
+        apply_palette_to_hunk "$theme_file" "$name" "${palettes[$name]}"
     done
 }
 
