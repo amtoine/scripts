@@ -78,6 +78,11 @@ check_format () {
     local theme_file=$3
     local format=$4
 
+    [ -z "$format" ] && {
+        echo "No format found between lines $line_begin_marker and $line_end_marker of $theme_file..." > /dev/stderr;
+        echo "Please make sur the '$FORMAT_MARKER' field is correct." > /dev/stderr;
+        terminate "$MISSING_FIELD_ERROR_CODE";
+    }
     [ -z "$(echo "$format" | grep "{name}" )" ] && {
         echo "missing 'name' key in format '$format' between lines $line_begin_marker and $line_end_marker of $theme_file..." > /dev/stderr;
         terminate "$MISSING_FIELD_ERROR_CODE";
