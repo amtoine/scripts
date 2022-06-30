@@ -26,6 +26,7 @@ assert_file_exist () {
         echo "$0: '$1': No such file or directory" > /dev/stderr;
         return "$BAD_ARGUMENTS_ERROR_CODE";
     }
+    return 0
 }
 
 
@@ -170,6 +171,8 @@ apply_theme() {
     shift 1
 
     assert_file_exist "$theme_file"
+    code=$?
+    [ $code -ne 0 ] && return "$code"
 
     # compute the associative array of named hunks and their respective color palettes.
     declare -A palettes
