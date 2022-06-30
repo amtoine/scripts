@@ -149,7 +149,7 @@ apply_palette_to_hunk () {
     code=$?
     [ $code -ne 0 ] && return "$code"
 
-    echo "apply '${palette[*]}' to $name"
+    echo "$theme_file: apply '${palette[*]}' to $name"
     # remove the colors inbetween the markers.
     file_no_colors=$(sed -e "/^$BEGIN_MARKER:$name$/,/^$END_MARKER:$name$/{//!d}" "$theme_file")
     # add the colors.
