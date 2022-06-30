@@ -238,11 +238,6 @@ main () {
       usage;
       return "$BAD_ARGUMENTS_ERROR_CODE";
   }
-  [ -z "$2" ] && {
-      echo "no colors to apply given as second positional argument...";
-      usage;
-      return "$BAD_ARGUMENTS_ERROR_CODE";
-  }
 
   file=$1
   shift 1
