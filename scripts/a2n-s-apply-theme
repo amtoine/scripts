@@ -22,75 +22,121 @@ ARRAY_SIZE_MISMATCH_ERROR_CODE=5
 
 
 terminate () {
-    echo "Terminating...";
+    echo "Terminating..." > /dev/stderr;
     exit "$1"
+}
+
+
+assert_file_exist () {
+    [ ! -f "$1" ] && {
+        echo "$0: '$1': No such file or directory" > /dev/stderr;
+        terminate "$BAD_ARGUMENTS_ERROR_CODE";
+    }
+}
+
+
+check_markers () {
+    local theme_file=$1
+    # assert color-theme markers exist.
+    local begin_markers=($(grep "^$BEGIN_MARKER$" "$theme_file" -n | awk -F: '{print $1}'))
+    local end_markers=($(grep "^$END_MARKER$" "$theme_file" -n | awk -F: '{print $1}'))
+    # grep "^$BEGIN_MARKER$" "$theme_file" -n
+    # echo "begin_markers: ${begin_markers[@]}"
+    # echo "end_markers: ${end_markers[@]}"
+    [ "${#begin_markers[@]}" -ne 1 ] && {
+        echo "There should be exactly 1 '$BEGIN_MARKER' marker in '$theme_file'." > /dev/stderr;
+        echo "Got ${#begin_markers[@]} markers on lines ${begin_markers[*]}." > /dev/stderr;
+        terminate "$MISSING_MARKER_ERROR_CODE";
+    }
+    [ "${#end_markers[@]}" -ne 1 ] && {
+        echo "There should be exactly 1 '$END_MARKER' marker in '$theme_file'." > /dev/stderr;
+        echo "Got ${#end_markers[@]} markers on lines ${end_markers[*]}." > /dev/stderr;
+        terminate "$MISSING_MARKER_ERROR_CODE";
+    }
+
+    # assert color-theme markers are placed correctly.
+    local line_begin_marker=${begin_markers[0]}
+    local line_end_marker=${end_markers[0]}
+    [ "$line_begin_marker" -gt "$line_end_marker" ] && {
+        echo "The '$END_MARKER' marker should come after '$BEGIN_MARKER'." > /dev/stderr;
+        echo "'$END_MARKER' found on line $line_end_marker" > /dev/stderr;
+        echo "'$BEGIN_MARKER' found on line $line_begin_marker" > /dev/stderr;
+        terminate "$MISPLACED_MARKERS_ERROR_CODE";
+    }
+
+    echo "$line_begin_marker" "$line_end_marker"
+}
+
+
+# extract meta data from the color-theme marker
+get_marker_zone () {
+  sed -n "/^$BEGIN_MARKER$/,/^$END_MARKER$/p" "$1"
+}
+
+
+check_format () {
+    local line_begin_marker=$1
+    local line_end_marker=$2
+    local theme_file=$3
+    local format=$4
+
+    [ -z "$(echo "$format" | grep "{name}" )" ] && {
+        echo "missing 'name' key in format '$format' between lines $line_begin_marker and $line_end_marker of $theme_file..." > /dev/stderr;
+        terminate "$MISSING_FIELD_ERROR_CODE";
+    }
+    [ -z "$(echo "$format" | grep "{color}" )" ] && {
+        echo "missing 'color' key in format '$format' between lines $line_begin_marker and $line_end_marker of $theme_file..." > /dev/stderr;
+        terminate "$MISSING_FIELD_ERROR_CODE";
+    }
+}
+
+
+get_format_from_marker_zone () {
+    local format=$(echo "$1" | grep "^$FORMAT_MARKER:.*" | cut -d: -f2-)
+    check_format "$2" "$3" "$4" "$format"
+
+    echo "$format"
+}
+
+
+get_names_from_marker_zone () {
+    local names=()
+    names=($(echo "$marker_zone" | grep "^$NAMES_MARKER:.*" | awk -F: '{print $2}' | tr ',' ' '))
+    [ "${#names[@]}" -eq 0 ] && {
+        echo "No names found between lines $line_begin_marker and $line_end_marker of $theme_file..." > /dev/stderr;
+        echo "Please make sur the '$NAMES_MARKER' field is correct." > /dev/stderr;
+        terminate "$MISSING_FIELD_ERROR_CODE";
+    }
+    echo "${names[@]}"
+}
+
+
+assert_name_and_color_sizes () {
+    [ "$1" -ne "$2" ] && {
+        echo "Not the same number of colors and names..." > /dev/stderr;
+        echo "Computed $1 colors." > /dev/stderr;
+        echo "Found $2 names in $3". > /dev/stderr;
+        terminate "$ARRAY_SIZE_MISMATCH_ERROR_CODE";
+    }
 }
 
 
 apply_theme() {
     theme_file="$1"
-    colors=($(echo "$2" | tr ',' ' '))
+    local colors=($(echo "$2" | tr ',' ' '))
 
-    [ ! -f "$theme_file" ] && {
-        echo "$0: '$theme_file': No such file or directory";
-        terminate "$BAD_ARGUMENTS_ERROR_CODE";
-    }
+    assert_file_exist "$theme_file"
 
-    # assert color-theme markers exist.
-    begin_markers=($(grep "^$BEGIN_MARKER$" "$theme_file" -n | awk -F: '{print $1}'))
-    end_markers=($(grep "^$END_MARKER$" "$theme_file" -n | awk -F: '{print $1}'))
-    [ "${#begin_markers[@]}" -ne 1 ] && {
-        echo "There should be exactly 1 '$BEGIN_MARKER' marker in '$theme_file'."
-        echo "Got ${#begin_markers[@]} markers on lines ${begin_markers[*]}.";
-        terminate "$MISSING_MARKER_ERROR_CODE";
-    }
-    [ "${#end_markers[@]}" -ne 1 ] && {
-        echo "There should be exactly 1 '$END_MARKER' marker in '$theme_file'."
-        echo "Got ${#end_markers[@]} markers on lines ${end_markers[*]}.";
-        terminate "$MISSING_MARKER_ERROR_CODE";
-    }
+    res=$(check_markers "$theme_file")
+    line_begin_marker=$(echo "$res" | cut -d' ' -f1)
+    line_end_marker=$(echo "$res" | cut -d' ' -f2)
 
-    # assert color-theme markers are placed correctly.
-    line_begin_marker=${begin_markers[0]}
-    line_end_marker=${end_markers[0]}
-    [ "$line_begin_marker" -gt "$line_end_marker" ] && {
-        echo "The '$END_MARKER' marker should come after '$BEGIN_MARKER'.";
-        echo "'$END_MARKER' found on line $line_end_marker";
-        echo "'$BEGIN_MARKER' found on line $line_begin_marker";
-        terminate "$MISPLACED_MARKERS_ERROR_CODE";
-    }
+    marker_zone=$(get_marker_zone "$theme_file")
 
-    # extract meta data from the color-theme marker
-    marker=$(sed -n "/^$BEGIN_MARKER$/,/^$END_MARKER$/p" "$theme_file")
+    format=$(get_format_from_marker_zone "$marker_zone" "$line_begin_marker" "$line_end_marker" "$theme_file")
+    names=($(get_names_from_marker_zone "$marker_zone" "$line_begin_marker" "$line_end_marker" "$theme_file"))
 
-    format=$(echo "$marker" | grep "^$FORMAT_MARKER:.*" | cut -d: -f2-)
-    [ -z "$format" ] && {
-        echo "No format found between lines $line_begin_marker and $line_end_marker of $theme_file...";
-        echo "Please make sur the '$FORMAT_MARKER' field is correct.";
-        terminate "$MISSING_FIELD_ERROR_CODE";
-    }
-    [ -z "$(echo "$format" | grep "{name}" )" ] && {
-        echo "missing 'name' key in format '$format' between lines $line_begin_marker and $line_end_marker of $theme_file...";
-        terminate "$MISSING_FIELD_ERROR_CODE";
-    }
-    [ -z "$(echo "$format" | grep "{color}" )" ] && {
-        echo "missing 'color' key in format '$format' between lines $line_begin_marker and $line_end_marker of $theme_file...";
-        terminate "$MISSING_FIELD_ERROR_CODE";
-    }
-
-    names=($(echo "$marker" | grep "^$NAMES_MARKER:.*" | awk -F: '{print $2}' | tr ',' ' '))
-    [ "${#names[@]}" -eq 0 ] && {
-        echo "No names found between lines $line_begin_marker and $line_end_marker of $theme_file...";
-        echo "Please make sur the '$NAMES_MARKER' field is correct.";
-        terminate "$MISSING_FIELD_ERROR_CODE";
-    }
-
-    [ "${#colors[@]}" -ne "${#names[@]}" ] && {
-        echo "Not the same number of colors and names...";
-        echo "Computed ${#colors[@]} colors: ${colors[*]}";
-        echo "Found ${#names[@]} names in $theme_file: ${names[*]}.";
-        terminate "$ARRAY_SIZE_MISMATCH_ERROR_CODE";
-    }
+    assert_name_and_color_sizes "${#colors[@]}" "${#names[@]}" "$theme_file"
 
     # remove the colors inbetween the markers.
     file_no_colors=$(sed -e "/^$BEGIN_MARKER$/,/^$END_MARKER$/{//!d}" "$theme_file")
@@ -162,7 +208,9 @@ main () {
       exit "$BAD_ARGUMENTS_ERROR_CODE";
   }
 
-  apply_theme "$1" "$2"
+  file=$1
+  shift 1
+  apply_theme "$file" "$@"
 }
 
 
