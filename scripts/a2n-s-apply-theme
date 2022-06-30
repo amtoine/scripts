@@ -18,7 +18,7 @@ MISSING_MARKER_ERROR_CODE=1
 MISPLACED_MARKERS_ERROR_CODE=2
 MISSING_FIELD_ERROR_CODE=3
 BAD_ARGUMENTS_ERROR_CODE=4
-ARRAY_SIZE_MISMATCH=5
+ARRAY_SIZE_MISMATCH_ERROR_CODE=5
 
 
 terminate () {
@@ -89,7 +89,7 @@ apply_theme() {
         echo "Not the same number of colors and names...";
         echo "Computed ${#colors[@]} colors: ${colors[*]}";
         echo "Found ${#names[@]} names in $theme_file: ${names[*]}.";
-        terminate "$ARRAY_SIZE_MISMATCH";
+        terminate "$ARRAY_SIZE_MISMATCH_ERROR_CODE";
     }
 
     # remove the colors inbetween the markers.
