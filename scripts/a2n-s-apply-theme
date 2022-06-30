@@ -21,16 +21,10 @@ BAD_ARGUMENTS_ERROR_CODE=4
 ARRAY_SIZE_MISMATCH_ERROR_CODE=5
 
 
-terminate () {
-    echo "Terminating..." > /dev/stderr;
-    exit "$1";
-}
-
-
 assert_file_exist () {
     [ ! -f "$1" ] && {
         echo "$0: '$1': No such file or directory" > /dev/stderr;
-        terminate "$BAD_ARGUMENTS_ERROR_CODE";
+        return "$BAD_ARGUMENTS_ERROR_CODE";
     }
 }
 
@@ -44,12 +38,12 @@ check_markers () {
     [ "${#begin_markers[@]}" -ne 1 ] && {
         echo "There should be exactly 1 '$BEGIN_MARKER:$name' marker in '$theme_file'." > /dev/stderr;
         echo "Got ${#begin_markers[@]} markers on lines ${begin_markers[*]}." > /dev/stderr;
-        terminate "$MISSING_MARKER_ERROR_CODE";
+        return "$MISSING_MARKER_ERROR_CODE";
     }
     [ "${#end_markers[@]}" -ne 1 ] && {
         echo "There should be exactly 1 '$END_MARKER:$name' marker in '$theme_file'." > /dev/stderr;
         echo "Got ${#end_markers[@]} markers on lines ${end_markers[*]}." > /dev/stderr;
-        terminate "$MISSING_MARKER_ERROR_CODE";
+        return "$MISSING_MARKER_ERROR_CODE";
     }
 
     # assert color-theme markers are placed correctly.
@@ -59,7 +53,7 @@ check_markers () {
         echo "The '$END_MARKER:$name' marker should come after '$BEGIN_MARKER:$name'." > /dev/stderr;
         echo "'$END_MARKER:$name' found on line $line_end_marker" > /dev/stderr;
         echo "'$BEGIN_MARKER:$name' found on line $line_begin_marker" > /dev/stderr;
-        terminate "$MISPLACED_MARKERS_ERROR_CODE";
+        return "$MISPLACED_MARKERS_ERROR_CODE";
     }
 
     echo "$line_begin_marker" "$line_end_marker"
@@ -81,22 +75,25 @@ check_format () {
     [ -z "$format" ] && {
         echo "No format found between lines $line_begin_marker and $line_end_marker of $theme_file..." > /dev/stderr;
         echo "Please make sur the '$FORMAT_MARKER' field is correct." > /dev/stderr;
-        terminate "$MISSING_FIELD_ERROR_CODE";
+        return "$MISSING_FIELD_ERROR_CODE";
     }
     [ -z "$(echo "$format" | grep "{name}" )" ] && {
         echo "missing 'name' key in format '$format' between lines $line_begin_marker and $line_end_marker of $theme_file..." > /dev/stderr;
-        terminate "$MISSING_FIELD_ERROR_CODE";
+        return "$MISSING_FIELD_ERROR_CODE";
     }
     [ -z "$(echo "$format" | grep "{color}" )" ] && {
         echo "missing 'color' key in format '$format' between lines $line_begin_marker and $line_end_marker of $theme_file..." > /dev/stderr;
-        terminate "$MISSING_FIELD_ERROR_CODE";
+        return "$MISSING_FIELD_ERROR_CODE";
     }
+    return 0
 }
 
 
 get_format_from_marker_zone () {
     local format=$(echo "$1" | grep "^$FORMAT_MARKER:.*" | cut -d: -f2-)
     check_format "$2" "$3" "$4" "$format"
+    code=$?
+    [ $code -ne 0 ] && return "$code"
 
     echo "$format"
 }
@@ -108,7 +105,7 @@ get_names_from_marker_zone () {
     [ "${#names[@]}" -eq 0 ] && {
         echo "No names found between lines $line_begin_marker and $line_end_marker of $theme_file..." > /dev/stderr;
         echo "Please make sur the '$NAMES_MARKER' field is correct." > /dev/stderr;
-        terminate "$MISSING_FIELD_ERROR_CODE";
+        return "$MISSING_FIELD_ERROR_CODE";
     }
     echo "${names[@]}"
 }
@@ -119,7 +116,7 @@ assert_name_and_color_sizes () {
         echo "Not the same number of colors and names..." > /dev/stderr;
         echo "Computed $1 colors." > /dev/stderr;
         echo "Found $2 names in $3". > /dev/stderr;
-        terminate "$ARRAY_SIZE_MISMATCH_ERROR_CODE";
+        return "$ARRAY_SIZE_MISMATCH_ERROR_CODE";
     }
     return 0
 }
@@ -152,6 +149,7 @@ apply_palette_to_hunk () {
     code=$?
     [ $code -ne 0 ] && return "$code"
 
+    echo "apply '${palette[*]}' to $name"
     # remove the colors inbetween the markers.
     file_no_colors=$(sed -e "/^$BEGIN_MARKER:$name$/,/^$END_MARKER:$name$/{//!d}" "$theme_file")
     # add the colors.
@@ -235,12 +233,12 @@ main () {
   [ -z "$1" ] && {
       echo "no file to edit given as first positional argument...";
       usage;
-      exit "$BAD_ARGUMENTS_ERROR_CODE";
+      return "$BAD_ARGUMENTS_ERROR_CODE";
   }
   [ -z "$2" ] && {
       echo "no colors to apply given as second positional argument...";
       usage;
-      exit "$BAD_ARGUMENTS_ERROR_CODE";
+      return "$BAD_ARGUMENTS_ERROR_CODE";
   }
 
   file=$1
