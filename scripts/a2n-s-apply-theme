@@ -12,6 +12,8 @@ BEGIN_MARKER="$COMMENT_SYMBOL+ BEGIN:color-theme"
 END_MARKER="$COMMENT_SYMBOL+ END:color-theme"
 FORMAT_MARKER="$COMMENT_SYMBOL+ format"
 NAMES_MARKER="$COMMENT_SYMBOL+ names"
+TEMP_MARKER="%%%"  # a temporary marker to ensure blank characters are taken into account.
+
 MISSING_MARKER_ERROR_CODE=1
 MISPLACED_MARKERS_ERROR_CODE=2
 MISSING_FIELD_ERROR_CODE=3
@@ -96,7 +98,7 @@ apply_theme() {
     for ((i=(("${#colors[@]}"-1)); i>=0; i--)) ;
     do
         line=$(echo "$format" | sed -e "s/{name}/${names[$i]}/g" -e "s/{color}/${colors[$i]}/g")
-        file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER/a $line")
+        file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER/a $TEMP_MARKER$line" | sed "s/^$TEMP_MARKER//")
     done
     # add the fields back.
     file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER/a $NAMES_MARKER:$(echo "${names[*]}" | tr ' ' ',')")
