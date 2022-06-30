@@ -171,6 +171,7 @@ apply_theme() {
 
     assert_file_exist "$theme_file"
 
+    # compute the associative array of named hunks and their respective color palettes.
     declare -A palettes
     for arg in "$@";
     do
@@ -179,6 +180,7 @@ apply_theme() {
       palettes["$name"]="$value"
     done
 
+    # apply the palettes to the hunks.
     for name in "${!palettes[@]}";
     do
         apply_palette_to_hunk "$theme_file" "$name" "${palettes[$name]}"
@@ -190,7 +192,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: a2n-s-apply-theme [-h] CONFIG_FILE COLOR_PALETTE"
+  echo "Usage: a2n-s-apply-theme [-h] CONFIG_FILE NAME1=PALETTE1 NAME2=PALETTE2 ..."
   echo "Type -h or --help for the full help."
 }
 
@@ -204,10 +206,11 @@ help () {
   echo "     Do not forget to put it in your PATH."
   echo ""
   echo "Usage:"
-  echo "     a2n-s-apply-theme [-h] CONFIG_FILE COLOR_PALETTE"
+  echo "     a2n-s-apply-theme [-h] CONFIG_FILE NAME1=PALETTE1 NAME2=PALETTE2 ..."
   echo ""
   echo "          - CONFIG_FILE is the path to the config file to edit"
-  echo "          - COLOR_PALETTE is the list of colors to apply to the config file"
+  echo "          - NAME is the name of the hunk to apply the theme to"
+  echo "          - PALETTE is the list of colors to apply to the config file"
   echo ""
   echo "Switches:"
   echo "     -h/--help               shows this help."
