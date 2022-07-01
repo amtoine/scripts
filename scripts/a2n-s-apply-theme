@@ -20,10 +20,43 @@ MISSING_FIELD_ERROR_CODE=3
 BAD_ARGUMENTS_ERROR_CODE=4
 ARRAY_SIZE_MISMATCH_ERROR_CODE=5
 
+RED="$(tput setaf 1)"
+GRN="$(tput setaf 2)"
+YLW="$(tput setaf 3)"
+BLU="$(tput setaf 4)"
+MGT="$(tput setaf 5)"
+CYN="$(tput setaf 6)"
+OFF="$(tput sgr0)"
+
+
+log_err () {
+    echo "${RED}[ERROR]${OFF} $1" > /dev/stderr;
+}
+
+
+log_warning () {
+    echo "${YLW}[WARNING]${OFF} $1" > /dev/stderr;
+}
+
+
+log_debug () {
+    echo "${MGT}[DEBUG]${OFF} $1" > /dev/stderr;
+}
+
+
+log_info () {
+    echo "${CYN}[INFO]${OFF} $1" > /dev/stderr;
+}
+
+
+log_ok () {
+    echo "${GRN}[OK]${OFF} $1" > /dev/stderr;
+}
+
 
 assert_file_exist () {
     [ ! -f "$1" ] && {
-        echo "$0: '$1': No such file or directory" > /dev/stderr;
+        log_err "$0: '$1': No such file or directory"
         return "$BAD_ARGUMENTS_ERROR_CODE";
     }
     return 0
@@ -37,13 +70,13 @@ check_markers () {
     local begin_markers=($(grep "^$BEGIN_MARKER:$name$" "$theme_file" -n | awk -F: '{print $1}'))
     local end_markers=($(grep "^$END_MARKER:$name$" "$theme_file" -n | awk -F: '{print $1}'))
     [ "${#begin_markers[@]}" -ne 1 ] && {
-        echo "There should be exactly 1 '$BEGIN_MARKER:$name' marker in '$theme_file'." > /dev/stderr;
-        echo "Got ${#begin_markers[@]} markers on lines ${begin_markers[*]}." > /dev/stderr;
+        log_err "There should be exactly 1 '$BEGIN_MARKER:$name' marker in '$theme_file'."
+        log_err "Got ${#begin_markers[@]} markers on lines ${begin_markers[*]}."
         return "$MISSING_MARKER_ERROR_CODE";
     }
     [ "${#end_markers[@]}" -ne 1 ] && {
-        echo "There should be exactly 1 '$END_MARKER:$name' marker in '$theme_file'." > /dev/stderr;
-        echo "Got ${#end_markers[@]} markers on lines ${end_markers[*]}." > /dev/stderr;
+        log_err "There should be exactly 1 '$END_MARKER:$name' marker in '$theme_file'."
+        log_err "Got ${#end_markers[@]} markers on lines ${end_markers[*]}."
         return "$MISSING_MARKER_ERROR_CODE";
     }
 
@@ -51,9 +84,9 @@ check_markers () {
     local line_begin_marker=${begin_markers[0]}
     local line_end_marker=${end_markers[0]}
     [ "$line_begin_marker" -gt "$line_end_marker" ] && {
-        echo "The '$END_MARKER:$name' marker should come after '$BEGIN_MARKER:$name'." > /dev/stderr;
-        echo "'$END_MARKER:$name' found on line $line_end_marker" > /dev/stderr;
-        echo "'$BEGIN_MARKER:$name' found on line $line_begin_marker" > /dev/stderr;
+        log_err "The '$END_MARKER:$name' marker should come after '$BEGIN_MARKER:$name'."
+        log_err "'$END_MARKER:$name' found on line $line_end_marker"
+        log_err "'$BEGIN_MARKER:$name' found on line $line_begin_marker"
         return "$MISPLACED_MARKERS_ERROR_CODE";
     }
 
@@ -74,16 +107,16 @@ check_format () {
     local format=$4
 
     [ -z "$format" ] && {
-        echo "No format found between lines $line_begin_marker and $line_end_marker of $theme_file..." > /dev/stderr;
-        echo "Please make sur the '$FORMAT_MARKER' field is correct." > /dev/stderr;
+        log_err "No format found between lines $line_begin_marker and $line_end_marker of $theme_file..."
+        log_err "Please make sur the '$FORMAT_MARKER' field is correct."
         return "$MISSING_FIELD_ERROR_CODE";
     }
     [ -z "$(echo "$format" | grep "{name}" )" ] && {
-        echo "missing 'name' key in format '$format' between lines $line_begin_marker and $line_end_marker of $theme_file..." > /dev/stderr;
+        log_err "missing 'name' key in format '$format' between lines $line_begin_marker and $line_end_marker of $theme_file..."
         return "$MISSING_FIELD_ERROR_CODE";
     }
     [ -z "$(echo "$format" | grep "{color}" )" ] && {
-        echo "missing 'color' key in format '$format' between lines $line_begin_marker and $line_end_marker of $theme_file..." > /dev/stderr;
+        log_err "missing 'color' key in format '$format' between lines $line_begin_marker and $line_end_marker of $theme_file..."
         return "$MISSING_FIELD_ERROR_CODE";
     }
     return 0
@@ -104,8 +137,8 @@ get_names_from_marker_zone () {
     local names=()
     names=($(echo "$marker_zone" | grep "^$NAMES_MARKER:.*" | awk -F: '{print $2}' | tr ',' ' '))
     [ "${#names[@]}" -eq 0 ] && {
-        echo "No names found between lines $line_begin_marker and $line_end_marker of $theme_file..." > /dev/stderr;
-        echo "Please make sur the '$NAMES_MARKER' field is correct." > /dev/stderr;
+        log_err "No names found between lines $line_begin_marker and $line_end_marker of $theme_file..."
+        log_err "Please make sur the '$NAMES_MARKER' field is correct."
         return "$MISSING_FIELD_ERROR_CODE";
     }
     echo "${names[@]}"
@@ -114,9 +147,9 @@ get_names_from_marker_zone () {
 
 assert_name_and_color_sizes () {
     [ "$1" -ne "$2" ] && {
-        echo "Not the same number of colors and names..." > /dev/stderr;
-        echo "Computed $1 colors." > /dev/stderr;
-        echo "Found $2 names in $3". > /dev/stderr;
+        log_err "Not the same number of colors and names..."
+        log_err "Computed $1 colors."
+        log_err "Found $2 names in $3"
         return "$ARRAY_SIZE_MISMATCH_ERROR_CODE";
     }
     return 0
@@ -150,7 +183,7 @@ apply_palette_to_hunk () {
     code=$?
     [ $code -ne 0 ] && return "$code"
 
-    echo "$theme_file: apply '${palette[*]}' to $name"
+    log_info "${BLU}[$theme_file]${OFF} apply ${BLU}'${palette[*]}'${OFF} to hunk '${BLU}$name${OFF}'"
     # remove the colors inbetween the markers.
     file_no_colors=$(sed -e "/^$BEGIN_MARKER:$name$/,/^$END_MARKER:$name$/{//!d}" "$theme_file")
     # add the colors.
@@ -163,6 +196,7 @@ apply_palette_to_hunk () {
     file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER:$name/a $NAMES_MARKER:$(echo "${names[*]}" | tr ' ' ',')")
     file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER:$name/a $FORMAT_MARKER:$format")
     echo "$file_no_colors" > "$theme_file"
+    log_ok "${GRN}[$theme_file]${OFF} theme successfully applied to hunk '${GRN}$name${OFF}'"
 }
 
 
@@ -237,7 +271,8 @@ main () {
   done
 
   [ -z "$1" ] && {
-      echo "no file to edit given as first positional argument...";
+      log_warning "no file to edit given as first positional argument...";
+      log_warning "Terminating...";
       usage;
       return "$BAD_ARGUMENTS_ERROR_CODE";
   }
