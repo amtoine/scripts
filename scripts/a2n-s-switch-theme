@@ -64,19 +64,19 @@ sync_themes () {
         log_warning "No local database found..."
         log_warning "$LOCAL_DATABASE: No such file or directory."
         log_info "Cloning the remote database..."
-        git clone "$REMOTE_DATABASE" "$LOCAL_DATABASE"
+        git clone "$REMOTE_DATABASE" "$LOCAL_DATABASE" > /dev/stderr
         did_things="clone"
     }
     [ ! -d "$LOCAL_DATABASE/database" ] && {
         log_warning "$LOCAL_DATABASE/database: No such file or directory."
         log_info "Creating the local database..."
-        mkdir -p "$LOCAL_DATABASE/database"
+        mkdir -p "$LOCAL_DATABASE/database" > /dev/stderr
         did_things="mkdir"
     }
     if [ "$did_things" == "false" ];
     then
         log_info "Updating the local database..."
-        git -C "$LOCAL_DATABASE" pull origin
+        git -C "$LOCAL_DATABASE" pull origin > /dev/stderr
     fi
     log_ok "Database successfully synched with remote."
 }
@@ -87,13 +87,13 @@ parse_themes () {
     for ((i=0; i<"$nb_themes"; i++));
     do
         theme="${themes[$i]}";
-        echo -n "${MGT}[$i / $nb_themes]${OFF} ${CYN}$theme${OFF}... ";
+        echo -n "${MGT}[$i / $nb_themes]${OFF} ${CYN}$theme${OFF}... " > /dev/stderr;
         if [ ! -f "$LOCAL_DATABASE/database/$theme.db" ] || [ "$1" == "force" ];
         then
             grep -v "^\s*#.*$" "$LOCAL_DATABASE/themes/$theme.conf" | grep -v "^\s*$" | sed 's/^\s*\(.*\)\s*$/\1/g; s/\s\+/:/g' | tee "$LOCAL_DATABASE/database/$theme.db" > /dev/null;
-            echo "${GRN}ok${OFF}";
+            echo "${GRN}ok${OFF}" > /dev/stderr;
         else
-            echo "${YLW}skip${OFF} (already parsed)";
+            echo "${YLW}skip${OFF} (already parsed)" > /dev/stderr;
         fi
     done
 }
