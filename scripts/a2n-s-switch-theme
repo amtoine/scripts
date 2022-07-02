@@ -113,7 +113,7 @@ menu_once () {
 
 menu () {
     options=$1
-    loop="true"
+    local loop="true"
     while [ "$loop" == "true" ];
     do
         choice=$(menu_once "$options")
@@ -126,30 +126,62 @@ menu () {
 }
 
 
-main () {
-    options="sync\nparse\nparse (force)\n$SEP\nexit"
+main_menu () {
+    state=$1
+    local loop="true"
+    options="sync\nparse\nparse (force)\napply\n$SEP\nexit"
+    choice=$(menu "$options")
+    case "$choice" in
+        "sync")
+            dunstify "a2n-s-switch-theme" "Syncing the database";
+            sync_themes ;;
+        "parse")
+            dunstify "a2n-s-switch-theme" "Parsing the themes"
+            themes=($(find "$LOCAL_DATABASE/themes" -type f -name "*.conf" | sort | xargs -I {} basename {} | sed 's/\.conf$//g'));
+            parse_themes ""
+            ;;
+        "parse (force)")
+            dunstify "a2n-s-switch-theme" "Parsing the themes"
+            themes=($(find "$LOCAL_DATABASE/themes" -type f -name "*.conf" | sort | xargs -I {} basename {} | sed 's/\.conf$//g'));
+            parse_themes "force"
+            ;;
+        "apply")
+            dunstify "a2n-s-switch-theme" "Switch to apply"
+            state="apply"
+            ;;
+        "exit"|"back") loop="false" ;;
+        *) log_err "'$choice' is an unknown choice...";;
+    esac
+    echo "$state" "$loop"
+}
 
-    loop="true"
+
+apply_menu () {
+    state=$1
+    local loop="true"
+    options=$({ echo -e "random\nback\nexit\n----------"; echo -e "${themes[@]}" | tr ' ' '\n'; })
+    choice=$(menu "$options")
+    case "$choice" in
+        "back") state="main" ;;
+        "exit") loop="false" ;;
+        *) log_err "'$choice' is an unknown choice...";;
+    esac
+    echo "$state" "$loop"
+}
+
+
+main () {
+    state="main"
+    local loop="true"
     while [ "$loop" == "true" ];
     do
-        choice=$(menu "$options")
-        case "$choice" in
-            "sync")
-                dunstify "a2n-s-switch-theme" "Syncing the database";
-                sync_themes ;;
-            "parse")
-                dunstify "a2n-s-switch-theme" "Parsing the themes"
-                themes=($(find "$LOCAL_DATABASE/themes" -type f -name "*.conf" | sort | xargs -I {} basename {} | sed 's/\.conf$//g'));
-                parse_themes ""
-                ;;
-            "parse (force)")
-                dunstify "a2n-s-switch-theme" "Parsing the themes"
-                themes=($(find "$LOCAL_DATABASE/themes" -type f -name "*.conf" | sort | xargs -I {} basename {} | sed 's/\.conf$//g'));
-                parse_themes "force"
-                ;;
-            "exit"|"back") exit 0 ;;
-            *) log_err "'$choice' is an unknown choice...";;
+        case "$state" in
+            main) res=$(main_menu "$state");;
+            apply) res=$(apply_menu "$state");;
+            *) exit 0;;
         esac
+        state=$(echo "$res" | cut -d' ' -f1)
+        loop=$(echo "$res" | cut -d' ' -f2)
     done
 }
 
