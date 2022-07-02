@@ -6,7 +6,7 @@ eval set -- "$OPTIONS"
 
 # environment variables.
 [ -z "$COMMENT_SYMBOL" ] && COMMENT_SYMBOL="#"
-[ -z "$CONFIG_FILE" ] && CONFIG_FILE="$HOME/.config/a2n-s-apply-theme.json"
+[ -z "$CONFIG_FILE" ] && CONFIG_FILE="$HOME/.config/a2n-s/themes.json"
 
 # some constants.
 BEGIN_MARKER="$COMMENT_SYMBOL+ BEGIN"
@@ -256,7 +256,7 @@ help () {
   echo ""
   echo "Environment variables:"
   echo "     COMMENT_SYMBOL          the symbol used to begin comment in the config file (defaults to '#', e.g. for \`bash\` or \`python\`)"
-  echo "     CONFIG_FILE             the config file for this script (defaults to '\$HOME/.config/a2n-s-apply-theme.json')"
+  echo "     CONFIG_FILE             the config file for this script (defaults to '\$HOME/.config/a2n-s/themes.json')"
   exit 0
 }
 
