@@ -6,12 +6,11 @@ eval set -- "$OPTIONS"
 
 # environment variables.
 [ -z "$COMMENT_SYMBOL" ] && COMMENT_SYMBOL="#"
+[ -z "$CONFIG_FILE" ] && CONFIG_FILE="$HOME/.config/a2n-s-apply-theme.json"
 
 # some constants.
 BEGIN_MARKER="$COMMENT_SYMBOL+ BEGIN"
 END_MARKER="$COMMENT_SYMBOL+ END"
-FORMAT_MARKER="$COMMENT_SYMBOL+ format"
-NAMES_MARKER="$COMMENT_SYMBOL+ names"
 TEMP_MARKER="%%%"  # a temporary marker to ensure blank characters are taken into account.
 
 MISSING_MARKER_ERROR_CODE=1
@@ -63,19 +62,37 @@ assert_file_exist () {
 }
 
 
+expand_user () {
+  sed "s|~|$HOME|g; s/\"//g"
+}
+
+
+get_file_from_json () {
+  jq ".$1.file" "$CONFIG_FILE" | expand_user
+}
+
+
 check_markers () {
     local theme_file=$1
-    local name=$2
+    local hunk=$2
     # assert color-theme markers exist.
-    local begin_markers=($(grep "^$BEGIN_MARKER:$name$" "$theme_file" -n | awk -F: '{print $1}'))
-    local end_markers=($(grep "^$END_MARKER:$name$" "$theme_file" -n | awk -F: '{print $1}'))
-    [ "${#begin_markers[@]}" -ne 1 ] && {
-        log_err "There should be exactly 1 '$BEGIN_MARKER:$name' marker in '$theme_file'."
+    local begin_markers=($(grep "^$BEGIN_MARKER:$hunk$" "$theme_file" -n | awk -F: '{print $1}'))
+    local end_markers=($(grep "^$END_MARKER:$hunk$" "$theme_file" -n | awk -F: '{print $1}'))
+    [ "${#begin_markers[@]}" -eq 0 ] && {
+        log_err "'$BEGIN_MARKER:$hunk' marker could not be found in '$theme_file'."
+        return "$MISSING_MARKER_ERROR_CODE";
+    }
+    [ "${#begin_markers[@]}" -gt 1 ] && {
+        log_err "There should be exactly 1 '$BEGIN_MARKER:$hunk' marker in '$theme_file'."
         log_err "Got ${#begin_markers[@]} markers on lines ${begin_markers[*]}."
         return "$MISSING_MARKER_ERROR_CODE";
     }
-    [ "${#end_markers[@]}" -ne 1 ] && {
-        log_err "There should be exactly 1 '$END_MARKER:$name' marker in '$theme_file'."
+    [ "${#end_markers[@]}" -eq 0 ] && {
+        log_err "'$END_MARKER:$hunk' marker could not be found in '$theme_file'."
+        return "$MISSING_MARKER_ERROR_CODE";
+    }
+    [ "${#end_markers[@]}" -gt 1 ] && {
+        log_err "There should be exactly 1 '$END_MARKER:$hunk' marker in '$theme_file'."
         log_err "Got ${#end_markers[@]} markers on lines ${end_markers[*]}."
         return "$MISSING_MARKER_ERROR_CODE";
     }
@@ -84,9 +101,9 @@ check_markers () {
     local line_begin_marker=${begin_markers[0]}
     local line_end_marker=${end_markers[0]}
     [ "$line_begin_marker" -gt "$line_end_marker" ] && {
-        log_err "The '$END_MARKER:$name' marker should come after '$BEGIN_MARKER:$name'."
-        log_err "'$END_MARKER:$name' found on line $line_end_marker"
-        log_err "'$BEGIN_MARKER:$name' found on line $line_begin_marker"
+        log_err "The '$END_MARKER:$hunk' marker should come after '$BEGIN_MARKER:$hunk'."
+        log_err "'$END_MARKER:$hunk' found on line $line_end_marker"
+        log_err "'$BEGIN_MARKER:$hunk' found on line $line_begin_marker"
         return "$MISPLACED_MARKERS_ERROR_CODE";
     }
 
@@ -94,54 +111,34 @@ check_markers () {
 }
 
 
-# extract meta data from the color-theme marker
-get_marker_zone () {
-  sed -n "/^$BEGIN_MARKER:$2$/,/^$END_MARKER:$2$/p" "$1"
-}
+get_format_from_json () {
+    local format=$(jq ".$1.hunks.$2.format" "$CONFIG_FILE")
 
-
-check_format () {
-    local line_begin_marker=$1
-    local line_end_marker=$2
-    local theme_file=$3
-    local format=$4
-
-    [ -z "$format" ] && {
-        log_err "No format found between lines $line_begin_marker and $line_end_marker of $theme_file..."
-        log_err "Please make sur the '$FORMAT_MARKER' field is correct."
+    [ "$format" == "null" ] && {
+        log_err "No format found in $CONFIG_FILE.$1.hunks.$2"
         return "$MISSING_FIELD_ERROR_CODE";
     }
     [ -z "$(echo "$format" | grep "{name}" )" ] && {
-        log_err "missing 'name' key in format '$format' between lines $line_begin_marker and $line_end_marker of $theme_file..."
+        log_err "missing 'name' key in $CONFIG_FILE.$1.hunks.$2"
         return "$MISSING_FIELD_ERROR_CODE";
     }
     [ -z "$(echo "$format" | grep "{color}" )" ] && {
-        log_err "missing 'color' key in format '$format' between lines $line_begin_marker and $line_end_marker of $theme_file..."
+        log_err "missing 'color' key in $CONFIG_FILE.$1.hunks.$2"
         return "$MISSING_FIELD_ERROR_CODE";
     }
-    return 0
+
+    echo "$format" | sed 's/^"//g; s/"$//g; s/\\"/"/g'
 }
 
 
-get_format_from_marker_zone () {
-    local format=$(echo "$1" | grep "^$FORMAT_MARKER:.*" | cut -d: -f2-)
-    check_format "$2" "$3" "$4" "$format"
-    code=$?
-    [ $code -ne 0 ] && return "$code"
-
-    echo "$format"
-}
-
-
-get_names_from_marker_zone () {
-    local names=()
-    names=($(echo "$marker_zone" | grep "^$NAMES_MARKER:.*" | awk -F: '{print $2}' | tr ',' ' '))
-    [ "${#names[@]}" -eq 0 ] && {
-        log_err "No names found between lines $line_begin_marker and $line_end_marker of $theme_file..."
-        log_err "Please make sur the '$NAMES_MARKER' field is correct."
+get_names_from_json () {
+    local names=$(jq ".$1.hunks.$2.names" "$CONFIG_FILE")
+    [ "$names" == "null" ] && {
+        log_err "No names found between lines $CONFIG_FILE.$1.hunks.$2"
         return "$MISSING_FIELD_ERROR_CODE";
     }
-    echo "${names[@]}"
+
+    echo "$names" | tail -n+2 | head -n-1 | sed 's/"//g; s/^\s*//g; s/,//g' | tr '\n' ' '
 }
 
 
@@ -157,54 +154,59 @@ assert_name_and_color_sizes () {
 
 
 apply_palette_to_hunk () {
-    theme_file=$1
-    name=$2
+    config=$1
+    hunk=$2
     shift 2
     palette=($@)
 
-    res=$(check_markers "$theme_file" "$name")
+    theme_file="$(get_file_from_json "$config")"
+
+    res=$(check_markers "$theme_file" "$hunk")
     code=$?
     [ $code -ne 0 ] && return "$code"
     line_begin_marker=$(echo "$res" | cut -d' ' -f1)
     line_end_marker=$(echo "$res" | cut -d' ' -f2)
 
-    marker_zone=$(get_marker_zone "$theme_file" "$name")
+    format=$(get_format_from_json "$config" "$hunk")
+    code=$?
+    [ $code -ne 0 ] && return "$code"
+    names=($(get_names_from_json "$config" "$hunk"))
     code=$?
     [ $code -ne 0 ] && return "$code"
 
-    format=$(get_format_from_marker_zone "$marker_zone" "$line_begin_marker" "$line_end_marker" "$theme_file")
-    code=$?
-    [ $code -ne 0 ] && return "$code"
-    names=($(get_names_from_marker_zone "$marker_zone" "$line_begin_marker" "$line_end_marker" "$theme_file"))
+    assert_name_and_color_sizes "${#palette[@]}" "${#names[@]}" "$CONFIG_FILE.$config.hunks.$hunk.names"
     code=$?
     [ $code -ne 0 ] && return "$code"
 
-    assert_name_and_color_sizes "${#palette[@]}" "${#names[@]}" "$theme_file"
-    code=$?
-    [ $code -ne 0 ] && return "$code"
-
-    log_info "${BLU}[$theme_file]${OFF} apply ${BLU}'${palette[*]}'${OFF} to hunk '${BLU}$name${OFF}'"
+    log_info "${BLU}[$theme_file]${OFF} apply ${BLU}'${palette[*]}'${OFF} to '${BLU}$config.$hunk${OFF}'"
     # remove the colors inbetween the markers.
-    file_no_colors=$(sed -e "/^$BEGIN_MARKER:$name$/,/^$END_MARKER:$name$/{//!d}" "$theme_file")
+    file_no_colors=$(sed -e "/^$BEGIN_MARKER:$hunk$/,/^$END_MARKER:$hunk$/{//!d}" "$theme_file")
     # add the colors.
     for ((i=(("${#palette[@]}"-1)); i>=0; i--)) ;
     do
         line=$(echo "$format" | sed -e "s/{name}/${names[$i]}/g" -e "s/{color}/${palette[$i]}/g")
-        file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER:$name/a $TEMP_MARKER$line" | sed "s/^$TEMP_MARKER//")
+        file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER:$hunk/a $TEMP_MARKER$line" | sed "s/^$TEMP_MARKER//")
     done
-    # add the fields back.
-    file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER:$name/a $NAMES_MARKER:$(echo "${names[*]}" | tr ' ' ',')")
-    file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER:$name/a $FORMAT_MARKER:$format")
     echo "$file_no_colors" > "$theme_file"
-    log_ok "${GRN}[$theme_file]${OFF} theme successfully applied to hunk '${GRN}$name${OFF}'"
+    log_ok "${GRN}[$theme_file]${OFF} theme successfully applied to hunk '${GRN}$config.$hunk${OFF}'"
 }
 
 
 apply_theme() {
-    theme_file="$1"
+    name=$1
     shift 1
 
-    assert_file_exist "$theme_file"
+    [ ! -f "$CONFIG_FILE" ] && {
+      log_err "CONFIG_FILE: '$CONFIG_FILE': No such file or directory.";
+      exit 1;
+    }
+
+    [ "$(jq ".$name" "$CONFIG_FILE")" == "null" ] && {
+      log_err "'$name' was not found in '$CONFIG_FILE'...";
+      exit 1;
+    }
+
+    assert_file_exist "$(get_file_from_json "$name")"
     code=$?
     [ $code -ne 0 ] && return "$code"
 
@@ -212,15 +214,15 @@ apply_theme() {
     declare -A palettes
     for arg in "$@";
     do
-      name=$(echo "$arg" | cut -d= -f1)
+      hunk=$(echo "$arg" | cut -d= -f1)
       value=$(echo "$arg" | cut -d= -f2)
-      palettes["$name"]="$value"
+      palettes["$hunk"]="$value"
     done
 
     # apply the palettes to the hunks.
-    for name in "${!palettes[@]}";
+    for hunk in "${!palettes[@]}";
     do
-        apply_palette_to_hunk "$theme_file" "$name" "${palettes[$name]}"
+        apply_palette_to_hunk "$name" "$hunk" "${palettes[$hunk]}"
     done
 }
 
@@ -229,7 +231,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: a2n-s-apply-theme [-h] CONFIG_FILE NAME1=PALETTE1 NAME2=PALETTE2 ..."
+  echo "Usage: a2n-s-apply-theme [-h] CONFIG_NAME NAME1=PALETTE1 NAME2=PALETTE2 ..."
   echo "Type -h or --help for the full help."
 }
 
@@ -243,9 +245,9 @@ help () {
   echo "     Do not forget to put it in your PATH."
   echo ""
   echo "Usage:"
-  echo "     a2n-s-apply-theme [-h] CONFIG_FILE NAME1=PALETTE1 NAME2=PALETTE2 ..."
+  echo "     a2n-s-apply-theme [-h] CONFIG_NAME NAME1=PALETTE1 NAME2=PALETTE2 ..."
   echo ""
-  echo "          - CONFIG_FILE is the path to the config file to edit"
+  echo "          - CONFIG_NAME is the name of the config in the json config file of this script"
   echo "          - NAME is the name of the hunk to apply the theme to"
   echo "          - PALETTE is the list of colors to apply to the config file"
   echo ""
@@ -254,6 +256,7 @@ help () {
   echo ""
   echo "Environment variables:"
   echo "     COMMENT_SYMBOL          the symbol used to begin comment in the config file (defaults to '#', e.g. for \`bash\` or \`python\`)"
+  echo "     CONFIG_FILE             the config file for this script (defaults to '\$HOME/.config/a2n-s-apply-theme.json')"
   exit 0
 }
 
@@ -277,9 +280,9 @@ main () {
       return "$BAD_ARGUMENTS_ERROR_CODE";
   }
 
-  file=$1
+  config=$1
   shift 1
-  apply_theme "$file" "$@"
+  apply_theme "$config" "$@"
 }
 
 
