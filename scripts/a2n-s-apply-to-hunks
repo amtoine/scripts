@@ -14,13 +14,13 @@
 # Contributors: Stevan Antoine
 
 
-OPTIONS=$(getopt -o h --long help -n 'a2n-s-apply-theme' -- "$@")
+OPTIONS=$(getopt -o h --long help -n 'a2n-s-apply-to-hunks' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
 # environment variables.
 [ -z "$COMMENT_SYMBOL" ] && COMMENT_SYMBOL="#"
-[ -z "$CONFIG_FILE" ] && CONFIG_FILE="$HOME/.config/a2n-s/themes.json"
+[ -z "$CONFIG_FILE" ] && CONFIG_FILE="$HOME/.config/a2n-s/hunks.json"
 
 # some constants.
 BEGIN_MARKER="$COMMENT_SYMBOL+ BEGIN"
@@ -87,31 +87,31 @@ get_file_from_json () {
 
 
 check_markers () {
-    local theme_file=$1
+    local file=$1
     local hunk=$2
-    # assert color-theme markers exist.
-    local begin_markers=($(grep "^$BEGIN_MARKER:$hunk$" "$theme_file" -n | awk -F: '{print $1}'))
-    local end_markers=($(grep "^$END_MARKER:$hunk$" "$theme_file" -n | awk -F: '{print $1}'))
+    # assert the hunk's markers exist.
+    local begin_markers=($(grep "^$BEGIN_MARKER:$hunk$" "$file" -n | awk -F: '{print $1}'))
+    local end_markers=($(grep "^$END_MARKER:$hunk$" "$file" -n | awk -F: '{print $1}'))
     [ "${#begin_markers[@]}" -eq 0 ] && {
-        log_err "'$BEGIN_MARKER:$hunk' marker could not be found in '$theme_file'."
+        log_err "'$BEGIN_MARKER:$hunk' marker could not be found in '$file'."
         return "$MISSING_MARKER_ERROR_CODE";
     }
     [ "${#begin_markers[@]}" -gt 1 ] && {
-        log_err "There should be exactly 1 '$BEGIN_MARKER:$hunk' marker in '$theme_file'."
+        log_err "There should be exactly 1 '$BEGIN_MARKER:$hunk' marker in '$file'."
         log_err "Got ${#begin_markers[@]} markers on lines ${begin_markers[*]}."
         return "$MISSING_MARKER_ERROR_CODE";
     }
     [ "${#end_markers[@]}" -eq 0 ] && {
-        log_err "'$END_MARKER:$hunk' marker could not be found in '$theme_file'."
+        log_err "'$END_MARKER:$hunk' marker could not be found in '$file'."
         return "$MISSING_MARKER_ERROR_CODE";
     }
     [ "${#end_markers[@]}" -gt 1 ] && {
-        log_err "There should be exactly 1 '$END_MARKER:$hunk' marker in '$theme_file'."
+        log_err "There should be exactly 1 '$END_MARKER:$hunk' marker in '$file'."
         log_err "Got ${#end_markers[@]} markers on lines ${end_markers[*]}."
         return "$MISSING_MARKER_ERROR_CODE";
     }
 
-    # assert color-theme markers are placed correctly.
+    # assert the hunk's markers are placed correctly.
     local line_begin_marker=${begin_markers[0]}
     local line_end_marker=${end_markers[0]}
     [ "$line_begin_marker" -gt "$line_end_marker" ] && {
@@ -167,15 +167,15 @@ assert_name_and_color_sizes () {
 }
 
 
-apply_palette_to_hunk () {
+apply_values_to_hunk () {
     config=$1
     hunk=$2
     shift 2
-    palette=($@)
+    values=($@)
 
-    theme_file="$(get_file_from_json "$config")"
+    file="$(get_file_from_json "$config")"
 
-    res=$(check_markers "$theme_file" "$hunk")
+    res=$(check_markers "$file" "$hunk")
     code=$?
     [ $code -ne 0 ] && return "$code"
     line_begin_marker=$(echo "$res" | cut -d' ' -f1)
@@ -188,25 +188,25 @@ apply_palette_to_hunk () {
     code=$?
     [ $code -ne 0 ] && return "$code"
 
-    assert_name_and_color_sizes "${#palette[@]}" "${#names[@]}" "$CONFIG_FILE.$config.hunks.$hunk.names"
+    assert_name_and_color_sizes "${#values[@]}" "${#names[@]}" "$CONFIG_FILE.$config.hunks.$hunk.names"
     code=$?
     [ $code -ne 0 ] && return "$code"
 
-    log_info "${BLU}[$theme_file]${OFF} apply ${BLU}'${palette[*]}'${OFF} to '${BLU}$config.$hunk${OFF}'"
+    log_info "${BLU}[$file]${OFF} apply ${BLU}'${values[*]}'${OFF} to '${BLU}$config.$hunk${OFF}'"
     # remove the colors inbetween the markers.
-    file_no_colors=$(sed -e "/^$BEGIN_MARKER:$hunk$/,/^$END_MARKER:$hunk$/{//!d}" "$theme_file")
+    file_no_colors=$(sed -e "/^$BEGIN_MARKER:$hunk$/,/^$END_MARKER:$hunk$/{//!d}" "$file")
     # add the colors.
-    for ((i=(("${#palette[@]}"-1)); i>=0; i--)) ;
+    for ((i=(("${#values[@]}"-1)); i>=0; i--)) ;
     do
-        line=$(echo "$format" | sed -e "s/{name}/${names[$i]}/g" -e "s/{color}/${palette[$i]}/g")
+        line=$(echo "$format" | sed -e "s/{name}/${names[$i]}/g" -e "s/{color}/${values[$i]}/g")
         file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER:$hunk/a $TEMP_MARKER$line" | sed "s/^$TEMP_MARKER//")
     done
-    echo "$file_no_colors" > "$theme_file"
-    log_ok "${GRN}[$theme_file]${OFF} theme successfully applied to hunk '${GRN}$config.$hunk${OFF}'"
+    echo "$file_no_colors" > "$file"
+    log_ok "${GRN}[$file]${OFF} config successfully applied to hunk '${GRN}$config.$hunk${OFF}'"
 }
 
 
-apply_theme() {
+apply_to_hunks() {
     name=$1
     shift 1
 
@@ -224,19 +224,22 @@ apply_theme() {
     code=$?
     [ $code -ne 0 ] && return "$code"
 
-    # compute the associative array of named hunks and their respective color palettes.
-    declare -A palettes
-    for arg in "$@";
+    [ $(($# % 2)) -ne 0 ] && { log_err "There should be the same number of hunk names and hunks values to apply..."; exit 1; }
+
+    # compute the associative array of named hunks and their respective values.
+    declare -A all_values
+    while [ "$#" -gt 0 ];
     do
-      hunk=$(echo "$arg" | cut -d= -f1)
-      value=$(echo "$arg" | cut -d= -f2)
-      palettes["$hunk"]="$value"
+      hunk=$1;
+      value=$2;
+      shift 2;
+      all_values["$hunk"]="$value"
     done
 
-    # apply the palettes to the hunks.
-    for hunk in "${!palettes[@]}";
+    # apply the values to the hunks.
+    for hunk in "${!all_values[@]}";
     do
-        apply_palette_to_hunk "$name" "$hunk" "${palettes[$hunk]}"
+        apply_values_to_hunk "$name" "$hunk" "${all_values[$hunk]}"
     done
 }
 
@@ -245,7 +248,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: a2n-s-apply-theme [-h] CONFIG_NAME NAME1=PALETTE1 NAME2=PALETTE2 ..."
+  echo "Usage: a2n-s-apply-to-hunks [-h] CONFIG_NAME HUNK1 VALUES1 HUNK2 VALUES2 ..."
   echo "Type -h or --help for the full help."
 }
 
@@ -254,23 +257,23 @@ help () {
   #
   # the help function.
   #
-  echo "a2n-s-apply-theme:"
-  echo "     This script allows the user to easily apply a theme to a config file."
+  echo "a2n-s-apply-to-hunks:"
+  echo "     This script allows the user to easily apply some configuration to a config file."
   echo "     Do not forget to put it in your PATH."
   echo ""
   echo "Usage:"
-  echo "     a2n-s-apply-theme [-h] CONFIG_NAME NAME1=PALETTE1 NAME2=PALETTE2 ..."
+  echo "     a2n-s-apply-to-hunks [-h] CONFIG_NAME HUNK1 VALUES1 HUNK2 VALUES2 ..."
   echo ""
   echo "          - CONFIG_NAME is the name of the config in the json config file of this script"
-  echo "          - NAME is the name of the hunk to apply the theme to"
-  echo "          - PALETTE is the list of colors to apply to the config file"
+  echo "          - HUNK is the name of the hunk to apply the values to"
+  echo "          - VALUES is the list of values to apply to the hunk"
   echo ""
   echo "Switches:"
   echo "     -h/--help               shows this help."
   echo ""
   echo "Environment variables:"
   echo "     COMMENT_SYMBOL          the symbol used to begin comment in the config file (defaults to '#', e.g. for \`bash\` or \`python\`)"
-  echo "     CONFIG_FILE             the config file for this script (defaults to '\$HOME/.config/a2n-s/themes.json')"
+  echo "     CONFIG_FILE             the config file for this script (defaults to '\$HOME/.config/a2n-s/hunks.json')"
   exit 0
 }
 
@@ -296,7 +299,7 @@ main () {
 
   config=$1
   shift 1
-  apply_theme "$config" "$@"
+  apply_to_hunks "$config" "$@"
 }
 
 
