@@ -134,12 +134,12 @@ get_format_from_json () {
         log_err "No format found in $CONFIG_FILE.$1.hunks.$2"
         return "$MISSING_FIELD_ERROR_CODE";
     }
-    [ -z "$(echo "$format" | grep "{name}" )" ] && {
-        log_err "missing 'name' key in $CONFIG_FILE.$1.hunks.$2"
+    [ -z "$(echo "$format" | grep "{key}" )" ] && {
+        log_err "missing 'key' placeholder in $CONFIG_FILE.$1.hunks.$2"
         return "$MISSING_FIELD_ERROR_CODE";
     }
-    [ -z "$(echo "$format" | grep "{color}" )" ] && {
-        log_err "missing 'color' key in $CONFIG_FILE.$1.hunks.$2"
+    [ -z "$(echo "$format" | grep "{value}" )" ] && {
+        log_err "missing 'value' placeholder in $CONFIG_FILE.$1.hunks.$2"
         return "$MISSING_FIELD_ERROR_CODE";
     }
 
@@ -147,22 +147,22 @@ get_format_from_json () {
 }
 
 
-get_names_from_json () {
-    local names=$(jq ".$1.hunks.$2.names" "$CONFIG_FILE")
-    [ "$names" == "null" ] && {
-        log_err "No names found between lines $CONFIG_FILE.$1.hunks.$2"
+get_mapping_from_json () {
+    local mapping=$(jq ".$1.hunks.$2.mapping" "$CONFIG_FILE")
+    [ "$mapping" == "null" ] && {
+        log_err "No mapping found between lines $CONFIG_FILE.$1.hunks.$2"
         return "$MISSING_FIELD_ERROR_CODE";
     }
 
-    echo "$names" | tail -n+2 | head -n-1 | sed 's/"//g; s/^\s*//g; s/,//g' | tr '\n' ' '
+    echo "$mapping" | tail -n+2 | head -n-1 | sed 's/"//g; s/^\s*//g; s/,//g' | tr '\n' ' '
 }
 
 
-assert_name_and_color_sizes () {
+assert_mapping_and_color_sizes () {
     [ "$1" -ne "$2" ] && {
-        log_err "Not the same number of colors and names..."
-        log_err "Computed $1 colors."
-        log_err "Found $2 names in $3"
+        log_err "Not the same number of colors and mapping elements..."
+        log_err "Got $1 colors."
+        log_err "Found $2 mapping elements from $3"
         return "$ARRAY_SIZE_MISMATCH_ERROR_CODE";
     }
     return "$SUCCESS_ERROR_CODE"
@@ -186,26 +186,26 @@ apply_values_to_hunk () {
     format=$(get_format_from_json "$config" "$hunk")
     code=$?
     [ $code -ne "$SUCCESS_ERROR_CODE" ] && return "$code"
-    names=($(get_names_from_json "$config" "$hunk"))
+    mapping=($(get_mapping_from_json "$config" "$hunk"))
     code=$?
     [ $code -ne "$SUCCESS_ERROR_CODE" ] && return "$code"
 
-    assert_name_and_color_sizes "${#values[@]}" "${#names[@]}" "$CONFIG_FILE.$config.hunks.$hunk.names"
+    assert_mapping_and_color_sizes "${#values[@]}" "${#mapping[@]}" "$CONFIG_FILE.$config.hunks.$hunk.mapping"
     code=$?
     [ $code -ne "$SUCCESS_ERROR_CODE" ] && return "$code"
 
     # generate the final maps of values.
-    declare -A names_map;
+    declare -A keys_map;
     declare -A values_map;
     error="false"
-    for ((i=0; i<"${#names[@]}"; i++));
+    for ((i=0; i<"${#mapping[@]}"; i++));
     do
-        names_key=$(echo "${names[$i]}" | cut -d: -f1)
-        names_value=$(echo "${names[$i]}" | cut -d: -f2)
+        keys_key=$(echo "${mapping[$i]}" | cut -d: -f1)
+        keys_value=$(echo "${mapping[$i]}" | cut -d: -f2)
         values_key=$(echo "${values[$i]}" | cut -d: -f1)
         values_value=$(echo "${values[$i]}" | cut -d: -f2)
-        [ "$names_key:$names_value" != "${names[$i]}" ] && {
-            log_err "Error parsing $CONFIG_FILE.$config.hunks.$hunk.names...";
+        [ "$keys_key:$keys_value" != "${mapping[$i]}" ] && {
+            log_err "Error parsing $CONFIG_FILE.$config.hunks.$hunk.mapping...";
             log_info "Please make sure all the array elements are of the form 'key:value'.";
             error="true";
         }
@@ -215,41 +215,41 @@ apply_values_to_hunk () {
             log_info "got '${values[*]}'."
             error="true";
         }
-        names_map["$names_key"]=$names_value
+        keys_map["$keys_key"]=$keys_value
         values_map["$values_key"]=$values_value
     done
     [ "$error" == "true" ] && return "$WRONG_MAPPING_ERROR_CODE";
 
     # check that the map from the config file uses keys provided as arguments.
-    for name in "${!names_map[@]}";
+    for key in "${!keys_map[@]}";
     do
-        value_name=${names_map[$name]}
-        value=${values_map[$value_name]}
+        value_key=${keys_map[$key]}
+        value=${values_map[$value_key]}
         [ -z "$value" ] && {
-            log_err "The '$value_name' value was not given as an argument but is required by '$name'...";
-            log_info "See $CONFIG_FILE.$config.hunks.$hunk.names to fix it."
+            log_err "The '$value_key' value was not given as an argument but is required by '$key'...";
+            log_info "See $CONFIG_FILE.$config.hunks.$hunk.mapping to fix it."
             log_info "The list of provided keys was '${!values_map[*]}'."
             return "$WRONG_MAPPING_ERROR_CODE";
         }
     done
 
     log_info "${BLU}[$file]${OFF} apply ${BLU}'${values[*]}'${OFF} to '${BLU}$config.$hunk${OFF}'"
-    # remove the colors inbetween the markers.
-    file_no_colors=$(sed -e "/^$BEGIN_MARKER:$hunk$/,/^$END_MARKER:$hunk$/{//!d}" "$file")
-    # add the colors.
-    for name in "${!names_map[@]}";
+    # remove the values inbetween the markers.
+    new_file=$(sed -e "/^$BEGIN_MARKER:$hunk$/,/^$END_MARKER:$hunk$/{//!d}" "$file")
+    # add the new values back.
+    for key in "${!keys_map[@]}";
     do
-        value=${values_map[${names_map[$name]}]}
-        line=$(echo "$format" | sed -e "s/{name}/$name/g" -e "s/{color}/$value/g")
-        file_no_colors=$(echo "$file_no_colors" | sed "/^$BEGIN_MARKER:$hunk/a $TEMP_MARKER$line" | sed "s/^$TEMP_MARKER//")
+        value=${values_map[${keys_map[$key]}]}
+        line=$(echo "$format" | sed -e "s/{key}/$key/g" -e "s/{value}/$value/g")
+        new_file=$(echo "$new_file" | sed "/^$BEGIN_MARKER:$hunk/a $TEMP_MARKER$line" | sed "s/^$TEMP_MARKER//")
     done
-    echo "$file_no_colors" > "$file"
+    echo "$new_file" > "$file"
     log_ok "${GRN}[$file]${OFF} config successfully applied to hunk '${GRN}$config.$hunk${OFF}'"
 }
 
 
 apply_to_hunks() {
-    name=$1
+    config=$1
     shift 1
 
     [ ! -f "$CONFIG_FILE" ] && {
@@ -257,16 +257,19 @@ apply_to_hunks() {
       exit 1;
     }
 
-    [ "$(jq ".$name" "$CONFIG_FILE")" == "null" ] && {
-      log_err "'$name' was not found in '$CONFIG_FILE'...";
+    [ "$(jq ".$config" "$CONFIG_FILE")" == "null" ] && {
+      log_err "'$config' was not found in '$CONFIG_FILE'...";
       exit 1;
     }
 
-    assert_file_exist "$(get_file_from_json "$name")"
+    assert_file_exist "$(get_file_from_json "$config")"
     code=$?
     [ $code -ne "$SUCCESS_ERROR_CODE" ] && return "$code"
 
-    [ $(($# % 2)) -ne 0 ] && { log_err "There should be the same number of hunk names and hunks values to apply..."; exit 1; }
+    [ $(($# % 2)) -ne 0 ] && {
+        log_err "There should be the same number of hunk names and hunks values to apply...";
+        exit 1;
+    }
 
     # compute the associative array of named hunks and their respective values.
     declare -A all_values
@@ -281,7 +284,7 @@ apply_to_hunks() {
     # apply the values to the hunks.
     for hunk in "${!all_values[@]}";
     do
-        apply_values_to_hunk "$name" "$hunk" "${all_values[$hunk]}"
+        apply_values_to_hunk "$config" "$hunk" "${all_values[$hunk]}"
     done
 }
 
@@ -308,7 +311,7 @@ help () {
   echo ""
   echo "          - CONFIG_NAME is the name of the config in the json config file of this script"
   echo "          - HUNK is the name of the hunk to apply the values to"
-  echo "          - VALUES is the list of name:value pairs, as defined in the config file below, to apply to the hunk"
+  echo "          - VALUES is the list of key:value pairs, as defined in the config file below, to apply to the hunk"
   echo ""
   echo "Switches:"
   echo "     -h/--help               shows this help."
