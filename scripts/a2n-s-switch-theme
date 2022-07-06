@@ -15,6 +15,7 @@
 
 
 # environment variables
+[ -z "$CONFIG_FILE" ] && CONFIG_FILE="$HOME/.config/a2n-s/hunks.json"
 [ -z "$DUNST_ID" ] && DUNST_ID=7
 
 CACHE="$HOME/.cache";
