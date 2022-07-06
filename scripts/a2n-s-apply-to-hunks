@@ -195,11 +195,29 @@ apply_values_to_hunk () {
     # generate the final maps of values.
     declare -A names_map;
     declare -A values_map;
+    error="false"
     for ((i=0; i<"${#names[@]}"; i++));
     do
-        names_map[$(echo "${names[$i]}" | cut -d: -f1)]=$(echo "${names[$i]}" | cut -d: -f2)
-        values_map[$(echo "${values[$i]}" | cut -d: -f1)]=$(echo "${values[$i]}" | cut -d: -f2)
+        names_key=$(echo "${names[$i]}" | cut -d: -f1)
+        names_value=$(echo "${names[$i]}" | cut -d: -f2)
+        values_key=$(echo "${values[$i]}" | cut -d: -f1)
+        values_value=$(echo "${values[$i]}" | cut -d: -f2)
+        [ "$names_key:$names_value" != "${names[$i]}" ] && {
+            log_err "Error parsing $CONFIG_FILE.$config.hunks.$hunk.names...";
+            log_info "Please make sure all the array elements are of the form 'key:value'.";
+            error="true";
+        }
+        [ "$values_key:$values_value" != "${values[$i]}" ] && {
+            log_err "Error parsing the input values...";
+            log_info "Please make sure all the input elements are of the form 'key:value',";
+            log_info "got '${values[*]}'."
+            error="true";
+        }
+        names_map["$names_key"]=$names_value
+        values_map["$values_key"]=$values_value
     done
+
+    [ "$error" == "true" ] && return 1;
 
     # check that the map from the config file uses keys provided as arguments.
     for name in "${!names_map[@]}";
