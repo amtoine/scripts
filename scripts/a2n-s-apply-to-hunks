@@ -158,17 +158,6 @@ get_mapping_from_json () {
 }
 
 
-assert_mapping_and_color_sizes () {
-    [ "$1" -ne "$2" ] && {
-        log_err "Not the same number of colors and mapping elements..."
-        log_err "Got $1 colors."
-        log_err "Found $2 mapping elements from $3"
-        return "$ARRAY_SIZE_MISMATCH_ERROR_CODE";
-    }
-    return "$SUCCESS_ERROR_CODE"
-}
-
-
 apply_values_to_hunk () {
     config=$1
     hunk=$2
@@ -190,32 +179,34 @@ apply_values_to_hunk () {
     code=$?
     [ $code -ne "$SUCCESS_ERROR_CODE" ] && return "$code"
 
-    assert_mapping_and_color_sizes "${#values[@]}" "${#mapping[@]}" "$CONFIG_FILE.$config.hunks.$hunk.mapping"
-    code=$?
-    [ $code -ne "$SUCCESS_ERROR_CODE" ] && return "$code"
-
     # generate the final maps of values.
     declare -A keys_map;
-    declare -A values_map;
     error="false"
     for ((i=0; i<"${#mapping[@]}"; i++));
     do
         keys_key=$(echo "${mapping[$i]}" | cut -d: -f1)
         keys_value=$(echo "${mapping[$i]}" | cut -d: -f2)
-        values_key=$(echo "${values[$i]}" | cut -d: -f1)
-        values_value=$(echo "${values[$i]}" | cut -d: -f2)
         [ "$keys_key:$keys_value" != "${mapping[$i]}" ] && {
             log_err "Error parsing $CONFIG_FILE.$config.hunks.$hunk.mapping...";
             log_info "Please make sure all the array elements are of the form 'key:value'.";
             error="true";
         }
+        keys_map["$keys_key"]=$keys_value
+    done
+    [ "$error" == "true" ] && return "$WRONG_MAPPING_ERROR_CODE";
+
+    declare -A values_map;
+    error="false"
+    for ((i=0; i<"${#values[@]}"; i++));
+    do
+        values_key=$(echo "${values[$i]}" | cut -d: -f1)
+        values_value=$(echo "${values[$i]}" | cut -d: -f2)
         [ "$values_key:$values_value" != "${values[$i]}" ] && {
             log_err "Error parsing the input values...";
             log_info "Please make sure all the input elements are of the form 'key:value',";
             log_info "got '${values[*]}'."
             error="true";
         }
-        keys_map["$keys_key"]=$keys_value
         values_map["$values_key"]=$values_value
     done
     [ "$error" == "true" ] && return "$WRONG_MAPPING_ERROR_CODE";
