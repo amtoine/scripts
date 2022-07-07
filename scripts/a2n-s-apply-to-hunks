@@ -154,7 +154,7 @@ get_mapping_from_json () {
         return "$MISSING_FIELD_ERROR_CODE";
     }
 
-    echo "$mapping" | tail -n+2 | head -n-1 | sed 's/"//g; s/^\s*//g; s/,//g' | tr '\n' ' '
+    echo "$mapping" | jq '.[]' | sed 's/^"\(.*\)"$/\1/g'
 }
 
 
