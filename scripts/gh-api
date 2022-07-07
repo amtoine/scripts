@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+if [ "$(gh api notifications --jq '.[].subject.title' | wc -l)" -eq 0 ];
+then
+    dunstify "gh api" "no notifications for now..."
+else
+    dunstify "gh api"
+    readarray -t titles < <(gh api notifications --jq '.[].subject.title')
+
+    repos=($(gh api notifications --jq '.[].repository.name'))
+    users=($(gh api notifications --jq '.[].repository.owner.login'))
+    issues=($(gh api notifications --jq '.[].subject.url' | sed 's|.*/||g'))
+    for ((i=0; i<"${#repos[@]}"; i++));
+    do
+        dunstify "${users[$i]}/${repos[$i]}: ${issues[$i]}" "\n${titles[$i]}"
+    done
+fi
