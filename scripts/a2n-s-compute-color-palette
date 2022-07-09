@@ -7,18 +7,59 @@ from tqdm import trange
 Color = str
 
 
+PALETTE_NAMES = [
+    "bg",
+    "fg",
+    "sel_fg",
+    "sel_bg",
+    "cursor",
+    "cl0",
+    "cl1",
+    "cl2",
+    "cl3",
+    "cl4",
+    "cl5",
+    "cl6",
+    "cl7",
+    "cl8",
+    "cl9",
+    "cl10",
+    "cl11",
+    "cl12",
+    "cl13",
+    "cl14",
+    "cl15",
+]
+
+GRADIENT_NAMES = [
+    "gd0",
+    "gd1",
+    "gd2",
+    "gd3",
+    "gd4",
+    "gd5",
+    "gd6",
+    "gd7",
+    "gd8",
+    "gd9",
+    "gd10",
+    "gd11",
+    "gd12",
+    "gd13",
+    "gd14",
+    "gd15",
+    "gd15",
+]
+
+NAMES = PALETTE_NAMES + GRADIENT_NAMES
+
+
 def is_valid_color(color: Color) -> bool:
     return color.startswith("#") and len(color) == 7
 
 
 def is_valid_rgb(red: int, green: int, blue: int) -> bool:
     return (0 <= red <= 255) and (0 <= green <= 255) and (0 <= blue <= 255)
-
-
-def make_random_color() -> Color:
-    return int_to_color(
-        np.random.randint(0, 256), np.random.randint(0, 256), np.random.randint(0, 256)
-    )
 
 
 def int_to_color(red: int, green: int, blue: int) -> Color:
@@ -42,14 +83,19 @@ def color_to_int(color: Color) -> (int, int, int):
     )
 
 
-def test():
-    for r in trange(256, desc="Testing the color conversions"):
-        for g in range(256):
-            for b in range(256):
-                assert (r, g, b) == color_to_int(int_to_color(r, g, b))
-    for i in trange(100000, desc="Testing the random color generation"):
-        assert is_valid_rgb(*color_to_int(make_random_color()))
-    print("Tests are successful!!")
+def make_random_color() -> Color:
+    return int_to_color(
+        np.random.randint(0, 256), np.random.randint(0, 256), np.random.randint(0, 256)
+    )
+
+
+def make_random_colors(names):
+    return dict(
+        zip(
+            names,
+            [make_random_color() for _ in range(len(names))],
+        )
+    )
 
 
 def compute_color_gradient(
@@ -80,36 +126,36 @@ def compute_color_gradient(
     return [int_to_color(r, g, b) for (r, g, b) in ziped_gradients]
 
 
+def test():
+    for r in trange(256, desc="Testing the color conversions"):
+        for g in range(256):
+            for b in range(256):
+                assert (r, g, b) == color_to_int(int_to_color(r, g, b))
+    for i in trange(100000, desc="Testing the random color generation"):
+        assert is_valid_rgb(*color_to_int(make_random_color()))
+    print("Tests are successful!!")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-1",
-        "--color_1",
+        "--gds",
         type=str,
         default="#ff0000",
         help=(
-            "the first color of the gradient of the form '#rrggbb' "
-            "(defaults to red, i.e '#ff0000')."
+            f"the first color of the gradient, i.e. \"{GRADIENT_NAMES[0]}\", "
+            "of the form '#rrggbb' (defaults to red, i.e '#ff0000')."
         ),
     )
     parser.add_argument(
         "-2",
-        "--color_2",
+        "--gde",
         type=str,
         default="#00ff00",
         help=(
-            "the first color of the gradient of the form '#rrggbb' "
-            "(defaults to green, i.e '#00ff00')."
-        ),
-    )
-    parser.add_argument(
-        "-n",
-        "--nb_colors",
-        type=int,
-        default=8,
-        help=(
-            "the total number of colors in the gradient, including the two "
-            "end colors (defaults to '8')."
+            f"the last color of the gradient, i.e. \"{GRADIENT_NAMES[-1]}\", "
+            "of the form '#rrggbb' (defaults to green, i.e '#00ff00')."
         ),
     )
     parser.add_argument(
@@ -123,16 +169,18 @@ if __name__ == "__main__":
         "--random_gradient",
         action="store_true",
         help=(
-            "use random colors for the two ends of the gradient "
+            "use random colors for the two ends of the gradient, i.e. \"gd0\" "
+            "to \"gd15\" keys "
             "(defaults to 'False'). Overwrites -1 and -2."
         ),
     )
     parser.add_argument(
         "-R",
-        "--random_colors",
+        "--random_palette",
         action="store_true",
         help=(
-            "use random colors for the whole gradient "
+            "use random colors for the whole palette, i.e. all the keys in "
+            f"'{', '.join(NAMES)}' "
             "(defaults to 'False'). Overwrites -G, -1 and -2."
         ),
     )
@@ -154,22 +202,40 @@ if __name__ == "__main__":
     if args.test:
         test()
     else:
-        if args.random_colors:
-            color_gradient = [make_random_color() for _ in range(args.nb_colors)]
+        if args.random_palette:
+            palette = make_random_colors(names=NAMES)
         else:
-            if args.random_gradient:
-                color_1 = make_random_color()
-                color_2 = make_random_color()
-            else:
-                color_1 = args.color_1
-                color_2 = args.color_2
+            colors = make_random_colors(names=PALETTE_NAMES)
 
-            color_gradient = compute_color_gradient(
-                color_1,
-                color_2,
-                nb_colors=args.nb_colors,
+            if args.random_gradient:
+                gd_start = make_random_color()
+                gd_end = make_random_color()
+            else:
+                gd_start = args.gds
+                gd_end = args.gde
+
+                if is_valid_color(f"#{gd_start}"):
+                    gd_start = "#" + gd_start
+                if is_valid_color(f"#{gd_end}"):
+                    gd_end = "#" + gd_end
+
+                assert is_valid_color(gd_start) or gd_start in PALETTE_NAMES
+                assert is_valid_color(gd_end) or gd_end in PALETTE_NAMES
+
+                if not is_valid_color(gd_start):
+                    gd_start = colors[gd_start]
+                if not is_valid_color(gd_end):
+                    gd_end = colors[gd_end]
+
+            gradient_colors = compute_color_gradient(
+                gd_start,
+                gd_end,
+                nb_colors=len(GRADIENT_NAMES),
                 reverse=args.reverse,
                 verbose=args.verbose,
             )
+            color_gradient = dict(zip(GRADIENT_NAMES, gradient_colors))
 
-        print(" ".join(color_gradient))
+            palette = {**colors, **color_gradient}
+
+        print("\n".join([f"{key}:{value}" for key, value in palette.items()]))
