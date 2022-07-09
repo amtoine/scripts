@@ -55,14 +55,17 @@ NAMES = PALETTE_NAMES + GRADIENT_NAMES
 
 
 def is_valid_color(color: Color) -> bool:
+    """TODO."""
     return color.startswith("#") and len(color) == 7
 
 
 def is_valid_rgb(red: int, green: int, blue: int) -> bool:
+    """TODO."""
     return (0 <= red <= 255) and (0 <= green <= 255) and (0 <= blue <= 255)
 
 
 def int_to_color(red: int, green: int, blue: int) -> Color:
+    """TODO."""
     if not is_valid_rgb(red, green, blue):
         raise ValueError(
             "Channels should be between 0 and 255, "
@@ -74,6 +77,7 @@ def int_to_color(red: int, green: int, blue: int) -> Color:
 
 
 def color_to_int(color: Color) -> (int, int, int):
+    """TODO."""
     if not is_valid_color(color):
         raise ValueError(f"'color' is not valid, got '{color}'")
     return (
@@ -83,19 +87,44 @@ def color_to_int(color: Color) -> (int, int, int):
     )
 
 
+def complete_color_representation(color: str) -> Color:
+    """TODO."""
+    return f"#{color}" if is_valid_color(f"#{color}") else color
+
+
 def make_random_color() -> Color:
+    """TODO."""
     return int_to_color(
         np.random.randint(0, 256), np.random.randint(0, 256), np.random.randint(0, 256)
     )
 
 
 def make_random_colors(names):
+    """TODO."""
     return dict(
         zip(
             names,
             [make_random_color() for _ in range(len(names))],
         )
     )
+
+
+def get_gradient_end_points(theme, args):
+    """TODO."""
+    if args.random_gradient:
+        gradient_start = make_random_color()
+        gradient_end = make_random_color()
+    else:
+        # get the colors given as arguments.
+        gradient_start = complete_color_representation(args.gds)
+        gradient_end = complete_color_representation(args.gde)
+
+        if not is_valid_color(gradient_start):
+            gradient_start = theme[gradient_start]
+        if not is_valid_color(gradient_end):
+            gradient_end = theme[gradient_end]
+
+    return gradient_start, gradient_end
 
 
 def compute_color_gradient(
@@ -106,6 +135,7 @@ def compute_color_gradient(
     reverse: bool = False,
     verbose: bool = False,
 ):
+    """TODO."""
     if nb_colors < 2:
         raise ValueError(f"'nb_colors' should be at least 2, got '{nb_colors}'.")
     r1, g1, b1 = color_to_int(c1)
@@ -127,6 +157,7 @@ def compute_color_gradient(
 
 
 def test():
+    """TODO."""
     for r in trange(256, desc="Testing the color conversions"):
         for g in range(256):
             for b in range(256):
@@ -137,7 +168,14 @@ def test():
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description=(
+            f"{PALETTE_NAMES = }"
+            "\n"
+            f"{GRADIENT_NAMES = }"
+        ),
+        formatter_class=argparse.RawTextHelpFormatter
+    )
     parser.add_argument(
         "-1",
         "--gds",
@@ -145,7 +183,8 @@ if __name__ == "__main__":
         default="#ff0000",
         help=(
             f"the first color of the gradient, i.e. \"{GRADIENT_NAMES[0]}\", "
-            "of the form '#rrggbb' (defaults to red, i.e '#ff0000')."
+            "of the form '#rrggbb' or a name in 'PALETTE_NAMES' "
+            "(defaults to red, i.e '#ff0000')."
         ),
     )
     parser.add_argument(
@@ -155,7 +194,8 @@ if __name__ == "__main__":
         default="#00ff00",
         help=(
             f"the last color of the gradient, i.e. \"{GRADIENT_NAMES[-1]}\", "
-            "of the form '#rrggbb' (defaults to green, i.e '#00ff00')."
+            "of the form '#rrggbb' or a name in 'PALETTE_NAMES' "
+            "(defaults to green, i.e '#00ff00')."
         ),
     )
     parser.add_argument(
@@ -169,9 +209,9 @@ if __name__ == "__main__":
         "--random_gradient",
         action="store_true",
         help=(
-            "use random colors for the two ends of the gradient, i.e. \"gd0\" "
-            "to \"gd15\" keys "
-            "(defaults to 'False'). Overwrites -1 and -2."
+            "use random colors for the two ends of the gradient, i.e. "
+            f"\"{GRADIENT_NAMES[0]}\" to \"{GRADIENT_NAMES[-1]}\" keys in "
+            "'GRADIENT_NAMES' (defaults to 'False'). Overwrites -1 and -2."
         ),
     )
     parser.add_argument(
@@ -180,7 +220,7 @@ if __name__ == "__main__":
         action="store_true",
         help=(
             "use random colors for the whole palette, i.e. all the keys in "
-            f"'{', '.join(NAMES)}' "
+            "'PALETTE_NAMES' or 'GRADIENT_NAMES' "
             "(defaults to 'False'). Overwrites -G, -1 and -2."
         ),
     )
@@ -203,29 +243,16 @@ if __name__ == "__main__":
         test()
     else:
         if args.random_palette:
+            # all the colors should be completely random.
             palette = make_random_colors(names=NAMES)
         else:
-            colors = make_random_colors(names=PALETTE_NAMES)
+            # TODO: add a real palette generation here.
+            # NOTE: that will probably be something that generates
+            # either light or dark with color0 and color8 being slightly red,
+            # the background following the theme, etc, etc, ...
+            color_theme = make_random_colors(names=PALETTE_NAMES)
 
-            if args.random_gradient:
-                gd_start = make_random_color()
-                gd_end = make_random_color()
-            else:
-                gd_start = args.gds
-                gd_end = args.gde
-
-                if is_valid_color(f"#{gd_start}"):
-                    gd_start = "#" + gd_start
-                if is_valid_color(f"#{gd_end}"):
-                    gd_end = "#" + gd_end
-
-                assert is_valid_color(gd_start) or gd_start in PALETTE_NAMES
-                assert is_valid_color(gd_end) or gd_end in PALETTE_NAMES
-
-                if not is_valid_color(gd_start):
-                    gd_start = colors[gd_start]
-                if not is_valid_color(gd_end):
-                    gd_end = colors[gd_end]
+            gd_start, gd_end = get_gradient_end_points(color_theme, args)
 
             gradient_colors = compute_color_gradient(
                 gd_start,
@@ -236,6 +263,6 @@ if __name__ == "__main__":
             )
             color_gradient = dict(zip(GRADIENT_NAMES, gradient_colors))
 
-            palette = {**colors, **color_gradient}
+            palette = {**color_theme, **color_gradient}
 
         print("\n".join([f"{key}:{value}" for key, value in palette.items()]))
