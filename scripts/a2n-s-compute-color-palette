@@ -118,6 +118,7 @@ def make_color_theme(*, light: bool = False) -> Dict[str, Color]:
     Args:
         light: tell whether to use a light theme or not.
     """
+    bright_to_normal_value = 0.8
     # define some color constants.
     hsv_black = colorsys.rgb_to_hsv(0.0, 0.0, 0.0)
     hsv_grey = colorsys.rgb_to_hsv(0.2, 0.2, 0.2)
@@ -150,16 +151,14 @@ def make_color_theme(*, light: bool = False) -> Dict[str, Color]:
         "cl14": hsv_cyan,
         "cl15": hsv_white,
     }
+    for key, value in color_theme.items():
+        color_theme[key] = np.array(value)
 
     # alter the color a little to complete the theme.
-    color_theme["cl0"] = tuple(np.array([1, 1, 0.8]) * np.array(color_theme["cl8"]))
-    color_theme["cl1"] = tuple(np.array([1, 1, 0.8]) * np.array(color_theme["cl9"]))
-    color_theme["cl2"] = tuple(np.array([1, 1, 0.8]) * np.array(color_theme["cl10"]))
-    color_theme["cl3"] = tuple(np.array([1, 1, 0.8]) * np.array(color_theme["cl11"]))
-    color_theme["cl4"] = tuple(np.array([1, 1, 0.8]) * np.array(color_theme["cl12"]))
-    color_theme["cl5"] = tuple(np.array([1, 1, 0.8]) * np.array(color_theme["cl13"]))
-    color_theme["cl6"] = tuple(np.array([1, 1, 0.8]) * np.array(color_theme["cl14"]))
-    color_theme["cl7"] = tuple(np.array([1, 1, 0.8]) * np.array(color_theme["cl15"]))
+    scale = np.array([1, 1, bright_to_normal_value])
+    for id in range(8):
+        new_value = scale * color_theme[f"cl{id + 8}"]
+        color_theme[f"cl{id}"] = np.clip(new_value, a_min=0.0, a_max=1.0)
 
     # convert the theme back to its
     return {
