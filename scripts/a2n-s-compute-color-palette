@@ -3,55 +3,9 @@
 import argparse
 import numpy as np
 from tqdm import trange
+import colorsys
 
 Color = str
-
-
-PALETTE_NAMES = [
-    "bg",
-    "fg",
-    "sel_fg",
-    "sel_bg",
-    "cursor",
-    "cl0",
-    "cl1",
-    "cl2",
-    "cl3",
-    "cl4",
-    "cl5",
-    "cl6",
-    "cl7",
-    "cl8",
-    "cl9",
-    "cl10",
-    "cl11",
-    "cl12",
-    "cl13",
-    "cl14",
-    "cl15",
-]
-
-GRADIENT_NAMES = [
-    "gd0",
-    "gd1",
-    "gd2",
-    "gd3",
-    "gd4",
-    "gd5",
-    "gd6",
-    "gd7",
-    "gd8",
-    "gd9",
-    "gd10",
-    "gd11",
-    "gd12",
-    "gd13",
-    "gd14",
-    "gd15",
-    "gd15",
-]
-
-NAMES = PALETTE_NAMES + GRADIENT_NAMES
 
 
 def is_valid_color(color: Color) -> bool:
@@ -109,9 +63,89 @@ def make_random_colors(names):
     )
 
 
+PALETTE_NAMES = [
+    "bg",
+    "fg",
+    "sel_bg",
+    "sel_fg",
+    "cursor",
+    "cl0",
+    "cl1",
+    "cl2",
+    "cl3",
+    "cl4",
+    "cl5",
+    "cl6",
+    "cl7",
+    "cl8",
+    "cl9",
+    "cl10",
+    "cl11",
+    "cl12",
+    "cl13",
+    "cl14",
+    "cl15",
+]
+
+GRADIENT_NAMES = [
+    "gd0",
+    "gd1",
+    "gd2",
+    "gd3",
+    "gd4",
+    "gd5",
+    "gd6",
+    "gd7",
+    "gd8",
+    "gd9",
+    "gd10",
+    "gd11",
+    "gd12",
+    "gd13",
+    "gd14",
+    "gd15",
+    "gd15",
+]
+
+NAMES = PALETTE_NAMES + GRADIENT_NAMES
+
+
 def make_color_theme(light: bool = False):
     """TODO."""
-    return make_random_colors(names=PALETTE_NAMES)
+    hsv_black = colorsys.rgb_to_hsv(0.0, 0.0, 0.0)
+    hsv_grey = colorsys.rgb_to_hsv(0.2, 0.2, 0.2)
+    hsv_red = colorsys.rgb_to_hsv(1.0, 0.0, 0.0)
+    hsv_green = colorsys.rgb_to_hsv(0.0, 1.0, 0.0)
+    hsv_yellow = colorsys.rgb_to_hsv(1.0, 1.0, 0.0)
+    hsv_blue = colorsys.rgb_to_hsv(0.0, 0.0, 1.0)
+    hsv_magenta = colorsys.rgb_to_hsv(1.0, 0.0, 1.0)
+    hsv_cyan = colorsys.rgb_to_hsv(0.0, 1.0, 1.0)
+    hsv_white = colorsys.rgb_to_hsv(1.0, 1.0, 1.0)
+    color_theme = {
+        "bg": hsv_black,
+        "fg": hsv_white,
+        "sel_bg": hsv_white,
+        "sel_fg": hsv_black,
+        "cursor": hsv_white,
+        "cl8": hsv_grey,
+        "cl9": hsv_red,
+        "cl10": hsv_green,
+        "cl11": hsv_yellow,
+        "cl12": hsv_blue,
+        "cl13": hsv_magenta,
+        "cl14": hsv_cyan,
+        "cl15": hsv_white,
+    }
+    color_theme["cl0"] = tuple(np.array([1, 1, .8]) * np.array(color_theme["cl8"]))
+    color_theme["cl1"] = tuple(np.array([1, 1, .8]) * np.array(color_theme["cl9"]))
+    color_theme["cl2"] = tuple(np.array([1, 1, .8]) * np.array(color_theme["cl10"]))
+    color_theme["cl3"] = tuple(np.array([1, 1, .8]) * np.array(color_theme["cl11"]))
+    color_theme["cl4"] = tuple(np.array([1, 1, .8]) * np.array(color_theme["cl12"]))
+    color_theme["cl5"] = tuple(np.array([1, 1, .8]) * np.array(color_theme["cl13"]))
+    color_theme["cl6"] = tuple(np.array([1, 1, .8]) * np.array(color_theme["cl14"]))
+    color_theme["cl7"] = tuple(np.array([1, 1, .8]) * np.array(color_theme["cl15"]))
+
+    return {key: int_to_color(*(np.array(colorsys.hsv_to_rgb(*value)) * 255).astype(int)) for key, value in color_theme.items()}
 
 
 def get_gradient_end_points(theme, args):
