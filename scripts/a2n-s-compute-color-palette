@@ -112,13 +112,29 @@ GRADIENT_NAMES = [
 NAMES = PALETTE_NAMES + GRADIENT_NAMES
 
 
-def make_color_theme(*, light: bool = False) -> Dict[str, Color]:
+def make_color_theme(
+    *,
+    light: bool = False,
+    bright_to_normal_value: float = 0.8,
+    hue_bias: float = 0.0,
+    hue_focus: float = 1.0,
+    saturation: float = 1.0,
+    brightness: float = 1.0,
+) -> Dict[str, Color]:
     """Make a full color theme centered around sensible colors.
 
     Args:
         light: tell whether to use a light theme or not.
+        bright_to_normal_value: the factor to go from bright to normal on the
+            brightness.
+        hue_bias: the amount to rotate around the hue circle.
+        hue_focus: the focus factor. the bigger the focus, the more the colors
+            will be centered around the bias.
+        saturation: the final scaling to apply to the saturation of all the
+            colors.
+        brightness: the final scaling to apply to the brightness of all the
+            colors.
     """
-    bright_to_normal_value = 0.8
     # define some color constants.
     hsv_black = colorsys.rgb_to_hsv(0.0, 0.0, 0.0)
     hsv_grey = colorsys.rgb_to_hsv(0.2, 0.2, 0.2)
@@ -159,6 +175,17 @@ def make_color_theme(*, light: bool = False) -> Dict[str, Color]:
     for id in range(8):
         new_value = scale * color_theme[f"cl{id + 8}"]
         color_theme[f"cl{id}"] = np.clip(new_value, a_min=0.0, a_max=1.0)
+
+    # rotate the hue a bit.
+    value_bias = np.array([hue_bias, 0, 0])
+    value_scale = np.array([1/hue_focus, 1, 1])
+    for key, value in color_theme.items():
+        color_theme[key] = value_bias + value * value_scale
+
+    # apply final transformations on the saturation and the brightness.
+    scale = np.array([1, saturation, brightness])
+    for key, value in color_theme.items():
+        color_theme[key] = np.clip(scale * value, a_min=0.0, a_max=1.0)
 
     # convert the theme back to its
     return {
