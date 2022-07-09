@@ -128,11 +128,18 @@ def make_color_theme(*, light: bool = False) -> Dict[str, Color]:
     hsv_magenta = colorsys.rgb_to_hsv(1.0, 0.0, 1.0)
     hsv_cyan = colorsys.rgb_to_hsv(0.0, 1.0, 1.0)
     hsv_white = colorsys.rgb_to_hsv(1.0, 1.0, 1.0)
+
+    if light:
+        fg, bg, sel_fg, sel_bg = hsv_black, hsv_white, hsv_white, hsv_black
+    else:
+        fg, bg, sel_fg, sel_bg = hsv_white, hsv_black, hsv_black, hsv_white
+
+    # define the base colors of the color theme.
     color_theme = {
-        "bg": hsv_black,
-        "fg": hsv_white,
-        "sel_bg": hsv_white,
-        "sel_fg": hsv_black,
+        "bg": bg,
+        "fg": fg,
+        "sel_bg": sel_fg,
+        "sel_fg": sel_bg,
         "cursor": hsv_white,
         "cl8": hsv_grey,
         "cl9": hsv_red,
