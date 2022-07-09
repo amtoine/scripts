@@ -204,6 +204,12 @@ if __name__ == "__main__":
         ),
     )
     parser.add_argument(
+        "-g",
+        "--gradient_only",
+        action="store_true",
+        help="print the gradient only (defaults to 'False').",
+    )
+    parser.add_argument(
         "-l",
         "--light",
         action="store_true",
@@ -270,6 +276,9 @@ if __name__ == "__main__":
             )
             color_gradient = dict(zip(GRADIENT_NAMES, gradient_colors))
 
-            palette = {**color_theme, **color_gradient}
+            if args.gradient_only:
+                palette = color_gradient
+            else:
+                palette = {**color_theme, **color_gradient}
 
         print("\n".join([f"{key}:{value}" for key, value in palette.items()]))
