@@ -42,6 +42,16 @@ def color_to_int(color: Color) -> (int, int, int):
     )
 
 
+def test():
+    for r in trange(256, desc="Testing the color conversions"):
+        for g in range(256):
+            for b in range(256):
+                assert (r, g, b) == color_to_int(int_to_color(r, g, b))
+    for i in trange(100000, desc="Testing the random color generation"):
+        assert is_valid_rgb(*color_to_int(make_random_color()))
+    print("Tests are successful!!")
+
+
 def compute_color_gradient(
     c1: Color,
     c2: Color,
@@ -68,14 +78,6 @@ def compute_color_gradient(
     if reverse:
         ziped_gradients = reversed(ziped_gradients)
     return [int_to_color(r, g, b) for (r, g, b) in ziped_gradients]
-
-
-def test():
-    for r in trange(256, desc="Testing the color conversions"):
-        for g in range(256):
-            for b in range(256):
-                assert (r, g, b) == color_to_int(int_to_color(r, g, b))
-    print("Tests are successful!!")
 
 
 if __name__ == "__main__":
