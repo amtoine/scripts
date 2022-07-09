@@ -109,6 +109,11 @@ def make_random_colors(names):
     )
 
 
+def make_color_theme(light: bool = False):
+    """TODO."""
+    return make_random_colors(names=PALETTE_NAMES)
+
+
 def get_gradient_end_points(theme, args):
     """TODO."""
     if args.random_gradient:
@@ -199,6 +204,12 @@ if __name__ == "__main__":
         ),
     )
     parser.add_argument(
+        "-l",
+        "--light",
+        action="store_true",
+        help="turns on light theme mode (defaults to false, i.e dark theme).",
+    )
+    parser.add_argument(
         "-r",
         "--reverse",
         action="store_true",
@@ -246,11 +257,7 @@ if __name__ == "__main__":
             # all the colors should be completely random.
             palette = make_random_colors(names=NAMES)
         else:
-            # TODO: add a real palette generation here.
-            # NOTE: that will probably be something that generates
-            # either light or dark with color0 and color8 being slightly red,
-            # the background following the theme, etc, etc, ...
-            color_theme = make_random_colors(names=PALETTE_NAMES)
+            color_theme = make_color_theme(light=args.light)
 
             gd_start, gd_end = get_gradient_end_points(color_theme, args)
 
