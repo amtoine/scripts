@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from typing import List, Dict, Tuple
 
 import argparse
 import numpy as np
@@ -6,20 +7,21 @@ from tqdm import trange
 import colorsys
 
 Color = str
+Args = argparse.Namespace
 
 
 def is_valid_color(color: Color) -> bool:
-    """TODO."""
+    """Check if a color is valid, i.e. of the form '#rrggbb'."""
     return color.startswith("#") and len(color) == 7
 
 
 def is_valid_rgb(red: int, green: int, blue: int) -> bool:
-    """TODO."""
+    """Check if each r, g and gb channels are integers between 0 and 255."""
     return (0 <= red <= 255) and (0 <= green <= 255) and (0 <= blue <= 255)
 
 
 def int_to_color(red: int, green: int, blue: int) -> Color:
-    """TODO."""
+    """Convert the R, G and B channels into a valid Color."""
     if not is_valid_rgb(red, green, blue):
         raise ValueError(
             "Channels should be between 0 and 255, "
@@ -31,7 +33,7 @@ def int_to_color(red: int, green: int, blue: int) -> Color:
 
 
 def color_to_int(color: Color) -> (int, int, int):
-    """TODO."""
+    """Convert a Color into its R, G and B channels."""
     if not is_valid_color(color):
         raise ValueError(f"'color' is not valid, got '{color}'")
     return (
@@ -42,19 +44,19 @@ def color_to_int(color: Color) -> (int, int, int):
 
 
 def complete_color_representation(color: str) -> Color:
-    """TODO."""
+    """Add a '#' in front of a color is it is one indeed."""
     return f"#{color}" if is_valid_color(f"#{color}") else color
 
 
 def make_random_color() -> Color:
-    """TODO."""
+    """Make a valid completely random color."""
     return int_to_color(
         np.random.randint(0, 256), np.random.randint(0, 256), np.random.randint(0, 256)
     )
 
 
-def make_random_colors(names):
-    """TODO."""
+def make_random_colors(names: List[str]) -> Dict[str, Color]:
+    """Make a bunch of completely random colors, indexed by the names."""
     return dict(
         zip(
             names,
@@ -110,8 +112,13 @@ GRADIENT_NAMES = [
 NAMES = PALETTE_NAMES + GRADIENT_NAMES
 
 
-def make_color_theme(light: bool = False):
-    """TODO."""
+def make_color_theme(*, light: bool = False) -> Dict[str, Color]:
+    """Make a full color theme centered around sensible colors.
+
+    Args:
+        light: tell whether to use a light theme or not.
+    """
+    # define some color constants.
     hsv_black = colorsys.rgb_to_hsv(0.0, 0.0, 0.0)
     hsv_grey = colorsys.rgb_to_hsv(0.2, 0.2, 0.2)
     hsv_red = colorsys.rgb_to_hsv(1.0, 0.0, 0.0)
@@ -136,20 +143,30 @@ def make_color_theme(light: bool = False):
         "cl14": hsv_cyan,
         "cl15": hsv_white,
     }
-    color_theme["cl0"] = tuple(np.array([1, 1, .8]) * np.array(color_theme["cl8"]))
-    color_theme["cl1"] = tuple(np.array([1, 1, .8]) * np.array(color_theme["cl9"]))
-    color_theme["cl2"] = tuple(np.array([1, 1, .8]) * np.array(color_theme["cl10"]))
-    color_theme["cl3"] = tuple(np.array([1, 1, .8]) * np.array(color_theme["cl11"]))
-    color_theme["cl4"] = tuple(np.array([1, 1, .8]) * np.array(color_theme["cl12"]))
-    color_theme["cl5"] = tuple(np.array([1, 1, .8]) * np.array(color_theme["cl13"]))
-    color_theme["cl6"] = tuple(np.array([1, 1, .8]) * np.array(color_theme["cl14"]))
-    color_theme["cl7"] = tuple(np.array([1, 1, .8]) * np.array(color_theme["cl15"]))
 
-    return {key: int_to_color(*(np.array(colorsys.hsv_to_rgb(*value)) * 255).astype(int)) for key, value in color_theme.items()}
+    # alter the color a little to complete the theme.
+    color_theme["cl0"] = tuple(np.array([1, 1, 0.8]) * np.array(color_theme["cl8"]))
+    color_theme["cl1"] = tuple(np.array([1, 1, 0.8]) * np.array(color_theme["cl9"]))
+    color_theme["cl2"] = tuple(np.array([1, 1, 0.8]) * np.array(color_theme["cl10"]))
+    color_theme["cl3"] = tuple(np.array([1, 1, 0.8]) * np.array(color_theme["cl11"]))
+    color_theme["cl4"] = tuple(np.array([1, 1, 0.8]) * np.array(color_theme["cl12"]))
+    color_theme["cl5"] = tuple(np.array([1, 1, 0.8]) * np.array(color_theme["cl13"]))
+    color_theme["cl6"] = tuple(np.array([1, 1, 0.8]) * np.array(color_theme["cl14"]))
+    color_theme["cl7"] = tuple(np.array([1, 1, 0.8]) * np.array(color_theme["cl15"]))
+
+    # convert the theme back to its
+    return {
+        key: int_to_color(*(np.array(colorsys.hsv_to_rgb(*value)) * 255).astype(int))
+        for key, value in color_theme.items()
+    }
 
 
-def get_gradient_end_points(theme, args):
-    """TODO."""
+def get_gradient_end_points(
+    *,
+    theme: Dict[str, Color],
+    args: Args,
+) -> Tuple[Color, Color]:
+    """Get the two end points of the color gradient from user input."""
     if args.random_gradient:
         gradient_start = make_random_color()
         gradient_end = make_random_color()
@@ -158,6 +175,9 @@ def get_gradient_end_points(theme, args):
         gradient_start = complete_color_representation(args.gds)
         gradient_end = complete_color_representation(args.gde)
 
+        # use the pre-computed values inside the theme if the colors
+        # given as arguments are not valid... they might just be the
+        # color keys for the other colors of the theme.
         if not is_valid_color(gradient_start):
             gradient_start = theme[gradient_start]
         if not is_valid_color(gradient_end):
@@ -173,8 +193,16 @@ def compute_color_gradient(
     nb_colors: int = 2,
     reverse: bool = False,
     verbose: bool = False,
-):
-    """TODO."""
+) -> List[Color]:
+    """Compute a color gradient from its two endpoints.
+
+    Args:
+        c1: the first end point.
+        c2: the second end point.
+        nb_colors: the number of colors, c1 and c2 included, in the gradient.
+        reverse: reverse the gradient.
+        verbose: turn on verbose mode.
+    """
     if nb_colors < 2:
         raise ValueError(f"'nb_colors' should be at least 2, got '{nb_colors}'.")
     r1, g1, b1 = color_to_int(c1)
@@ -196,7 +224,7 @@ def compute_color_gradient(
 
 
 def test():
-    """TODO."""
+    """Run some tests on the above functions."""
     for r in trange(256, desc="Testing the color conversions"):
         for g in range(256):
             for b in range(256):
@@ -208,12 +236,8 @@ def test():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description=(
-            f"{PALETTE_NAMES = }"
-            "\n"
-            f"{GRADIENT_NAMES = }"
-        ),
-        formatter_class=argparse.RawTextHelpFormatter
+        description=(f"{PALETTE_NAMES = }" "\n" f"{GRADIENT_NAMES = }"),
+        formatter_class=argparse.RawTextHelpFormatter,
     )
     parser.add_argument(
         "-1",
@@ -221,7 +245,7 @@ if __name__ == "__main__":
         type=str,
         default="#ff0000",
         help=(
-            f"the first color of the gradient, i.e. \"{GRADIENT_NAMES[0]}\", "
+            f'the first color of the gradient, i.e. "{GRADIENT_NAMES[0]}", '
             "of the form '#rrggbb' or a name in 'PALETTE_NAMES' "
             "(defaults to red, i.e '#ff0000')."
         ),
@@ -232,7 +256,7 @@ if __name__ == "__main__":
         type=str,
         default="#00ff00",
         help=(
-            f"the last color of the gradient, i.e. \"{GRADIENT_NAMES[-1]}\", "
+            f'the last color of the gradient, i.e. "{GRADIENT_NAMES[-1]}", '
             "of the form '#rrggbb' or a name in 'PALETTE_NAMES' "
             "(defaults to green, i.e '#00ff00')."
         ),
@@ -261,7 +285,7 @@ if __name__ == "__main__":
         action="store_true",
         help=(
             "use random colors for the two ends of the gradient, i.e. "
-            f"\"{GRADIENT_NAMES[0]}\" to \"{GRADIENT_NAMES[-1]}\" keys in "
+            f'"{GRADIENT_NAMES[0]}" to "{GRADIENT_NAMES[-1]}" keys in '
             "'GRADIENT_NAMES' (defaults to 'False'). Overwrites -1 and -2."
         ),
     )
@@ -299,7 +323,7 @@ if __name__ == "__main__":
         else:
             color_theme = make_color_theme(light=args.light)
 
-            gd_start, gd_end = get_gradient_end_points(color_theme, args)
+            gd_start, gd_end = get_gradient_end_points(theme=color_theme, args=args)
 
             gradient_colors = compute_color_gradient(
                 gd_start,
