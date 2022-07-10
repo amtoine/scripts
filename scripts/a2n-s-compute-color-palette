@@ -136,15 +136,17 @@ def make_color_theme(
             colors.
     """
     # define some color constants.
-    hsv_black = colorsys.rgb_to_hsv(0.0, 0.0, 0.0)
-    hsv_grey = colorsys.rgb_to_hsv(0.2, 0.2, 0.2)
-    hsv_red = colorsys.rgb_to_hsv(1.0, 0.0, 0.0)
-    hsv_green = colorsys.rgb_to_hsv(0.0, 1.0, 0.0)
-    hsv_yellow = colorsys.rgb_to_hsv(1.0, 1.0, 0.0)
-    hsv_blue = colorsys.rgb_to_hsv(0.0, 0.0, 1.0)
-    hsv_magenta = colorsys.rgb_to_hsv(1.0, 0.0, 1.0)
-    hsv_cyan = colorsys.rgb_to_hsv(0.0, 1.0, 1.0)
-    hsv_white = colorsys.rgb_to_hsv(1.0, 1.0, 1.0)
+    base = dict(
+        hsv_black=colorsys.rgb_to_hsv(0.0, 0.0, 0.0),
+        hsv_grey=colorsys.rgb_to_hsv(0.2, 0.2, 0.2),
+        hsv_red=colorsys.rgb_to_hsv(1.0, 0.0, 0.0),
+        hsv_green=colorsys.rgb_to_hsv(0.0, 1.0, 0.0),
+        hsv_yellow=colorsys.rgb_to_hsv(1.0, 1.0, 0.0),
+        hsv_blue=colorsys.rgb_to_hsv(0.0, 0.0, 1.0),
+        hsv_magenta=colorsys.rgb_to_hsv(1.0, 0.0, 1.0),
+        hsv_cyan=colorsys.rgb_to_hsv(0.0, 1.0, 1.0),
+        hsv_white=colorsys.rgb_to_hsv(1.0, 1.0, 1.0),
+    )
 
     if light:
         fg, bg, sel_fg, sel_bg = hsv_black, hsv_white, hsv_white, hsv_black
@@ -157,15 +159,15 @@ def make_color_theme(
         "fg": fg,
         "sel_bg": sel_fg,
         "sel_fg": sel_bg,
-        "cursor": hsv_white,
-        "cl8": hsv_grey,
-        "cl9": hsv_red,
-        "cl10": hsv_green,
-        "cl11": hsv_yellow,
-        "cl12": hsv_blue,
-        "cl13": hsv_magenta,
-        "cl14": hsv_cyan,
-        "cl15": hsv_white,
+        "cursor": base["hsv_white"],
+        "cl8": base["hsv_grey"],
+        "cl9": base["hsv_red"],
+        "cl10": base["hsv_green"],
+        "cl11": base["hsv_yellow"],
+        "cl12": base["hsv_blue"],
+        "cl13": base["hsv_magenta"],
+        "cl14": base["hsv_cyan"],
+        "cl15": base["hsv_white"],
     }
     for key, value in color_theme.items():
         color_theme[key] = np.array(value)
