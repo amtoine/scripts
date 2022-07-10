@@ -338,6 +338,55 @@ if __name__ == "__main__":
         ),
     )
     parser.add_argument(
+        "--bright_to_normal_value",
+        type=float,
+        default="0.8",
+        help=(
+            "the multiplicative factor to go from bright to normal colors. "
+            "Should be between 0 and 1 (defaults to 0.8)."
+        ),
+    )
+    parser.add_argument(
+        "--hue_bias",
+        type=float,
+        default="0.0",
+        help=(
+            "the additive bias which rotates the color wheel, can be either "
+            "negative or positive and values that are 1 apart result in the "
+            "same rotation of the color wheel (defaults to 0.0)."
+        ),
+    )
+    parser.add_argument(
+        "--hue_focus",
+        type=float,
+        default="1.0",
+        help=(
+            "the multiplicative factor by which the color wheel is dilated. "
+            "The result is that the colors are then zoomed around the hue "
+            "bias (defaults to 1.0, i.e. normal focus)."
+        ),
+    )
+    parser.add_argument(
+        "--saturation",
+        type=float,
+        default="1.0",
+        help=(
+            "the multiplicative factor to apply to the saturation at the end. "
+            "A low value will dilute the colors, a high one will reinforce "
+            "them (defaults to 1.0)."
+        ),
+    )
+    parser.add_argument(
+        "--brightness",
+        type=float,
+        default="1.0",
+        help=(
+            "the multiplicative factor to go from bright to normal colors. "
+            "A high value will bump the brightness up, a low one will darken "
+            "the theme (defaults to 1.0)."
+        ),
+    )
+    parser.add_argument(
         "-v",
         "--verbose",
         action="store_true",
@@ -359,7 +408,14 @@ if __name__ == "__main__":
             # all the colors should be completely random.
             palette = make_random_colors(names=NAMES)
         else:
-            color_theme = make_color_theme(light=args.light)
+            color_theme = make_color_theme(
+                light=args.light,
+                bright_to_normal_value=args.bright_to_normal_value,
+                hue_bias=args.hue_bias,
+                hue_focus=args.hue_focus,
+                saturation=args.saturation,
+                brightness=args.brightness,
+            )
 
             gd_start, gd_end = get_gradient_end_points(theme=color_theme, args=args)
 
