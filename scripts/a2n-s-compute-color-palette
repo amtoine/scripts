@@ -7,6 +7,7 @@ from tqdm import trange
 import colorsys
 
 Color = str
+HSVColor = Tuple[float, float, float]
 Args = argparse.Namespace
 
 
@@ -63,6 +64,22 @@ def make_random_colors(names: List[str]) -> Dict[str, Color]:
             [make_random_color() for _ in range(len(names))],
         )
     )
+
+
+def make_grounds(
+    base: Dict[str, HSVColor], *, light: bool = False
+) -> Tuple[HSVColor, HSVColor, HSVColor, HSVColor]:
+    """Make all the 'grounds' used by a theme from base colors."""
+    fg, bg, sel_fg, sel_bg = (
+        base["hsv_white"],
+        base["hsv_black"],
+        base["hsv_black"],
+        base["hsv_white"],
+    )
+    if light:
+        fg, bg = bg, fg
+        sel_fg, sel_bg = sel_bg, sel_fg
+    return fg, bg, sel_fg, sel_bg
 
 
 PALETTE_NAMES = [
@@ -148,10 +165,7 @@ def make_color_theme(
         hsv_white=colorsys.rgb_to_hsv(1.0, 1.0, 1.0),
     )
 
-    if light:
-        fg, bg, sel_fg, sel_bg = hsv_black, hsv_white, hsv_white, hsv_black
-    else:
-        fg, bg, sel_fg, sel_bg = hsv_white, hsv_black, hsv_black, hsv_white
+    fg, bg, sel_fg, sel_bg = make_grounds(base, light=light)
 
     # define the base colors of the color theme.
     color_theme = {
