@@ -174,7 +174,7 @@ def make_color_theme(
     scale = np.array([1, 1, bright_to_normal_value])
     for id in range(8):
         new_value = scale * color_theme[f"cl{id + 8}"]
-        color_theme[f"cl{id}"] = np.clip(new_value, a_min=0.0, a_max=1.0)
+        color_theme[f"cl{id}"] = new_value
 
     # rotate the hue a bit.
     value_bias = np.array([hue_bias, 0, 0])
@@ -185,7 +185,12 @@ def make_color_theme(
     # apply final transformations on the saturation and the brightness.
     scale = np.array([1, saturation, brightness])
     for key, value in color_theme.items():
-        color_theme[key] = np.clip(scale * value, a_min=0.0, a_max=1.0)
+        color_theme[key] = scale * value
+
+    # make sure the saturation and the brightness are between 0 and 1.
+    for key, value in color_theme.items():
+        clipped_value = np.array([value[0], *np.clip(value[1:], a_min=0.0, a_max=1.0)])
+        color_theme[key] = clipped_value
 
     # convert the theme back to its
     return {
