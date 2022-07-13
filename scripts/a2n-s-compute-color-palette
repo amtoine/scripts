@@ -1,0 +1,471 @@
+#!/usr/bin/env python3
+from typing import List, Dict, Tuple
+
+import argparse
+import numpy as np
+from tqdm import trange
+import colorsys
+
+Color = str
+HSVColor = Tuple[float, float, float]
+Args = argparse.Namespace
+
+
+def is_valid_color(color: Color) -> bool:
+    """Check if a color is valid, i.e. of the form '#rrggbb'."""
+    return color.startswith("#") and len(color) == 7
+
+
+def is_valid_rgb(red: int, green: int, blue: int) -> bool:
+    """Check if each r, g and gb channels are integers between 0 and 255."""
+    return (0 <= red <= 255) and (0 <= green <= 255) and (0 <= blue <= 255)
+
+
+def int_to_color(red: int, green: int, blue: int) -> Color:
+    """Convert the R, G and B channels into a valid Color."""
+    if not is_valid_rgb(red, green, blue):
+        raise ValueError(
+            "Channels should be between 0 and 255, "
+            f"got '{red}', '{green}' and '{blue}'."
+        )
+
+    color = hex((red << 16) + (green << 8) + (blue << 0)).replace("0x", "")
+    return f"#{color:>06}"
+
+
+def color_to_int(color: Color) -> (int, int, int):
+    """Convert a Color into its R, G and B channels."""
+    if not is_valid_color(color):
+        raise ValueError(f"'color' is not valid, got '{color}'")
+    return (
+        int(f"0x{color[1:3]}", base=16),
+        int(f"0x{color[3:5]}", base=16),
+        int(f"0x{color[5:7]}", base=16),
+    )
+
+
+def complete_color_representation(color: str) -> Color:
+    """Add a '#' in front of a color is it is one indeed."""
+    return f"#{color}" if is_valid_color(f"#{color}") else color
+
+
+def make_random_color() -> Color:
+    """Make a valid completely random color."""
+    return int_to_color(
+        np.random.randint(0, 256), np.random.randint(0, 256), np.random.randint(0, 256)
+    )
+
+
+def make_random_colors(names: List[str]) -> Dict[str, Color]:
+    """Make a bunch of completely random colors, indexed by the names."""
+    return dict(
+        zip(
+            names,
+            [make_random_color() for _ in range(len(names))],
+        )
+    )
+
+
+def make_grounds(
+    base: Dict[str, HSVColor], *, light: bool = False
+) -> Tuple[HSVColor, HSVColor, HSVColor, HSVColor]:
+    """Make all the 'grounds' used by a theme from base colors."""
+    fg, bg, sel_fg, sel_bg = (
+        base["hsv_white"],
+        base["hsv_black"],
+        base["hsv_black"],
+        base["hsv_white"],
+    )
+    if light:
+        fg, bg = bg, fg
+        sel_fg, sel_bg = sel_bg, sel_fg
+    return fg, bg, sel_fg, sel_bg
+
+
+PALETTE_NAMES = [
+    "bg",
+    "fg",
+    "sel_bg",
+    "sel_fg",
+    "cursor",
+    "cl0",
+    "cl1",
+    "cl2",
+    "cl3",
+    "cl4",
+    "cl5",
+    "cl6",
+    "cl7",
+    "cl8",
+    "cl9",
+    "cl10",
+    "cl11",
+    "cl12",
+    "cl13",
+    "cl14",
+    "cl15",
+]
+
+GRADIENT_NAMES = [
+    "gd0",
+    "gd1",
+    "gd2",
+    "gd3",
+    "gd4",
+    "gd5",
+    "gd6",
+    "gd7",
+    "gd8",
+    "gd9",
+    "gd10",
+    "gd11",
+    "gd12",
+    "gd13",
+    "gd14",
+    "gd15",
+    "gd15",
+]
+
+NAMES = PALETTE_NAMES + GRADIENT_NAMES
+
+
+def make_color_theme(
+    *,
+    light: bool = False,
+    bright_to_normal_value: float = 0.8,
+    hue_bias: float = 0.0,
+    hue_focus: float = 1.0,
+    saturation: float = 1.0,
+    brightness: float = 1.0,
+    temperature: float = 0.0,
+) -> Dict[str, Color]:
+    """Make a full color theme centered around sensible colors.
+
+    Args:
+        light: tell whether to use a light theme or not.
+        bright_to_normal_value: the factor to go from bright to normal on the
+            brightness.
+        hue_bias: the amount to rotate around the hue circle.
+        hue_focus: the focus factor. the bigger the focus, the more the colors
+            will be centered around the bias.
+        saturation: the final scaling to apply to the saturation of all the
+            colors.
+        brightness: the final scaling to apply to the brightness of all the
+            colors.
+    """
+    # define some color constants.
+    base = dict(
+        hsv_black=colorsys.rgb_to_hsv(0.1, 0.1, 0.1),
+        hsv_grey=colorsys.rgb_to_hsv(0.2, 0.2, 0.2),
+        hsv_red=colorsys.rgb_to_hsv(1.0, 0.0, 0.0),
+        hsv_green=colorsys.rgb_to_hsv(0.0, 1.0, 0.0),
+        hsv_yellow=colorsys.rgb_to_hsv(1.0, 1.0, 0.0),
+        hsv_blue=colorsys.rgb_to_hsv(0.0, 0.0, 1.0),
+        hsv_magenta=colorsys.rgb_to_hsv(1.0, 0.0, 1.0),
+        hsv_cyan=colorsys.rgb_to_hsv(0.0, 1.0, 1.0),
+        hsv_white=colorsys.rgb_to_hsv(1.0, 1.0, 1.0),
+    )
+
+    fg, bg, sel_fg, sel_bg = make_grounds(base, light=light)
+
+    # define the base colors of the color theme.
+    color_theme = {
+        "bg": bg,
+        "fg": fg,
+        "sel_bg": sel_fg,
+        "sel_fg": sel_bg,
+        "cursor": base["hsv_white"],
+        "cl8": base["hsv_grey"],
+        "cl9": base["hsv_red"],
+        "cl10": base["hsv_green"],
+        "cl11": base["hsv_yellow"],
+        "cl12": base["hsv_blue"],
+        "cl13": base["hsv_magenta"],
+        "cl14": base["hsv_cyan"],
+        "cl15": base["hsv_white"],
+    }
+    for key, value in color_theme.items():
+        color_theme[key] = np.array(value)
+
+    # alter the color a little to complete the theme.
+    scale = np.array([1, 1, bright_to_normal_value])
+    for id in range(8):
+        new_value = scale * color_theme[f"cl{id + 8}"]
+        color_theme[f"cl{id}"] = new_value
+
+    # rotate the hue a bit.
+    value_bias = np.array([hue_bias, 0, 0])
+    value_scale = np.array([1 / hue_focus, 1, 1])
+    for key, value in color_theme.items():
+        color_theme[key] = value_bias + value * value_scale
+
+    # apply final transformations on the saturation and the brightness.
+    scale = np.array([1, saturation, brightness])
+    for key, value in color_theme.items():
+        color_theme[key] = scale * value
+
+    # apply some random variations based on the temperature.
+    for key, value in color_theme.items():
+        color_theme[key] = np.random.normal(loc=value, scale=temperature)
+
+    # make sure the saturation and the brightness are between 0 and 1, and the
+    # the hue wraps around 0 and 1.
+    for key, value in color_theme.items():
+        clipped_value = np.array(
+            [value[0] % 1, *np.clip(value[1:], a_min=0.0, a_max=1.0)]
+        )
+        color_theme[key] = clipped_value
+
+    # convert the theme back to its
+    return {
+        key: int_to_color(*(np.array(colorsys.hsv_to_rgb(*value)) * 255).astype(int))
+        for key, value in color_theme.items()
+    }
+
+
+def get_gradient_end_points(
+    *,
+    theme: Dict[str, Color],
+    args: Args,
+) -> Tuple[Color, Color]:
+    """Get the two end points of the color gradient from user input."""
+    if args.random_gradient:
+        gradient_start = make_random_color()
+        gradient_end = make_random_color()
+    else:
+        # get the colors given as arguments.
+        gradient_start = complete_color_representation(args.gds)
+        gradient_end = complete_color_representation(args.gde)
+
+        # use the pre-computed values inside the theme if the colors
+        # given as arguments are not valid... they might just be the
+        # color keys for the other colors of the theme.
+        if not is_valid_color(gradient_start):
+            gradient_start = theme[gradient_start]
+        if not is_valid_color(gradient_end):
+            gradient_end = theme[gradient_end]
+
+    return gradient_start, gradient_end
+
+
+def compute_color_gradient(
+    c1: Color,
+    c2: Color,
+    *,
+    nb_colors: int = 2,
+    reverse: bool = False,
+    verbose: bool = False,
+) -> List[Color]:
+    """Compute a color gradient from its two endpoints.
+
+    Args:
+        c1: the first end point.
+        c2: the second end point.
+        nb_colors: the number of colors, c1 and c2 included, in the gradient.
+        reverse: reverse the gradient.
+        verbose: turn on verbose mode.
+    """
+    if nb_colors < 2:
+        raise ValueError(f"'nb_colors' should be at least 2, got '{nb_colors}'.")
+    r1, g1, b1 = color_to_int(c1)
+    r2, g2, b2 = color_to_int(c2)
+    if verbose:
+        print(f"{c1} -> ({r1}, {g1}, {b1})")
+        print(f"{c2} -> ({r2}, {g2}, {b2})")
+    red_gradient = np.linspace(r1, r2, nb_colors).astype(int)
+    green_gradient = np.linspace(g1, g2, nb_colors).astype(int)
+    blue_gradient = np.linspace(b1, b2, nb_colors).astype(int)
+    if verbose:
+        print(f"red: {red_gradient}")
+        print(f"green: {green_gradient}")
+        print(f"blue: {blue_gradient}")
+    ziped_gradients = list(zip(red_gradient, green_gradient, blue_gradient))
+    if reverse:
+        ziped_gradients = reversed(ziped_gradients)
+    return [int_to_color(r, g, b) for (r, g, b) in ziped_gradients]
+
+
+def test():
+    """Run some tests on the above functions."""
+    for r in trange(256, desc="Testing the color conversions"):
+        for g in range(256):
+            for b in range(256):
+                assert (r, g, b) == color_to_int(int_to_color(r, g, b))
+    for i in trange(100000, desc="Testing the random color generation"):
+        assert is_valid_rgb(*color_to_int(make_random_color()))
+    print("Tests are successful!!")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description=(f"{PALETTE_NAMES = }" "\n" f"{GRADIENT_NAMES = }"),
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
+    parser.add_argument(
+        "-1",
+        "--gds",
+        type=str,
+        default="#ff0000",
+        help=(
+            f'the first color of the gradient, i.e. "{GRADIENT_NAMES[0]}", '
+            "of the form '#rrggbb' or a name in 'PALETTE_NAMES' "
+            "(defaults to red, i.e '#ff0000')."
+        ),
+    )
+    parser.add_argument(
+        "-2",
+        "--gde",
+        type=str,
+        default="#00ff00",
+        help=(
+            f'the last color of the gradient, i.e. "{GRADIENT_NAMES[-1]}", '
+            "of the form '#rrggbb' or a name in 'PALETTE_NAMES' "
+            "(defaults to green, i.e '#00ff00')."
+        ),
+    )
+    parser.add_argument(
+        "-g",
+        "--gradient_only",
+        action="store_true",
+        help="print the gradient only (defaults to False).",
+    )
+    parser.add_argument(
+        "-l",
+        "--light",
+        action="store_true",
+        help="turns on light theme mode (defaults to False, i.e dark theme).",
+    )
+    parser.add_argument(
+        "-r",
+        "--reverse",
+        action="store_true",
+        help="print the gradient in reverse (defaults to 'False').",
+    )
+    parser.add_argument(
+        "-G",
+        "--random_gradient",
+        action="store_true",
+        help=(
+            "use random colors for the two ends of the gradient, i.e. "
+            f'"{GRADIENT_NAMES[0]}" to "{GRADIENT_NAMES[-1]}" keys in '
+            "'GRADIENT_NAMES' (defaults to False). Overwrites -1 and -2."
+        ),
+    )
+    parser.add_argument(
+        "-R",
+        "--random_palette",
+        action="store_true",
+        help=(
+            "use random colors for the whole palette, i.e. all the keys in "
+            "'PALETTE_NAMES' or 'GRADIENT_NAMES' "
+            "(defaults to False). Overwrites -G, -1 and -2."
+        ),
+    )
+    parser.add_argument(
+        "--bright_to_normal_value",
+        type=float,
+        default="0.8",
+        help=(
+            "the multiplicative factor to go from bright to normal colors. "
+            "Should be between 0 and 1 (defaults to 0.8)."
+        ),
+    )
+    parser.add_argument(
+        "--hue_bias",
+        type=float,
+        default="0.0",
+        help=(
+            "the additive bias which rotates the color wheel, can be either "
+            "negative or positive and values that are 1 apart result in the "
+            "same rotation of the color wheel (defaults to 0.0)."
+        ),
+    )
+    parser.add_argument(
+        "--hue_focus",
+        type=float,
+        default="1.0",
+        help=(
+            "the multiplicative factor by which the color wheel is dilated. "
+            "The result is that the colors are then zoomed around the hue "
+            "bias (defaults to 1.0, i.e. normal focus)."
+        ),
+    )
+    parser.add_argument(
+        "--saturation",
+        type=float,
+        default="1.0",
+        help=(
+            "the multiplicative factor to apply to the saturation at the end. "
+            "A low value will dilute the colors, a high one will reinforce "
+            "them (defaults to 1.0)."
+        ),
+    )
+    parser.add_argument(
+        "--brightness",
+        type=float,
+        default="1.0",
+        help=(
+            "the multiplicative factor to go from bright to normal colors. "
+            "A high value will bump the brightness up, a low one will darken "
+            "the theme (defaults to 1.0)."
+        ),
+    )
+    parser.add_argument(
+        "--temperature",
+        type=float,
+        default="0.0",
+        help=(
+            "the hotter, the more the colors will be random around the "
+            "deterministic values generated by all the parameters above "
+            "(defaults to 0.0)."
+        ),
+    )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="be more verbose (defaults to False).",
+    )
+    parser.add_argument(
+        "-t",
+        "--test",
+        action="store_true",
+        help="run the tests (defaults to False).",
+    )
+
+    args = parser.parse_args()
+
+    if args.test:
+        test()
+    else:
+        if args.random_palette:
+            # all the colors should be completely random.
+            palette = make_random_colors(names=NAMES)
+        else:
+            color_theme = make_color_theme(
+                light=args.light,
+                bright_to_normal_value=args.bright_to_normal_value,
+                hue_bias=args.hue_bias,
+                hue_focus=args.hue_focus,
+                saturation=args.saturation,
+                brightness=args.brightness,
+                temperature=args.temperature,
+            )
+
+            gd_start, gd_end = get_gradient_end_points(theme=color_theme, args=args)
+
+            gradient_colors = compute_color_gradient(
+                gd_start,
+                gd_end,
+                nb_colors=len(GRADIENT_NAMES),
+                reverse=args.reverse,
+                verbose=args.verbose,
+            )
+            color_gradient = dict(zip(GRADIENT_NAMES, gradient_colors))
+
+            if args.gradient_only:
+                palette = color_gradient
+            else:
+                palette = {**color_theme, **color_gradient}
+
+        print("\n".join([f"{key}:{value}" for key, value in palette.items()]))
