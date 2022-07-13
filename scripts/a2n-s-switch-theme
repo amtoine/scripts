@@ -48,21 +48,19 @@ get_themes () {
 
 
 sync_themes () {
-    did_things="false"
+    did_clone="false"
     [ ! -d "$LOCAL_DATABASE" ] && {
-        log_warning "No local database found..."
         log_warning "$LOCAL_DATABASE: No such file or directory."
         log_info "Cloning the remote database..."
         git clone "$REMOTE_DATABASE" "$LOCAL_DATABASE" > /dev/stderr
-        did_things="clone"
+        did_clone="true"
     }
     [ ! -d "$LOCAL_DATABASE/database" ] && {
         log_warning "$LOCAL_DATABASE/database: No such file or directory."
         log_info "Creating the local database..."
         mkdir -p "$LOCAL_DATABASE/database" > /dev/stderr
-        did_things="mkdir"
     }
-    if [ "$did_things" == "false" ];
+    if [ "$did_clone" == "false" ];
     then
         log_info "Updating the local database..."
         git -C "$LOCAL_DATABASE" pull origin > /dev/stderr
