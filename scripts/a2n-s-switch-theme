@@ -71,6 +71,11 @@ sync_themes () {
 }
 
 
+parse_theme () {
+    grep -v "^\s*#.*$" "$LOCAL_DATABASE/themes/$1.conf" | grep -v "^\s*$" | sed 's/^\s*\(.*\)\s*$/\1/g; s/\s\+/:/g'
+}
+
+
 parse_themes () {
     readarray -t themes <<< "$(get_themes)"
     nb_themes="${#themes[@]}";
@@ -80,7 +85,7 @@ parse_themes () {
         echo -n "${MGT}[$i / $nb_themes]${OFF} ${CYN}$theme${OFF}... " > /dev/stderr;
         if [ ! -f "$LOCAL_DATABASE/database/$theme.db" ] || [ "$1" == "force" ];
         then
-            grep -v "^\s*#.*$" "$LOCAL_DATABASE/themes/$theme.conf" | grep -v "^\s*$" | sed 's/^\s*\(.*\)\s*$/\1/g; s/\s\+/:/g' | tee "$LOCAL_DATABASE/database/$theme.db" > /dev/null;
+            parse_theme "$theme" | tee "$LOCAL_DATABASE/database/$theme.db" > /dev/null;
             echo "${GRN}ok${OFF}" > /dev/stderr;
         else
             echo "${YLW}skip${OFF} (already parsed)" > /dev/stderr;
