@@ -35,30 +35,15 @@ OFF="$(tput sgr0)"
 
 SEP="---"
 
+_log_any () { echo "$1[$2]${OFF} $3" > /dev/stderr; }
 
-log_err () {
-    echo "${RED}[ERROR]${OFF} $1" > /dev/stderr;
-}
-
-
-log_warning () {
-    echo "${YLW}[WARNING]${OFF} $1" > /dev/stderr;
-}
+log_err ()     { _log_any "$RED" "ERROR"   "$1"; }
+log_warning () { _log_any "$YLW" "WARNING" "$1"; }
+log_debug ()   { _log_any "$MGT" "DEBUG"   "$1"; }
+log_info ()    { _log_any "$CYN" "INFO"    "$1"; }
+log_ok ()      { _log_any "$GRN" "OK"      "$1"; }
 
 
-log_debug () {
-    echo "${MGT}[DEBUG]${OFF} $1" > /dev/stderr;
-}
-
-
-log_info () {
-    echo "${CYN}[INFO]${OFF} $1" > /dev/stderr;
-}
-
-
-log_ok () {
-    echo "${GRN}[OK]${OFF} $1" > /dev/stderr;
-}
 
 
 sync_themes () {
