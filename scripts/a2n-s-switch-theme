@@ -23,8 +23,6 @@ CACHE="$HOME/.cache";
 REMOTE_DATABASE="https://github.com/kovidgoyal/kitty-themes.git";
 LOCAL_DATABASE="$CACHE/a2n-s-switch-theme/themes";
 
-THEMES=($(find "$LOCAL_DATABASE/themes" -type f -name "*.conf" | sort | xargs -I {} basename {} | sed 's/\.conf$//g'));
-
 RED="$(tput setaf 1)"
 GRN="$(tput setaf 2)"
 YLW="$(tput setaf 3)"
@@ -44,6 +42,9 @@ log_info ()    { _log_any "$CYN" "INFO"    "$1"; }
 log_ok ()      { _log_any "$GRN" "OK"      "$1"; }
 
 
+get_themes () {
+    find "$LOCAL_DATABASE/themes" -type f -name "*.conf" | sort | xargs -I {} basename {} | sed 's/\.conf$//g'
+}
 
 
 sync_themes () {
@@ -71,10 +72,11 @@ sync_themes () {
 
 
 parse_themes () {
-    nb_themes="${#THEMES[@]}";
+    readarray -t themes <<< "$(get_themes)"
+    nb_themes="${#themes[@]}";
     for ((i=0; i<"$nb_themes"; i++));
     do
-        theme="${THEMES[$i]}";
+        theme="${themes[$i]}";
         echo -n "${MGT}[$i / $nb_themes]${OFF} ${CYN}$theme${OFF}... " > /dev/stderr;
         if [ ! -f "$LOCAL_DATABASE/database/$theme.db" ] || [ "$1" == "force" ];
         then
@@ -126,12 +128,10 @@ main_menu () {
         "parse")
             dunstify "a2n-s-switch-theme" "Parsing the themes"
             parse_themes ""
-            THEMES=($(find "$LOCAL_DATABASE/themes" -type f -name "*.conf" | sort | xargs -I {} basename {} | sed 's/\.conf$//g'));
             ;;
         "parse (force)")
             dunstify "a2n-s-switch-theme" "Parsing the themes"
             parse_themes "force"
-            THEMES=($(find "$LOCAL_DATABASE/themes" -type f -name "*.conf" | sort | xargs -I {} basename {} | sed 's/\.conf$//g'));
             ;;
         "apply")
             dunstify "a2n-s-switch-theme" "Switch to apply"
@@ -147,7 +147,8 @@ main_menu () {
 apply_menu () {
     state=$1
     local loop="true"
-    options=$({ echo -e "random\nback\nexit\n----------"; echo -e "${THEMES[@]}" | tr ' ' '\n'; })
+    readarray -t themes <<< "$(get_themes)"
+    options=$({ echo -e "random\nback\nexit\n----------"; echo -e "${themes[@]}" | tr ' ' '\n'; })
     choice=$(menu "$options")
     case "$choice" in
         "random") apply_themes ;;
