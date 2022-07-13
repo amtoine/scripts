@@ -103,6 +103,52 @@ parse_themes () {
 }
 
 
+get_array_from_json () {
+    # $1: the array to get from CONFIG_FILE
+    jq "$1|keys[]" "$CONFIG_FILE" | sed 's/^"//g; s/"$//g;'
+}
+
+
+get_color () {
+    # $1: the name of the color
+    # $2: the list of color:rgb pairs
+    echo "$2" | grep "\<$1\>" | cut -d: -f2
+}
+
+apply_theme () {
+    dunstify "a2n-s-switch-theme" "Applying $1..."
+
+    # compute the proper theme or use the database.
+    case "$1" in
+        default) theme=$(a2n-s-compute-color-palette -1 cl2 -2 cl1);;
+        random) theme=$(a2n-s-compute-color-palette --temperature .1 --saturation .8);;
+        *)  theme=$(cat "$LOCAL_DATABASE/database/$1.db")
+            # the database does not ship with gradients, compute it.
+            gds=$(get_color "cl2" "$theme")
+            gde=$(get_color "cl1" "$theme")
+            theme=$(echo -e "$theme\n$(a2n-s-compute-color-palette -g -1 "$gds" -2 "$gde")")
+        ;;
+    esac
+
+    # iterate over each config in CONFIG_FILE
+    readarray -t configs <<< "$(get_array_from_json ".")"
+    for config in "${configs[@]}";
+    do
+        if [ "$(jq ".$config.hunks" "$CONFIG_FILE")" != "null" ];
+        then
+            # if there is at least one hunk, iterate and apply the theme.
+            readarray -t hunks <<< "$(get_array_from_json ".$config.hunks")"
+            for hunk in "${hunks[@]}";
+            do
+                a2n-s-apply-to-hunks "$config" "$hunk" "$theme"
+            done
+        else
+            log_warning "$config does not have any hunk..."
+        fi
+    done
+}
+
+
 menu_once () {
     options=$1
     choices=$( echo -e "$options" | dmenu -c -l 10 -bw 5 -i -p "Choose a theme: " | sort -u)
@@ -162,14 +208,13 @@ apply_menu () {
     state=$1
     local loop="true"
     readarray -t themes <<< "$(get_themes "database" ".db")"
-    options=$({ echo -e "random\nback\nexit\n$SEP"; echo -e "${themes[@]}" | tr ' ' '\n'; })
+    options=$({ echo -e "default\nrandom\nback\nexit\n$SEP"; echo -e "${themes[@]}" | tr ' ' '\n'; })
     choice=$(menu "$options")
     case "$choice" in
-        "random") apply_themes ;;
         "back") state="main" ;;
         "exit") loop="false" ;;
         "$SEP") ;;
-        *) log_err "'$choice' is an unknown choice...";;
+        *) loop="false"; apply_theme "$choice";;
     esac
     echo "$state" "$loop"
 }
