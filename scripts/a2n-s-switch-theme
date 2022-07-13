@@ -70,7 +70,17 @@ sync_themes () {
 
 
 parse_theme () {
-    grep -v "^\s*#.*$" "$LOCAL_DATABASE/themes/$1.conf" | grep -v "^\s*$" | sed 's/^\s*\(.*\)\s*$/\1/g; s/\s\+/:/g'
+    grep -v "^\s*#.*$" "$LOCAL_DATABASE/themes/$1.conf" | \
+        grep -v "^\s*$" | \
+        sed 's/^\s*\(.*\)\s*$/\1/g; s/\s\+/:/g' | \
+        sed 's/^foreground/fg/g' | \
+        sed 's/^background/bg/g' | \
+        sed 's/selection_foreground/sel_fg/g' | \
+        sed 's/selection_background/sel_bg/g' | \
+        sed 's/color\(.*\):/cl\1:/g' | \
+        sed 's/\(url_color\)/\1/g' | \
+        sed 's/\(url_style\)/\1/g' | \
+        sed 's/\(cursor\)/\1/g'
 }
 
 
