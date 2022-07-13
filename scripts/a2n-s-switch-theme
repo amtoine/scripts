@@ -152,12 +152,13 @@ apply_menu () {
     state=$1
     local loop="true"
     readarray -t themes <<< "$(get_themes "database" ".db")"
-    options=$({ echo -e "random\nback\nexit\n----------"; echo -e "${themes[@]}" | tr ' ' '\n'; })
+    options=$({ echo -e "random\nback\nexit\n$SEP"; echo -e "${themes[@]}" | tr ' ' '\n'; })
     choice=$(menu "$options")
     case "$choice" in
         "random") apply_themes ;;
         "back") state="main" ;;
         "exit") loop="false" ;;
+        "$SEP") ;;
         *) log_err "'$choice' is an unknown choice...";;
     esac
     echo "$state" "$loop"
