@@ -43,7 +43,7 @@ log_ok ()      { _log_any "$GRN" "OK"      "$1"; }
 
 
 get_themes () {
-    find "$LOCAL_DATABASE/themes" -type f -name "*.conf" | sort | xargs -I {} basename {} | sed 's/\.conf$//g'
+    find "$LOCAL_DATABASE/$1" -type f -name "*$2" | sort | xargs -I {} basename {} | sed "s/$2\$//g"
 }
 
 
@@ -75,7 +75,7 @@ parse_theme () {
 
 
 parse_themes () {
-    readarray -t themes <<< "$(get_themes)"
+    readarray -t themes <<< "$(get_themes "themes" ".conf")"
     nb_themes="${#themes[@]}";
     [ "$nb_themes" -eq 0  ] || [ "${themes[0]}" == "" ] && return 1
     for ((i=0; i<"$nb_themes"; i++));
@@ -151,7 +151,7 @@ main_menu () {
 apply_menu () {
     state=$1
     local loop="true"
-    readarray -t themes <<< "$(get_themes)"
+    readarray -t themes <<< "$(get_themes "database" ".db")"
     options=$({ echo -e "random\nback\nexit\n----------"; echo -e "${themes[@]}" | tr ' ' '\n'; })
     choice=$(menu "$options")
     case "$choice" in
