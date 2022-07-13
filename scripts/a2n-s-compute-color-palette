@@ -327,13 +327,13 @@ if __name__ == "__main__":
         "-g",
         "--gradient_only",
         action="store_true",
-        help="print the gradient only (defaults to 'False').",
+        help="print the gradient only (defaults to False).",
     )
     parser.add_argument(
         "-l",
         "--light",
         action="store_true",
-        help="turns on light theme mode (defaults to false, i.e dark theme).",
+        help="turns on light theme mode (defaults to False, i.e dark theme).",
     )
     parser.add_argument(
         "-r",
@@ -348,7 +348,7 @@ if __name__ == "__main__":
         help=(
             "use random colors for the two ends of the gradient, i.e. "
             f'"{GRADIENT_NAMES[0]}" to "{GRADIENT_NAMES[-1]}" keys in '
-            "'GRADIENT_NAMES' (defaults to 'False'). Overwrites -1 and -2."
+            "'GRADIENT_NAMES' (defaults to False). Overwrites -1 and -2."
         ),
     )
     parser.add_argument(
@@ -358,7 +358,7 @@ if __name__ == "__main__":
         help=(
             "use random colors for the whole palette, i.e. all the keys in "
             "'PALETTE_NAMES' or 'GRADIENT_NAMES' "
-            "(defaults to 'False'). Overwrites -G, -1 and -2."
+            "(defaults to False). Overwrites -G, -1 and -2."
         ),
     )
     parser.add_argument(
@@ -424,13 +424,13 @@ if __name__ == "__main__":
         "-v",
         "--verbose",
         action="store_true",
-        help="be more verbose (defaults to 'False').",
+        help="be more verbose (defaults to False).",
     )
     parser.add_argument(
         "-t",
         "--test",
         action="store_true",
-        help="run the tests (defaults to 'False').",
+        help="run the tests (defaults to False).",
     )
 
     args = parser.parse_args()
