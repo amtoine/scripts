@@ -115,6 +115,11 @@ get_color () {
     echo "$2" | grep "\<$1\>" | cut -d: -f2
 }
 
+
+get_commands () {
+    jq ".$1.commands[]" "$CONFIG_FILE" | sed 's/^"//g; s/"$//g;'
+}
+
 apply_theme () {
     dunstify "a2n-s-switch-theme" "Applying $1..."
 
@@ -142,6 +147,15 @@ apply_theme () {
             do
                 a2n-s-apply-to-hunks "$config" "$hunk" "$theme"
             done
+
+            # if there is a post application script to run, run it.
+            [ "$(jq ".$config.commands" "$CONFIG_FILE")" != "null" ] && {
+                readarray -t commands <<< "$(get_commands "$config")"
+                for command in "${commands[@]}";
+                do
+                    bash -c "$command"
+                done
+            }
         else
             log_warning "$config does not have any hunk..."
         fi
