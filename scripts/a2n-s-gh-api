@@ -2,9 +2,9 @@
 
 if [ "$(gh api notifications --jq '.[].subject.title' | wc -l)" -eq 0 ];
 then
-    dunstify "gh api" "no notifications for now..."
+    dunstify "a2n-s-gh-api" "no notifications for now..."
 else
-    dunstify "gh api"
+    dunstify "a2n-s-gh-api" "pulling information from the API..."
     readarray -t titles < <(gh api notifications --jq '.[].subject.title')
 
     repos=($(gh api notifications --jq '.[].repository.name'))
