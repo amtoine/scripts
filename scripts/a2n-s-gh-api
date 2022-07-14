@@ -7,9 +7,9 @@ else
     dunstify "a2n-s-gh-api" "pulling information from the API..."
     readarray -t titles < <(gh api notifications --jq '.[].subject.title')
 
-    repos=($(gh api notifications --jq '.[].repository.name'))
-    users=($(gh api notifications --jq '.[].repository.owner.login'))
-    issues=($(gh api notifications --jq '.[].subject.url' | sed 's|.*/||g'))
+    readarray -t repos < <(gh api notifications --jq '.[].repository.name')
+    readarray -t users < <(gh api notifications --jq '.[].repository.owner.login')
+    readarray -t issues < <(gh api notifications --jq '.[].subject.url' | sed 's|.*/||g')
     for ((i=0; i<"${#repos[@]}"; i++));
     do
         dunstify "${users[$i]}/${repos[$i]}: ${issues[$i]}" "\n${titles[$i]}"
