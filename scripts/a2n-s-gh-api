@@ -19,11 +19,12 @@ pull_from_api () {
 }
 
 
-get_nb_notifications () { jq '.[].subject.title' "$tmpfile" | wc -l; }
-get_titles () { jq '.[].subject.title' "$tmpfile"; }
-get_repos  () { jq '.[].repository.name' "$tmpfile"; }
-get_users  () { jq '.[].repository.owner.login' "$tmpfile"; }
-get_issues () { jq '.[].subject.url' "$tmpfile" | sed 's|.*/||g'; }
+get_from_json () { jq "$1" "$tmpfile" | sed 's/^"//g; s/"$//g'; }
+get_nb_notifications () { get_from_json '.[].subject.title' | wc -l; }
+get_titles () { get_from_json '.[].subject.title'; }
+get_repos  () { get_from_json '.[].repository.name'; }
+get_users  () { get_from_json '.[].repository.owner.login'; }
+get_issues () { get_from_json '.[].subject.url' | sed 's|.*/||g'; }
 
 
 main () {
