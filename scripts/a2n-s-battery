@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #           ___
-#      __ _|_  )_ _ ___ ___   personal page: https://a2n-s.github.io/
-#     / _` |/ /| ' \___(_-<   github   page: https://github.com/a2n-s
-#     \__,_/___|_||_|  /__/   my   dotfiles: https://github.com/a2n-s/dotfiles
+#      __ _|_  )_ _ ___ ___   personal page: https://amtoine.github.io/
+#     / _` |/ /| ' \___(_-<   github   page: https://github.com/amtoine
+#     \__,_/___|_||_|  /__/   my   dotfiles: https://github.com/amtoine/dotfiles
 #           ___                _          _   _
 #      __ _|_  )_ _ ___ ______| |__  __ _| |_| |_ ___ _ _ _  _
 #     / _` |/ /| ' \___(_-<___| '_ \/ _` |  _|  _/ -_) '_| || |
@@ -11,15 +11,15 @@
 #
 # Description:  a script to check the state of the battery and throw appropriate notifications.
 #   run `sudo systemctl enable cronie` to activate the `cron` daemon if not already done, then
-#   add `* * * * * DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=<address> /usr/local/bin/a2n-s-battery --check`
+#   add `* * * * * DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=<address> /usr/local/bin/amtoine-battery --check`
 #   to the `cron` table with `crontab -e` and restart the `cron` daemon with
 #   `sudo systemctl restart cronie`. The address can be found with `echo $DBUS_SESSION_BUS_ADDRESS`.
 # Dependencies: dunst.
-# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
+# License:      https://github.com/amtoine/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 # parse the arguments
-OPTIONS=$(getopt -o hcp --long help,check,print -n 'a2n-s-battery' -- "$@")
+OPTIONS=$(getopt -o hcp --long help,check,print -n 'amtoine-battery' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -27,7 +27,7 @@ eval set -- "$OPTIONS"
 [ -z "$BATTERY" ] && BATTERY="BAT0"
 [ -z "$LOW" ] && LOW=15
 [ -z "$HIGH" ] && HIGH=85
-[ -z "$ICONS" ] && ICONS="/usr/share/icons/a2n-s-icons-git/dark/128x128"
+[ -z "$ICONS" ] && ICONS="/usr/share/icons/amtoine-icons-git/dark/128x128"
 [ -z "$DUNST_ID" ] && DUNST_ID=1
 
 # the location of the battery information files
@@ -104,7 +104,7 @@ print_battery () {
     else
         icon="full"
     fi
-    dunstify --urgency low "a2n-s-battery" "$BATTERY is $status at $level" --icon="$ICONS/battery/$icon.png" --timeout 5000 --replace="$DUNST_ID"
+    dunstify --urgency low "amtoine-battery" "$BATTERY is $status at $level" --icon="$ICONS/battery/$icon.png" --timeout 5000 --replace="$DUNST_ID"
 }
 
 
@@ -125,7 +125,7 @@ check_battery () {
         elif [ "$state" = "high" ]; then
             icon="$ICONS/battery/full.png"
         fi
-        dunstify --urgency critical "a2n-s-battery" "$BATTERY is $state\n($status at $level%)" --icon="$icon" --replace="$DUNST_ID";
+        dunstify --urgency critical "amtoine-battery" "$BATTERY is $state\n($status at $level%)" --icon="$icon" --replace="$DUNST_ID";
     else
         dunstify --close="$DUNST_ID";
     fi
@@ -136,7 +136,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: a2n-s-battery [-hcp]"
+  echo "Usage: amtoine-battery [-hcp]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -146,11 +146,11 @@ help () {
   #
   # the help function.
   #
-  echo "a2n-s-battery:"
+  echo "amtoine-battery:"
   echo "     a script to check the state of the battery and throw appropriate notifications."
   echo ""
   echo "Usage:"
-  echo "     a2n-s-battery [-hcp]"
+  echo "     amtoine-battery [-hcp]"
   echo ""
   echo "Switches:"
   echo "     -h/--help             shows this help."
@@ -161,7 +161,7 @@ help () {
   echo "     BATTERY               the name of the battery to check, inside '/sys/class/power_supply'(defaults to 'BAT0')"
   echo "     LOW                   the threshold below which a discharging battery is considered critical (defaults to 15)"
   echo "     HIGH                  the threshold above which a charging battery is considered critical (defaults to 85)"
-  echo "     ICONS                 the path the the icons (defaults to '/usr/share/icons/a2n-s-icons-git/dark/128x128')"
+  echo "     ICONS                 the path the the icons (defaults to '/usr/share/icons/amtoine-icons-git/dark/128x128')"
   echo "     DUNST_ID              the id of the sound notification, to replace them properly (defaults to 1)"
   exit 0
 }

@@ -1,7 +1,7 @@
 #! /usr/bin/bash
-#           ___                       personal page: https://a2n-s.github.io/
-#      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s
-#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles
+#           ___                       personal page: https://amtoine.github.io/
+#      __ _|_  )_ _    ___   ___      github   page: https://github.com/amtoine
+#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/amtoine/dotfiles
 #     \__,_/___|_||_|       /__/
 #           ___                              _
 #      __ _|_  )_ _ ___ ______ _ __  __ _ __| |_  ___
@@ -11,7 +11,7 @@
 # Description:  gives a complete overview of all the active repos on the system.
 #               inpired from https://hiphish.github.io/blog/2020/05/31/macho-man-command-on-steroids
 # Dependencies: man, fzf
-# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
+# License:      https://github.com/amtoine/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 export FZF_DEFAULT_OPTS='
@@ -25,12 +25,12 @@ help () {
   #
   # the help function.
   #
-  echo "a2n-s-macho:"
+  echo "amtoine-macho:"
   echo "     This script allows the user to easily search man pages with fzf."
   echo "     Do not forget to puth it in your PATH."
   echo ""
   echo "Usage:"
-  echo "     a2n-s-macho [-h] [-s SECTION]"
+  echo "     amtoine-macho [-h] [-s SECTION]"
   echo ""
   echo "Switches:"
   echo "     -h         show this help."

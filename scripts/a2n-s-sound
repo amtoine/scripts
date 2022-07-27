@@ -1,7 +1,7 @@
 #! /usr/bin/bash
-#           ___                       personal page: https://a2n-s.github.io/
-#      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s
-#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles
+#           ___                       personal page: https://amtoine.github.io/
+#      __ _|_  )_ _    ___   ___      github   page: https://github.com/amtoine
+#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/amtoine/dotfiles
 #     \__,_/___|_||_|       /__/
 #           ___                                     _
 #      __ _|_  )_ _ ___ ______ ___ ___ _  _ _ _  __| |
@@ -11,12 +11,12 @@
 # Description:  manages sound and bluetooth sinks.
 #               one can use multiple flags, only the last one will be used.
 # Dependencies: amixer
-# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
+# License:      https://github.com/amtoine/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 # parse the arguments
 OPTIONS=$(getopt -o udtmbc:s:nh --long up,down,toggle,bluetooth,channel:,step:,notify,help \
-              -n 'a2n-s-sound' -- "$@")
+              -n 'amtoine-sound' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -24,7 +24,7 @@ eval set -- "$OPTIONS"
 [[ ! -v DEVICE ]] && DEVICE="JBL Xtreme"
 [[ ! -v ON ]] && ON="a2dp_sink"
 [[ ! -v OFF ]] && OFF="off"
-[[ ! -v ICONS ]] && ICONS="/usr/share/icons/a2n-s-icons-git/dark/128x128"
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/amtoine-icons-git/dark/128x128"
 [ -z "$DUNST_ID" ] && DUNST_ID=2
 
 
@@ -99,7 +99,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: a2n-s-sound [-hudtbn] -c CHANNEL [-s STEP]"
+  echo "Usage: amtoine-sound [-hudtbn] -c CHANNEL [-s STEP]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -109,12 +109,12 @@ help () {
   #
   # the help function.
   #
-  echo "a2n-s-sound:"
+  echo "amtoine-sound:"
   echo "     This script allows the user to easily control the sound."
   echo "     Do not forget to puth it in your PATH."
   echo ""
   echo "Usage:"
-  echo "     a2n-s-sound [-hudtbn] -c CHANNEL [-s STEP]"
+  echo "     amtoine-sound [-hudtbn] -c CHANNEL [-s STEP]"
   echo ""
   echo "Switches:"
   echo "     -h/--help               shows this help."
@@ -130,7 +130,7 @@ help () {
   echo "     DEVICE                  the bluetooth device connected (defaults to 'JBL Xtreme')"
   echo "     ON                      the 'on' sink related to the \`device\` (defaults to 'a2dp_sink')"
   echo "     OFF                     the 'on' sink related to the \`device\` (defaults to 'off')"
-  echo "     ICONS                   the path the the icons (defaults to '/usr/share/icons/a2n-s-icons-git/dark/128x128')"
+  echo "     ICONS                   the path the the icons (defaults to '/usr/share/icons/amtoine-icons-git/dark/128x128')"
   echo "     DUNST_ID                the id of the sound notification, to replace them properly (defaults to 2)"
   exit 0
 }

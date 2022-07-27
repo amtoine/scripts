@@ -1,7 +1,7 @@
 #! /usr/bin/bash
-#           ___                       personal page: https://a2n-s.github.io/
-#      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s
-#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles
+#           ___                       personal page: https://amtoine.github.io/
+#      __ _|_  )_ _    ___   ___      github   page: https://github.com/amtoine
+#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/amtoine/dotfiles
 #     \__,_/___|_||_|       /__/
 #           ___                            _ _
 #      __ _|_  )_ _ ___ ______ __ _ _ _ __| | |__
@@ -11,13 +11,13 @@
 #
 # Description:  rename the default branch automaticcaly.
 #               By default, rename master into main on the remote origin.
-#               The above can be changed with `OLD=<old-branch> NEW=<new-branch> REM=<remote> a2n-s-grdb`
+#               The above can be changed with `OLD=<old-branch> NEW=<new-branch> REM=<remote> amtoine-grdb`
 # Dependencies: git
-# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
+# License:      https://github.com/amtoine/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 # parse the arguments
-OPTIONS=$(getopt -o h --long help -n 'a2n-s-grdb' -- "$@")
+OPTIONS=$(getopt -o h --long help -n 'amtoine-grdb' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -31,7 +31,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: a2n-s-grdb [-h]"
+  echo "Usage: amtoine-grdb [-h]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -41,11 +41,11 @@ help () {
   #
   # the help function.
   #
-  echo "a2n-s-grdb:"
+  echo "amtoine-grdb:"
   echo "     changes the name of the default branch of a \`git\` repository, locally."
   echo ""
   echo "Usage:"
-  echo "     a2n-s-grdb [-h]"
+  echo "     amtoine-grdb [-h]"
   echo ""
   echo "Switches:"
   echo "     -h/--help             shows this help."

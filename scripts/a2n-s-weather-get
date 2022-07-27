@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-#           ___                       personal page: https://a2n-s.github.io/
-#      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s
-#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles
+#           ___                       personal page: https://amtoine.github.io/
+#      __ _|_  )_ _    ___   ___      github   page: https://github.com/amtoine
+#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/amtoine/dotfiles
 #     \__,_/___|_||_|       /__/
 #           ___                                _   _                         _
 #      __ _|_  )_ _ ___ ________ __ _____ __ _| |_| |_  ___ _ _ ___ __ _ ___| |_
@@ -11,16 +11,16 @@
 #
 # Description:  show the weather of some places in the world.
 # Dependencies: curl
-# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
+# License:      https://github.com/amtoine/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 # parse the arguments
-OPTIONS=$(getopt -o h --long help -n 'a2n-s-weather-get' -- "$@")
+OPTIONS=$(getopt -o h --long help -n 'amtoine-weather-get' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
 # allow the user to change the environment variables.
-[[ ! -v ICONS ]] && ICONS="/usr/share/icons/a2n-s-icons-git/dark/128x128"
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/amtoine-icons-git/dark/128x128"
 [[ ! -v PLACES ]] && PLACES="Paris,Seoul,Nantes"
 
 
@@ -28,7 +28,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: a2n-s-weather-get [-h]"
+  echo "Usage: amtoine-weather-get [-h]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -38,17 +38,17 @@ help () {
   #
   # the help function.
   #
-  echo "a2n-s-weather-get :"
+  echo "amtoine-weather-get :"
   echo "     TODO."
   echo ""
   echo "Usage:"
-  echo "     a2n-s-weather-get [-h]"
+  echo "     amtoine-weather-get [-h]"
   echo ""
   echo "Switches:"
   echo "     -h/--help             shows this help."
   echo ""
   echo "Environment variables:"
-  echo "     ICONS                 TODO (defaults to \"/usr/share/icons/a2n-s-icons-git/dark/128x128\")"
+  echo "     ICONS                 TODO (defaults to \"/usr/share/icons/amtoine-icons-git/dark/128x128\")"
   echo "     PLACES                TODO (defaults to \"Paris,Seoul,Nantes\")"
   exit 0
 }

@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
-#           ___                       personal page: https://a2n-s.github.io/
-#      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s
-#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles
+#           ___                       personal page: https://amtoine.github.io/
+#      __ _|_  )_ _    ___   ___      github   page: https://github.com/amtoine
+#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/amtoine/dotfiles
 #     \__,_/___|_||_|       /__/
 #           ___                _         _        _ _
 #      __ _|_  )_ _ ___ ______(_)_ _  __| |_ __ _| | |
@@ -12,12 +12,12 @@
 #               assumes basic Arch Linux installation: https://www.youtube.com/watch?v=PQgyW10xD8s
 #               commands taken from: https://www.youtube.com/watch?v=pouX5VvX0_Q
 # Dependencies: pacman, curl
-# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
+# License:      https://github.com/amtoine/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 # parse the arguments.
 OPTIONS=$(getopt -o hsrSfaid --long help,nosync,reboot,noshell,nodialog,action,interactive,debug \
-              -n 'a2n-s-install' -- "$@")
+              -n 'amtoine-install' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -71,13 +71,13 @@ info () {
 # some environment variable definitions and
 # preliminary work to get all the material
 # necessary to the deployment.
-[[ ! -v DOTFILES ]] && DOTFILES="$HOME/.dotfiles.a2n-s"
+[[ ! -v DOTFILES ]] && DOTFILES="$HOME/.dotfiles.amtoine"
 [[ ! -v CHANNEL ]] && CHANNEL="main"
 
 # download the colorscheme in a temporary file.
-DRC=$(mktemp /tmp/a2n-s_dotfiles_dialogrc.XXXXXX)
+DRC=$(mktemp /tmp/amtoine_dotfiles_dialogrc.XXXXXX)
 trap 'rm "$DRC"' 0 1 15
-_dialogrc_url="https://raw.githubusercontent.com/a2n-s/dotfiles/$CHANNEL/.local/bin/.install.dialogrc"
+_dialogrc_url="https://raw.githubusercontent.com/amtoine/dotfiles/$CHANNEL/.local/bin/.install.dialogrc"
 curl -fsSLo "$DRC" "$_dialogrc_url" || error "Error downloading $_dialogrc_url"
 
 # declare the global dependency table.
@@ -119,7 +119,7 @@ welcome() {
   #
   # designed to be used with `error`, see `error` above
   #
-  DIALOGRC="$DRC" dialog --clear --colors --title "\Z7\ZbInstalling a2n-s' config!" --msgbox "This is a script that will install my current main config. It's really just an installation script for those that want to try out my Qtile desktop.  We will add install the Qtile tiling window manager, the kitty and alacritty terminal emulators , the Fish shell with Oh My Fish and augment the bash shell with Oh My Bash, Doom Emacs and my rice of Neovim and many other essential programs needed to make my dotfiles work correctly.\\n\\n-a2n-s (Antoine Stevan)" 16 60
+  DIALOGRC="$DRC" dialog --clear --colors --title "\Z7\ZbInstalling amtoine' config!" --msgbox "This is a script that will install my current main config. It's really just an installation script for those that want to try out my Qtile desktop.  We will add install the Qtile tiling window manager, the kitty and alacritty terminal emulators , the Fish shell with Oh My Fish and augment the bash shell with Oh My Bash, Doom Emacs and my rice of Neovim and many other essential programs needed to make my dotfiles work correctly.\\n\\n-amtoine (Antoine Stevan)" 16 60
   DIALOGRC="$DRC" dialog --clear --colors --title "\Z7\ZbStay near your computer!" --yes-label "Continue" --no-label "Exit" --yesno "This script is not allowed to be run as root, but you will be asked to enter your sudo password at various points during this installation. This is to give PACMAN the necessary permissions to install the software.  So stay near the computer." 8 60
 }
 
@@ -131,8 +131,8 @@ lastchance() {
   #
   # designed to be used with `error`, see `error` above
   #
-  DIALOGRC="$DRC" dialog --clear --colors --title "\Z7\ZbInstalling a2n-s' config!" --msgbox "WARNING! This installation script is currently in public beta testing. There are almost certainly errors in it; therefore, it is strongly recommended that you not install this on production machines. It is recommended that you try this out in either a virtual machine or on a test machine." 16 60
-  DIALOGRC="$DRC" dialog --clear --colors --title "\Z7\ZbAre You Sure You Want To Do This?" --yes-label "Begin Installation" --no-label "Exit" --yesno "Shall we begin installing a2n-s' config?" 8 60 || { clear; exit 1; }
+  DIALOGRC="$DRC" dialog --clear --colors --title "\Z7\ZbInstalling amtoine' config!" --msgbox "WARNING! This installation script is currently in public beta testing. There are almost certainly errors in it; therefore, it is strongly recommended that you not install this on production machines. It is recommended that you try this out in either a virtual machine or on a test machine." 16 60
+  DIALOGRC="$DRC" dialog --clear --colors --title "\Z7\ZbAre You Sure You Want To Do This?" --yes-label "Begin Installation" --no-label "Exit" --yesno "Shall we begin installing amtoine' config?" 8 60 || { clear; exit 1; }
 }
 
 
@@ -147,7 +147,7 @@ init_deps () {
   #   are used inside the interactive dialog, `yay:cmd` means that
   #   `cmd` is part of the AUR, etc...
   #
-  deps_file=$(mktemp /tmp/a2n-s_dotfiles_deps.XXXXXX)
+  deps_file=$(mktemp /tmp/amtoine_dotfiles_deps.XXXXXX)
   trap 'rm "$deps_file"' 0 1 15
 
   info "################################################################"
@@ -568,7 +568,7 @@ _install_custom_pkgs () {
     for dep in $(grep -e "^pkg:" "$deps_file"); do
       repo_branch="$(echo "$dep" | sed 's/^pkg://')"
       # pull the PKGBUILD
-      curl -fsSLo PKGBUILD "https://raw.githubusercontent.com/a2n-s/$repo_branch/PKGBUILD"
+      curl -fsSLo PKGBUILD "https://raw.githubusercontent.com/amtoine/$repo_branch/PKGBUILD"
       makepkg -cf
     done
     sudo pacman -U -- *.pkg.tar.zst*
@@ -596,8 +596,8 @@ install_config () {
   # each line is duplicated to add a bit color verbose to the
   # process and help the user know what is happening.
   #
-  echo -e "${CMD}git clone ${SUB}-b $CHANNEL ${SRC}https://github.com/a2n-s/dotfiles ${DST}$DOTFILES${OFF}"
-  git clone -b "$CHANNEL" https://github.com/a2n-s/dotfiles "$DOTFILES"
+  echo -e "${CMD}git clone ${SUB}-b $CHANNEL ${SRC}https://github.com/amtoine/dotfiles ${DST}$DOTFILES${OFF}"
+  git clone -b "$CHANNEL" https://github.com/amtoine/dotfiles "$DOTFILES"
   if grep -e "^grub" "$deps_file" -q; then
     echo -e "${CMD}sudo grub-mkconfig ${DST}-o /boot/grub/grub.cfg${OFF}"
     sudo grub-mkconfig -o /boot/grub/grub.cfg
@@ -641,9 +641,9 @@ install_config () {
     echo -e "${CMD}cp -r ${SRC}$DOTFILES/.config/picom ${DST}$HOME/.config${OFF}"
     cp -r "$DOTFILES/.config/picom" "$HOME/.config"
   fi
-  if grep -e "^wallpapers:a2n-s/wallpapers" "$deps_file" -q; then
-    echo -e "${CMD}git clone ${SRC}https://github.com/a2n-s/wallpapers ${DST}$HOME/ghq/githb.com/a2n-s/wallpapers${OFF}"
-    git clone https://github.com/a2n-s/wallpapers "$HOME/ghq/github.com/a2n-s/wallpapers"
+  if grep -e "^wallpapers:amtoine/wallpapers" "$deps_file" -q; then
+    echo -e "${CMD}git clone ${SRC}https://github.com/amtoine/wallpapers ${DST}$HOME/ghq/githb.com/amtoine/wallpapers${OFF}"
+    git clone https://github.com/amtoine/wallpapers "$HOME/ghq/github.com/amtoine/wallpapers"
   fi
   if grep -e "^.*:qutebrowser" "$deps_file" -q; then
     echo -e "${CMD}cp -r ${SRC}$DOTFILES/.config/qutebrowser ${DST}$HOME/.config${OFF}"
@@ -657,18 +657,18 @@ install_config () {
     echo -e "${CMD}cp -r ${SRC}$DOTFILES/.config/alacritty ${DST}$HOME/.config${OFF}"
     cp -r "$DOTFILES/.config/alacritty" "$HOME/.config"
   fi
-  if grep -e "^.*:a2n-s/surf" "$deps_file" -q; then
+  if grep -e "^.*:amtoine/surf" "$deps_file" -q; then
     echo -e "${CMD}cp -r ${SRC}$DOTFILES/.config/surf ${DST}$HOME/.config${OFF}"
     cp -r "$DOTFILES/.config/surf" "$HOME/.config"
   fi
-  if grep -e "^.*:a2n-s/st" "$deps_file" -q; then
+  if grep -e "^.*:amtoine/st" "$deps_file" -q; then
     echo -e "${CMD}cp -r ${SRC}$DOTFILES/.config/st ${DST}$HOME/.config${OFF}"
     cp -r "$DOTFILES/.config/st" "$HOME/.config"
   fi
   if grep -e "^.*:neovim" "$deps_file" -q; then
     info "Installing my neovim rice"
-    echo -e "${CMD}git clone ${SRC}https://github.com/a2n-s/nvim ${DST}$HOME/.config/nvim${OFF}"
-    git clone https://github.com/a2n-s/nvim "$HOME/.config/nvim"
+    echo -e "${CMD}git clone ${SRC}https://github.com/amtoine/nvim ${DST}$HOME/.config/nvim${OFF}"
+    git clone https://github.com/amtoine/nvim "$HOME/.config/nvim"
   fi
   if grep -e "^.*:emacs" "$deps_file" -q; then
     info "Installing doom Emacs"
@@ -831,13 +831,13 @@ help () {
   #
   # the help function.
   #
-  echo "a2n-s-install:"
+  echo "amtoine-install:"
   echo "     This is the deployment script of my dotfiles"
   echo "     Software will be installed and configuration"
   echo "     files will be moved around the filesystem."
   echo ""
   echo "Usage:"
-  echo "     a2n-s-install [-hsfSrai]"
+  echo "     amtoine-install [-hsfSrai]"
   echo ""
   echo "Switches:"
   echo "     -h/--help           shows this help."
@@ -849,7 +849,7 @@ help () {
   echo "     -i/--interactive    interactive install process"
   echo ""
   echo "Environment variables:"
-  echo "     DOTFILES    the path where the dotfiles are pulled down  (defaults to \$HOME/.dotfiles.a2n-s)"
+  echo "     DOTFILES    the path where the dotfiles are pulled down  (defaults to \$HOME/.dotfiles.amtoine)"
   echo "     CHANNEL     the branch of the dotfiles to use            (defaults to main)"
   exit 0
 }
@@ -883,13 +883,13 @@ main () {
 
   echo "Massive changes have been implemented in all the repos of my github:"
   echo "  - repos have been renamed or removed"
-  echo "  - some part of that config have been or are planned to be moved to standalone repos, e.g. ~/.local/bin will be moved shortly to https://github.com/a2n-s/scripts, if not already done"
-  echo "  - PKGBUILD of custom applications have been moved https://github.com/a2n-s/pkgbuild"
+  echo "  - some part of that config have been or are planned to be moved to standalone repos, e.g. ~/.local/bin will be moved shortly to https://github.com/amtoine/scripts, if not already done"
+  echo "  - PKGBUILD of custom applications have been moved https://github.com/amtoine/pkgbuild"
   echo ""
   echo "In the end, I do not consider this script safe enough for now... So it is disabled for now."
   echo ""
   echo "If you really wanted to run that script, please contact me over on Github, the better being"
-  echo "by opening an issue on https://github.com/a2n-s/scripts"
+  echo "by opening an issue on https://github.com/amtoine/scripts"
   exit 0
 
   # check if the action is valid.

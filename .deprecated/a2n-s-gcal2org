@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # parse the arguments
-OPTIONS=$(getopt -o h --long help -n 'a2n-s-gcal2org' -- "$@")
+OPTIONS=$(getopt -o h --long help -n 'amtoine-gcal2org' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -18,7 +18,7 @@ usage () {
     #
     # the usage function.
     #
-    echo "Usage: a2n-s-gcal2org [-h]"
+    echo "Usage: amtoine-gcal2org [-h]"
     echo "Type -h or --help for the full help."
     exit 0
 }
@@ -28,11 +28,11 @@ help () {
     #
     # the help function.
     #
-    echo "a2n-s-gcal2org:"
+    echo "amtoine-gcal2org:"
     echo "     DEPRECATED."
     echo ""
     echo "Usage:"
-    echo "     a2n-s-gcal2org [-h]"
+    echo "     amtoine-gcal2org [-h]"
     echo ""
     echo "Switches:"
     echo "     -h/--help             shows this help."

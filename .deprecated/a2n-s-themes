@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-#           ___                       personal page: https://a2n-s.github.io/ 
-#      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s 
-#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles 
+#           ___                       personal page: https://amtoine.github.io/ 
+#      __ _|_  )_ _    ___   ___      github   page: https://github.com/amtoine 
+#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/amtoine/dotfiles 
 #     \__,_/___|_||_|       /__/
 #           ___                _   _
 #      __ _|_  )_ _ ___ ______| |_| |_  ___ _ __  ___ ___
@@ -10,11 +10,11 @@
 #
 # Description:  manages all the themes of my desktop environment.
 # Dependencies:
-# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
+# License:      https://github.com/amtoine/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 # parse the arguments.
-OPTIONS=$(getopt -o huscpt::C:aPbod --long help,update,strip,clean,print,theme::,config:,all,preview,boot,other,dmenu -n 'a2n-s-themes' -- "$@")
+OPTIONS=$(getopt -o huscpt::C:aPbod --long help,update,strip,clean,print,theme::,config:,all,preview,boot,other,dmenu -n 'amtoine-themes' -- "$@")
 if [ $? != 0 ] ; then usage >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -140,7 +140,7 @@ strip () {
     echo "${Dst}Done${Off}"
   else
     echo -e "No cache to clean at ${Pmt}$CACHE${Off}."
-    echo -e "Consider using ${Tip}a2n-s-themes -u${Off} to update the cache.";
+    echo -e "Consider using ${Tip}amtoine-themes -u${Off} to update the cache.";
   fi
 }
 
@@ -157,7 +157,7 @@ print () {
     fi
   else
     echo -e "No database at ${Pmt}$colordatabase${Off}."
-    echo -e "Consider using ${Tip}a2n-s-themes -s${Off} to generate the ${Dst}$colordatabase${Off} database.";
+    echo -e "Consider using ${Tip}amtoine-themes -s${Off} to generate the ${Dst}$colordatabase${Off} database.";
   fi
 }
 
@@ -174,7 +174,7 @@ preview () {
     fi
   else
     echo -e "No database at ${Pmt}$colorpreview${Off}."
-    echo -e "Consider using ${Tip}a2n-s-themes -s${Off} to generate the ${Dst}$colorpreview${Off} database.";
+    echo -e "Consider using ${Tip}amtoine-themes -s${Off} to generate the ${Dst}$colorpreview${Off} database.";
   fi
 }
 
@@ -188,7 +188,7 @@ clean () {
     rm -rf "$CACHE";
   else
     echo -e "No cache to clean at ${Pmt}$CACHE${Off}."
-    echo -e "Consider using ${Tip}a2n-s-themes -u${Off} to update the cache.";
+    echo -e "Consider using ${Tip}amtoine-themes -u${Off} to update the cache.";
   fi
 }
 
@@ -467,7 +467,7 @@ theme () {
     done
   else
     echo -e "No database at ${Pmt}$colordatabase${Off}."
-    echo -e "Consider using ${Tip}a2n-s-themes -s${Off} to generate the ${Dst}$colordatabase${Off} database.";
+    echo -e "Consider using ${Tip}amtoine-themes -s${Off} to generate the ${Dst}$colordatabase${Off} database.";
   fi
 }
 
@@ -476,7 +476,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: a2n-s-themes [-huscpaPd] [-t=THEME] [-C=C1,C2]"
+  echo "Usage: amtoine-themes [-huscpaPd] [-t=THEME] [-C=C1,C2]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -486,13 +486,13 @@ help () {
   #
   # the help function.
   #
-  echo "a2n-s-themes:"
+  echo "amtoine-themes:"
   echo "     This script allows the user to easily download"
   echo "     preprocess and change colorschemes."
   echo "     Do not forget to puth it in your PATH."
   echo ""
   echo "Usage:"
-  echo "     a2n-s-themes [-huscpPaob] [-t=THEME] [-C=C1,C2]"
+  echo "     amtoine-themes [-huscpPaob] [-t=THEME] [-C=C1,C2]"
   echo ""
   echo "Switches:"
   echo "     -h/--help           shows this help."

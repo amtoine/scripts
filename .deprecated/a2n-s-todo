@@ -6,7 +6,7 @@
 # add it.
 
 # parse the arguments
-OPTIONS=$(getopt -o h --long help -n 'a2n-s-todo' -- "$@")
+OPTIONS=$(getopt -o h --long help -n 'amtoine-todo' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -15,7 +15,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: a2n-s-todo [-h]"
+  echo "Usage: amtoine-todo [-h]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -25,11 +25,11 @@ help () {
   #
   # the help function.
   #
-  echo "a2n-s-todo:"
+  echo "amtoine-todo:"
   echo "     TODO."
   echo ""
   echo "Usage:"
-  echo "     a2n-s-todo [-h]"
+  echo "     amtoine-todo [-h]"
   echo ""
   echo "Switches:"
   echo "     -h/--help             shows this help."

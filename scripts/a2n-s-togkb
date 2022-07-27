@@ -1,7 +1,7 @@
 #! /usr/bin/bash
-#           ___                       personal page: https://a2n-s.github.io/
-#      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s
-#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles
+#           ___                       personal page: https://amtoine.github.io/
+#      __ _|_  )_ _    ___   ___      github   page: https://github.com/amtoine
+#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/amtoine/dotfiles
 #     \__,_/___|_||_|       /__/
 #           ___                _             _   _
 #      __ _|_  )_ _ ___ ______| |_ ___  __ _| |_| |__
@@ -11,11 +11,11 @@
 #
 # Description:  toggles the keyboard layout between qwerty and azerty.
 # Dependencies: setxkbmap 
-# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
+# License:      https://github.com/amtoine/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 # parse the arguments
-OPTIONS=$(getopt -o h --long help -n 'a2n-s-togkb' -- "$@")
+OPTIONS=$(getopt -o h --long help -n 'amtoine-togkb' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -24,7 +24,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: a2n-s-togkb [-h]"
+  echo "Usage: amtoine-togkb [-h]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -34,11 +34,11 @@ help () {
   #
   # the help function.
   #
-  echo "a2n-s-togkb:"
+  echo "amtoine-togkb:"
   echo "     TODO."
   echo ""
   echo "Usage:"
-  echo "     a2n-s-togkb [-h]"
+  echo "     amtoine-togkb [-h]"
   echo ""
   echo "Switches:"
   echo "     -h/--help             shows this help."

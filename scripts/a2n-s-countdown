@@ -1,7 +1,7 @@
 #! /usr/bin/bash
-#           ___                       personal page: https://a2n-s.github.io/
-#      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s
-#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles
+#           ___                       personal page: https://amtoine.github.io/
+#      __ _|_  )_ _    ___   ___      github   page: https://github.com/amtoine
+#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/amtoine/dotfiles
 #     \__,_/___|_||_|       /__/
 #           ___                                _      _
 #      __ _|_  )_ _ ___ ______ __ ___ _  _ _ _| |_ __| |_____ __ ___ _
@@ -10,11 +10,11 @@
 #
 # Description:  simple countdown
 # Dependencies: play, dunst
-# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
+# License:      https://github.com/amtoine/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 # parse the arguments
-OPTIONS=$(getopt -o ht: --long help,time: -n 'a2n-s-countdown' -- "$@")
+OPTIONS=$(getopt -o ht: --long help,time: -n 'amtoine-countdown' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -49,10 +49,10 @@ ring () {
 countdown () {
     for t in $(seq 0 "$1" | tac); do
         progress=$(_compute_progress "$t" "$1")
-        dunstify --urgency low "a2n-s-countdown" "total:${1}s\nremaining:${t}s" -h "int:value:$progress" --replace "$DUNST_ID"
+        dunstify --urgency low "amtoine-countdown" "total:${1}s\nremaining:${t}s" -h "int:value:$progress" --replace "$DUNST_ID"
         sleep 1
     done
-    dunstify --urgency normal "a2n-s-countdown" "time is over" --replace "$DUNST_ID"
+    dunstify --urgency normal "amtoine-countdown" "time is over" --replace "$DUNST_ID"
 }
 
 
@@ -60,7 +60,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: a2n-s-countdown [-h] -t TIME"
+  echo "Usage: amtoine-countdown [-h] -t TIME"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -70,11 +70,11 @@ help () {
   #
   # the help function.
   #
-  echo "a2n-s-battery:"
+  echo "amtoine-battery:"
   echo "     a script to launch a countdown, displayed as notifications, and with a bell at the end."
   echo ""
   echo "Usage:"
-  echo "     a2n-s-countdown [-h] -t TIME"
+  echo "     amtoine-countdown [-h] -t TIME"
   echo ""
   echo "Switches:"
   echo "     -h/--help             shows this help."
@@ -107,7 +107,7 @@ main () {
       countdown "$TIME"
       ring
   else
-      dunstify --urgency critical --timeout 5000 "a2n-s-countdown" "Please provide a time as the only argument"
+      dunstify --urgency critical --timeout 5000 "amtoine-countdown" "Please provide a time as the only argument"
   fi
 }
 

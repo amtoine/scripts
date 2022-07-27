@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-#           ___                       personal page: https://a2n-s.github.io/
-#      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s
-#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles
+#           ___                       personal page: https://amtoine.github.io/
+#      __ _|_  )_ _    ___   ___      github   page: https://github.com/amtoine
+#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/amtoine/dotfiles
 #     \__,_/___|_||_|       /__/
 #           ___                _     __
 #      __ _|_  )_ _ ___ ______| |__ / _|__ _
@@ -11,11 +11,11 @@
 #
 # Description:  a wrapper around lazygit to use it from anywhere on the dotfiles.
 # Dependencies:
-# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
+# License:      https://github.com/amtoine/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 # parse the arguments
-OPTIONS=$(getopt -o h --long help -n 'a2n-s-lcfg' -- "$@")
+OPTIONS=$(getopt -o h --long help -n 'amtoine-lcfg' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -28,7 +28,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: a2n-s-lcfg [-h]"
+  echo "Usage: amtoine-lcfg [-h]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -38,11 +38,11 @@ help () {
   #
   # the help function.
   #
-  echo "a2n-s-lcfg:"
+  echo "amtoine-lcfg:"
   echo "     open the dotfiles *bare* \`git\` repository in \`lazygit\`."
   echo ""
   echo "Usage:"
-  echo "     a2n-s-lcfg [-h]"
+  echo "     amtoine-lcfg [-h]"
   echo ""
   echo "Switches:"
   echo "     -h/--help             shows this help."

@@ -1,7 +1,7 @@
 #! /usr/bin/bash
-#           ___                       personal page: https://a2n-s.github.io/ 
-#      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s 
-#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles 
+#           ___                       personal page: https://amtoine.github.io/ 
+#      __ _|_  )_ _    ___   ___      github   page: https://github.com/amtoine 
+#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/amtoine/dotfiles 
 #     \__,_/___|_||_|       /__/
 #           ___
 #      __ _|_  )_ _ ___ ______ _ __  __ _ __
@@ -11,25 +11,25 @@
 #
 # Description:  wraps the picom compositor with some notifications.
 # Dependencies: picom, dunst
-# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
+# License:      https://github.com/amtoine/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 # parse the arguments.
-OPTIONS=$(getopt -o tbnh --long toggle,blur,notify,help -n 'a2n-s-pcm' -- "$@")
+OPTIONS=$(getopt -o tbnh --long toggle,blur,notify,help -n 'amtoine-pcm' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
 # environment variables
 [[ ! -v DUNST_ID ]] && DUNST_ID=6
 [[ ! -v PICOM_EXTRA_FLAGS ]] && PICOM_EXTRA_FLAGS="--experimental-backends"
-[[ ! -v ICONS ]] && ICONS="/usr/share/icons/a2n-s-icons-git/dark/128x128"
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/amtoine-icons-git/dark/128x128"
 
 
 usage () {
   #
   # the usage function.
   #
-  echo "Usage: a2n-s-pcm [-htbn]"
+  echo "Usage: amtoine-pcm [-htbn]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -39,12 +39,12 @@ help () {
   #
   # the help function.
   #
-  echo "a2n-s-pcm:"
+  echo "amtoine-pcm:"
   echo "     This script allows the user to easily manage picom."
   echo "     Do not forget to puth it in your PATH."
   echo ""
   echo "Usage:"
-  echo "     a2n-s-pcm [-htbn]"
+  echo "     amtoine-pcm [-htbn]"
   echo ""
   echo "Switches:"
   echo "     -h/--help       shows this help."
@@ -54,7 +54,7 @@ help () {
   echo ""
   echo "Environment variables:"
   echo "     DUNST_ID        the id of the dunst notification to be replaced (defaults to 6)"
-  echo "     ICONS           the path the the icons (defaults to '/usr/share/icons/a2n-s-icons-git/dark/128x128')"
+  echo "     ICONS           the path the the icons (defaults to '/usr/share/icons/amtoine-icons-git/dark/128x128')"
   echo "     PICOM_EXTRA_FLAGS     extra flags to pass to \`picom\` (defaults to '--experimental-backends')"
 
   exit 0
@@ -81,19 +81,19 @@ main () {
       if pgrep -x "picom" > /dev/null
       then
         killall picom
-        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "picom killed" --icon="$ICONS/video/compositor-off.png" --replace "$DUNST_ID"
+        [[ "$NOTIFY" == "yes" ]] && dunstify "amtoine-pcm" "picom killed" --icon="$ICONS/video/compositor-off.png" --replace "$DUNST_ID"
       else
         picom  --daemon $PICOM_EXTRA_FLAGS
-        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "picom started" --icon="$ICONS/video/compositor-off.png" --replace "$DUNST_ID"
+        [[ "$NOTIFY" == "yes" ]] && dunstify "amtoine-pcm" "picom started" --icon="$ICONS/video/compositor-off.png" --replace "$DUNST_ID"
       fi;;
     blur )
       if grep "^#blur-method" ~/.config/picom/picom.conf > /dev/null
       then
         sed -i 's/^#\?blur-method/blur-method/' ~/.config/picom/picom.conf
-        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "blur ON" --icon="$ICONS/video/blur/on.png" --replace "$DUNST_ID"
+        [[ "$NOTIFY" == "yes" ]] && dunstify "amtoine-pcm" "blur ON" --icon="$ICONS/video/blur/on.png" --replace "$DUNST_ID"
       else
         sed -i 's/^#\?blur-method/#blur-method/' ~/.config/picom/picom.conf
-        [[ "$NOTIFY" == "yes" ]] && dunstify "a2n-s-pcm" "blur OFF" --icon="$ICONS/video/blur/off.png" --replace "$DUNST_ID"
+        [[ "$NOTIFY" == "yes" ]] && dunstify "amtoine-pcm" "blur OFF" --icon="$ICONS/video/blur/off.png" --replace "$DUNST_ID"
       fi;;
     * ) echo "an error occured (got unexpected '$ACTION')" ;;
   esac

@@ -1,7 +1,7 @@
 #! /usr/bin/bash
-#           ___                       personal page: https://a2n-s.github.io/
-#      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s
-#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles
+#           ___                       personal page: https://amtoine.github.io/
+#      __ _|_  )_ _    ___   ___      github   page: https://github.com/amtoine
+#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/amtoine/dotfiles
 #     \__,_/___|_||_|       /__/
 #           ___                                        _
 #      __ _|_  )_ _ ___ ______ _ __ _ _ ___ _ __  _ __| |_
@@ -16,11 +16,11 @@
 #               ~/scripts/prompt "Do you really want to shutdown your machine?" "shutdown -h now"
 #               will ask you before shutting down.
 # Dependencies: dmenu
-# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
+# License:      https://github.com/amtoine/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 # parse the arguments.
-OPTIONS=$(getopt -o h --long help -n 'a2n-s-prompt' -- "$@")
+OPTIONS=$(getopt -o h --long help -n 'amtoine-prompt' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -32,7 +32,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: a2n-s-prompt [-h] MESSAGE COMMAND"
+  echo "Usage: amtoine-prompt [-h] MESSAGE COMMAND"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -42,12 +42,12 @@ help () {
   #
   # the help function.
   #
-  echo "a2n-s-prompt:"
+  echo "amtoine-prompt:"
   echo "     This script opens a binary prompt to launch or discard applications."
   echo "     Do not forget to puth it in your PATH."
   echo ""
   echo "Usage:"
-  echo "     a2n-s-prompt [-h] MESSAGE COMMAND"
+  echo "     amtoine-prompt [-h] MESSAGE COMMAND"
   echo ""
   echo "Switches:"
   echo "     -h/--help       shows this help."

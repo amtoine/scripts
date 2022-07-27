@@ -1,7 +1,7 @@
 #! /usr/bin/bash
-#           ___                       personal page: https://a2n-s.github.io/
-#      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s
-#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles
+#           ___                       personal page: https://amtoine.github.io/
+#      __ _|_  )_ _    ___   ___      github   page: https://github.com/amtoine
+#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/amtoine/dotfiles
 #     \__,_/___|_||_|       /__/
 #           ___                             _ _ _
 #      __ _|_  )_ _ ___ ______ _ __  ___ __| (_) |_
@@ -11,11 +11,11 @@
 #
 # Description:  edit a pass entry with dmenu
 # Dependencies: kitty, feh, okular
-# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
+# License:      https://github.com/amtoine/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 # parse the arguments.
-OPTIONS=$(getopt -o h --long help -n 'a2n-s-pedit' -- "$@")
+OPTIONS=$(getopt -o h --long help -n 'amtoine-pedit' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -28,12 +28,12 @@ help () {
   #
   # the help function.
   #
-  echo "a2n-s-pedit:"
+  echo "amtoine-pedit:"
   echo "     This script searches and edits \`pass\` entries."
   echo "     Do not forget to puth it in your PATH."
   echo ""
   echo "Usage:"
-  echo "     a2n-s-pedit [-h]"
+  echo "     amtoine-pedit [-h]"
   echo ""
   echo "Switches:"
   echo "     -h/--help       shows this help."

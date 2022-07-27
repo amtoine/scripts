@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-#           ___                       personal page: https://a2n-s.github.io/
-#      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s
-#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles
+#           ___                       personal page: https://amtoine.github.io/
+#      __ _|_  )_ _    ___   ___      github   page: https://github.com/amtoine
+#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/amtoine/dotfiles
 #     \__,_/___|_||_|       /__/
 #           ___
 #      __ _|_  )_ _ ___ ______ _ __  ___  __ _ __
@@ -11,17 +11,17 @@
 #
 # Description:  give information about the current moc server.
 # Dependencies: mocp
-# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
+# License:      https://github.com/amtoine/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 # parse the arguments
 OPTIONS=$(getopt -o fh --long follow,help \
-              -n 'a2n-s-mocp' -- "$@")
+              -n 'amtoine-mocp' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
 # environment variables.
-[[ ! -v ICONS ]] && ICONS="/usr/share/icons/a2n-s-icons-git/dark/128x128"
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/amtoine-icons-git/dark/128x128"
 [[ ! -v DUNST_ID ]] && DUNST_ID=3
 [[ ! -v FOLLOW_SLEEP ]] && FOLLOW_SLEEP=1
 [[ ! -v FOLLOW_LOOPS ]] && FOLLOW_LOOPS=10
@@ -85,7 +85,7 @@ show_moc_server_once () {
     total_time=$(_get_mocp_info "TotalTime")
     current_time=$(_get_mocp_info "CurrentTime")
     progress=$(_compute_progress "$current_sec" "$total_sec")
-    dunstify "a2n-s-mocp" "$title\n$current_time/$total_time" -h "int:value:$progress" -u low --icon="$icon" --replace="$DUNST_ID"
+    dunstify "amtoine-mocp" "$title\n$current_time/$total_time" -h "int:value:$progress" -u low --icon="$icon" --replace="$DUNST_ID"
 }
 
 
@@ -103,7 +103,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: a2n-s-mocp [-hf]"
+  echo "Usage: amtoine-mocp [-hf]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -113,18 +113,18 @@ help () {
   #
   # the help function.
   #
-  echo "a2n-s-mocp:"
+  echo "amtoine-mocp:"
   echo "     show the current state of the MOC server."
   echo ""
   echo "Usage:"
-  echo "     a2n-s-mocp [-hf]"
+  echo "     amtoine-mocp [-hf]"
   echo ""
   echo "Switches:"
   echo "     -h/--help               shows this help."
   echo "     -f/--follow             follow the song instead of showing a single notification."
   echo ""
   echo "Environment variables:"
-  echo "     ICONS                   the path the the icons (defaults to '/usr/share/icons/a2n-s-icons-git/dark/128x128')"
+  echo "     ICONS                   the path the the icons (defaults to '/usr/share/icons/amtoine-icons-git/dark/128x128')"
   echo "     DUNST_ID                the id of the dunst notification to be replaced (defaults to 3)"
   echo "     FOLLOW_SLEEP            the time to sleep between two server polls when following (defaults to 1)"
   echo "     FOLLOW_LOOPS            the number of time to follow the server (defaults to 10)"
@@ -151,7 +151,7 @@ main () {
   title=$(_get_mocp_info "Title")
 
   # state won't be set if the server is not running, quit properly.
-  [ -z "$state" ] && { dunstify "a2n-s-mocp" "server is not running" -u critical -t 5000 --icon="$ICONS/audio/mute.png"; exit 1; }
+  [ -z "$state" ] && { dunstify "amtoine-mocp" "server is not running" -u critical -t 5000 --icon="$ICONS/audio/mute.png"; exit 1; }
 
   # otherwise show a nice notification.
   icon="$(_compute_icon "$state")"

@@ -1,7 +1,7 @@
 #! /usr/bin/bash
-#           ___                       personal page: https://a2n-s.github.io/
-#      __ _|_  )_ _    ___   ___      github   page: https://github.com/a2n-s
-#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/a2n-s/dotfiles
+#           ___                       personal page: https://amtoine.github.io/
+#      __ _|_  )_ _    ___   ___      github   page: https://github.com/amtoine
+#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/amtoine/dotfiles
 #     \__,_/___|_||_|       /__/
 #           ___                _       __
 #      __ _|_  )_ _ ___ ______| |_ __ / _|__ _
@@ -11,11 +11,11 @@
 #
 # Description:  a wrapper around tig to use it from anywhere on the dotfiles.
 # Dependencies:
-# License:      https://github.com/a2n-s/scripts/blob/main/LICENSE
+# License:      https://github.com/amtoine/scripts/blob/main/LICENSE
 # Contributors: Stevan Antoine
 
 # parse the arguments
-OPTIONS=$(getopt -o h --long help -n 'a2n-s-tcfg' -- "$@")
+OPTIONS=$(getopt -o h --long help -n 'amtoine-tcfg' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -28,7 +28,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: a2n-s-tcfg [-h]"
+  echo "Usage: amtoine-tcfg [-h]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -38,11 +38,11 @@ help () {
   #
   # the help function.
   #
-  echo "a2n-s-tcfg:"
+  echo "amtoine-tcfg:"
   echo "     TODO."
   echo ""
   echo "Usage:"
-  echo "     a2n-s-tcfg [-h]"
+  echo "     amtoine-tcfg [-h]"
   echo ""
   echo "Switches:"
   echo "     -h/--help             shows this help."
