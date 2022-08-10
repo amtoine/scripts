@@ -60,16 +60,19 @@ main () {
 
   dir="$HOME/.pkgslists"
   echo "updating packages list..."
-    pacman -Qqe > $dir/allpkglist.txt
-    pacman -Qqent > $dir/pkglist.txt
+    pacman -Qqe > $dir/all.pacman
+    pacman -Qqent > $dir/pkgs.pacman
   echo "updating dependencies list..."
-    comm -13 <(pacman -Qqdt | sort) <(pacman -Qqdtt | sort) > $dir/optdeplist.txt
+    comm -13 <(pacman -Qqdt | sort) <(pacman -Qqdtt | sort) > $dir/opt.pacman
   echo "updating foreign packages list..."
-    pacman -Qqem > $dir/foreignpkglist.txt
+    pacman -Qqem > $dir/foreign.pacman
+
   echo "updating cargo commands list..."
-    cargo install --list > $dir/cargocmdlist.txt
+    cargo install --list > $dir/pkgs.cargo
+
   echo "updating python packages list..."
-    /usr/bin/pip list > $dir/pippkglist.txt
+    /usr/bin/pip list > $dir/pkgs.pip
+
   echo "all done!"
 }
 
