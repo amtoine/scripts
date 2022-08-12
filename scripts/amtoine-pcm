@@ -22,7 +22,7 @@ eval set -- "$OPTIONS"
 # environment variables
 [[ ! -v DUNST_ID ]] && DUNST_ID=6
 [[ ! -v PICOM_EXTRA_FLAGS ]] && PICOM_EXTRA_FLAGS="--experimental-backends"
-[[ ! -v ICONS ]] && ICONS="/usr/share/icons/amtoine-icons-git/dark/128x128"
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/amtoine-icons-git/stickers/100x100"
 
 
 usage () {

@@ -27,7 +27,7 @@ eval set -- "$OPTIONS"
 [ -z "$BATTERY" ] && BATTERY="BAT0"
 [ -z "$LOW" ] && LOW=15
 [ -z "$HIGH" ] && HIGH=85
-[ -z "$ICONS" ] && ICONS="/usr/share/icons/amtoine-icons-git/dark/128x128"
+[ -z "$ICONS" ] && ICONS="/usr/share/icons/amtoine-icons-git/stickers/100x100"
 [ -z "$DUNST_ID" ] && DUNST_ID=1
 
 # the location of the battery information files
@@ -87,6 +87,29 @@ _check_battery_state() {
 }
 
 
+_get_icon_name () {
+    # Get the icon name based on the status and the level.
+    #
+    # Args:
+    #   $1: the status of the battery.
+    #   $2: the level of the battery.
+    status="$1"
+    if [ "$status" == "Charging" ]; then
+        dir="charging"
+    else
+        dir="normal"
+    fi
+
+    level="$2"
+    name="$((level / 10))0"
+    if [ "$level" -ne 100 ]; then
+        name="0$name"
+    fi
+
+    echo "$dir/level-$name.png"
+}
+
+
 print_battery () {
     # Print the state of the battery in a notification.
     #
@@ -95,16 +118,10 @@ print_battery () {
     #   $2: the level of the battery.
     status="$1"
     level="$2"
-    if [ "$level" -lt "25" ]; then
-        icon="critical"
-    elif [ "$level" -lt "50" ]; then
-        icon="low"
-    elif [ "$level" -lt "75" ]; then
-        icon="normal"
-    else
-        icon="full"
-    fi
-    dunstify --urgency low "amtoine-battery" "$BATTERY is $status at $level" --icon="$ICONS/battery/$icon.png" --timeout 5000 --replace="$DUNST_ID"
+
+    icon=$(_get_icon_name "$status" "$level")
+
+    dunstify --urgency low "amtoine-battery" "$BATTERY is $status at $level" --icon="$ICONS/battery/$icon" --timeout 5000 --replace="$DUNST_ID"
 }
 
 
@@ -120,12 +137,8 @@ check_battery () {
 
     # throw a notification only if required.
     if [ -n "$state" ]; then
-        if [ "$state" = "low" ]; then
-            icon="$ICONS/battery/critical.png"
-        elif [ "$state" = "high" ]; then
-            icon="$ICONS/battery/full.png"
-        fi
-        dunstify --urgency critical "amtoine-battery" "$BATTERY is $state\n($status at $level%)" --icon="$icon" --replace="$DUNST_ID";
+        icon=$(_get_icon_name "$status" "$level")
+        dunstify --urgency critical "amtoine-battery" "$BATTERY is $state\n($status at $level%)" --icon="$ICONS/battery/$icon" --replace="$DUNST_ID";
     else
         dunstify --close="$DUNST_ID";
     fi

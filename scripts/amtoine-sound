@@ -24,7 +24,7 @@ eval set -- "$OPTIONS"
 [[ ! -v DEVICE ]] && DEVICE="JBL Xtreme"
 [[ ! -v ON ]] && ON="a2dp_sink"
 [[ ! -v OFF ]] && OFF="off"
-[[ ! -v ICONS ]] && ICONS="/usr/share/icons/amtoine-icons-git/dark/128x128"
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/amtoine-icons-git/stickers/100x100"
 [ -z "$DUNST_ID" ] && DUNST_ID=2
 
 
