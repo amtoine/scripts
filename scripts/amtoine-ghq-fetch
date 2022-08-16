@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+GRN="$(tput setaf 2)"
+YLW="$(tput setaf 3)"
+OFF="$(tput sgr0)"
+
+for repo in $(ghq list);
+do
+    echo "${GRN}[repo]${OFF} $repo"
+    echo -n "${YLW}"
+    git -C "$(ghq root)/$repo" fetch --all --dry-run
+done
+
