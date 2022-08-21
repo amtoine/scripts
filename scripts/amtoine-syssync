@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+from_directory="$HOME/.local"
+
+files=(
+etc/default/grub
+etc/pacman.conf
+etc/sddm.conf
+usr/share/sddm/themes/sugar-candy/theme.conf
+)
+
+
+sync_files () {
+    for file in "${files[@]}";
+    do
+        sudo cp "$from_directory/$file" "/$file" --verbose
+    done
+}
+
+
+run_post_sync_commands () {
+    sudo grub-mkconfig -o /boot/grub/grub.cfg
+}
+
+
+sync_files
+run_post_sync_commands
