@@ -21,7 +21,7 @@ if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
 # the environment variables
-[[ ! -v SCREENSHOT_PATH ]] && SCREENSHOT_PATH="$HOME/images/scrot"
+[[ ! -v SCREENSHOT_PATH ]] && SCREENSHOT_PATH="$HOME/media/images/scrot"
 [[ ! -v FORMAT ]] && FORMAT='%Y-%m-%d_%H-%M-%S_$wx$h'
 [[ ! -v ICONS ]] && ICONS="/usr/share/icons/amtoine-icons-git/stickers/100x100"
 
