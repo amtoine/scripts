@@ -72,8 +72,8 @@ main () {
   done
   [ -z "$ACTION" ] && usage
   case "$ACTION" in
-    disable ) xautolock -disable; [[ "$NOTIFY" == "yes" ]] && dunstify "amtoine-xal" "xautolock disabled" --icon="$ICONS/lock/unlocked.png" ;;
-    enable) xautolock -enable; [[ "$NOTIFY" == "yes" ]] && dunstify "amtoine-xal" "xautolock enabled" --icon="$ICONS/lock/locked.png" ;;
+    disable ) xautolock -disable; [[ "$NOTIFY" == "yes" ]] && dunstify "amtoine-xal" "xautolock disabled" --icon="$ICONS/lock/padlock.png" ;;
+    enable) xautolock -enable; [[ "$NOTIFY" == "yes" ]] && dunstify "amtoine-xal" "xautolock enabled" --icon="$ICONS/lock/lock.png" ;;
     * ) echo "an error occured (got unexpected '$ACTION')" ;;
   esac
 }
