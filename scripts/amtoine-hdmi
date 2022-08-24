@@ -103,7 +103,7 @@ notify_brightness () {
   #
   # TODO.
   #
-  dunstify "amtoine-hdmi" "Brightness ($1)\n$2" -h "int:value:$2" -u low --icon="$ICONS/video/brightness.png" --replace="$DUNST_ID"
+  dunstify "amtoine-hdmi" "Brightness ($1)\n$2" -h "int:value:$2" -u low --icon="$ICONS/video/sun.png" --replace="$DUNST_ID"
 }
 
 
