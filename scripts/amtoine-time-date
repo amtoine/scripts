@@ -63,7 +63,7 @@ main () {
     esac
   done
 
-  notify-send -t 3500 "$(date '+%a %b %e%n%r')" --icon="$ICONS/misc/calendar.png"
+  notify-send -t 3500 "$(date '+%a %b %e%n%r')" --icon="$ICONS/misc/planner.png"
 }
 
 
