@@ -21,27 +21,27 @@ if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
 # environment variables
-[[ ! -v ICONS ]] && ICONS="/usr/share/icons/amtoine-icons-git/dark/128x128"
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/amtoine-icons-git/stickers/100x100"
 [[ ! -v TERMINAL ]] && TERMINAL="st -e"
 
 
 check_updates () {
   # Check the system for updates.
-  dunstify "amtoine-update" "pulling updates..."
+  dunstify "amtoine-update" "pulling updates..." --icon="$ICONS/notification/notification.png"
   updates=$(checkupdates | wc -l)
   if [ "$updates" -eq "0" ]; then
-    dunstify "amtoine-update" "everything is up to date!" --icon="$ICONS/misc/ok.png"
+    dunstify "amtoine-update" "everything is up to date!" --icon="$ICONS/misc/empty-treasure-chest.png"
   else
-    dunstify "amtoine-update" "there are $updates updates." --icon="$ICONS/misc/package.png"
+    dunstify "amtoine-update" "there are $updates updates." --icon="$ICONS/misc/treasure-chest.png"
   fi
 }
 
 
 update () {
   # Update the system with pacman in a popup terminal.
-  dunstify "amtoine-update" "please confirm your password in the popup window" --icon="$ICONS/lock/locked.png"
+  dunstify "amtoine-update" "please confirm your password in the popup window" --icon="$ICONS/lock/lock.png"
   $TERMINAL sudo pacman -Syyu
-  dunstify "amtoine-update" "update did complete successfully" --icon="$ICONS/lock/unlocked.png"
+  dunstify "amtoine-update" "update did complete successfully" --icon="$ICONS/lock/padlock.png"
   check_updates
 }
 

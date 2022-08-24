@@ -26,7 +26,7 @@ eval set -- "$OPTIONS"
 # the environment variables
 [ ! -v MAIN ] && MAIN="eDP-1"
 [ ! -v SECOND ] && SECOND="HDMI-2"
-[[ ! -v ICONS ]] && ICONS="/usr/share/icons/amtoine-icons-git/dark/128x128"
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/amtoine-icons-git/stickers/100x100"
 [ -z "$DUNST_ID" ] && DUNST_ID=5
 
 
@@ -103,7 +103,7 @@ notify_brightness () {
   #
   # TODO.
   #
-  dunstify "amtoine-hdmi" "Brightness ($1)\n$2" -h "int:value:$2" -u low --icon="$ICONS/video/brightness.png" --replace="$DUNST_ID"
+  dunstify "amtoine-hdmi" "Brightness ($1)\n$2" -h "int:value:$2" -u low --icon="$ICONS/video/sun.png" --replace="$DUNST_ID"
 }
 
 

@@ -20,7 +20,7 @@ if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
 # allow the user to change the environment variables.
-[[ ! -v ICONS ]] && ICONS="/usr/share/icons/amtoine-icons-git/dark/128x128"
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/amtoine-icons-git/stickers/100x100"
 
 
 usage () {
@@ -64,14 +64,14 @@ main () {
     esac
   done
 
-  dunstify "amtoine-sys-stats" "polling the system for information..." --icon="$ICONS/misc/gears.png"
+  dunstify "amtoine-sys-stats" "polling the system for information..." --icon="$ICONS/misc/iphone-spinner.png"
 
   memory=$(free -m | awk 'NR==2{printf "%s/%sMB (%.2f%%)\n", $3,$2,$3*100/$2 }')
   load=$(top -bn1 | grep load | awk '{printf "%.2f\n", $(NF-2)}')
   cpu_temp=$(sensors | grep 'Core .:' | awk -F' ' '{ print $3 }')
 
   dunstify "Usage" "$memory" --icon="$ICONS/misc/usage-chart.png"
-  dunstify "Load" "$load" --icon="$ICONS/misc/brain-machine.png"
+  dunstify "Load" "$load" --icon="$ICONS/misc/processor.png"
   dunstify "CPU" "$cpu_temp" --icon="$ICONS/misc/temperature.png"
 }
 
