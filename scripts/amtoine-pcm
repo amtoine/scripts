@@ -81,10 +81,10 @@ main () {
       if pgrep -x "picom" > /dev/null
       then
         killall picom
-        [[ "$NOTIFY" == "yes" ]] && dunstify "amtoine-pcm" "picom killed" --icon="$ICONS/video/compositor-off.png" --replace "$DUNST_ID"
+        [[ "$NOTIFY" == "yes" ]] && dunstify "amtoine-pcm" "picom killed" --icon="$ICONS/video/compositor/off.png" --replace "$DUNST_ID"
       else
         picom  --daemon $PICOM_EXTRA_FLAGS
-        [[ "$NOTIFY" == "yes" ]] && dunstify "amtoine-pcm" "picom started" --icon="$ICONS/video/compositor-off.png" --replace "$DUNST_ID"
+        [[ "$NOTIFY" == "yes" ]] && dunstify "amtoine-pcm" "picom started" --icon="$ICONS/video/compositor/on.png" --replace "$DUNST_ID"
       fi;;
     blur )
       if grep "^#blur-method" ~/.config/picom/picom.conf > /dev/null
