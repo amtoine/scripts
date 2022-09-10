@@ -71,12 +71,12 @@ main () {
   }
 
   echo "updating packages list..."
-    pacman -Qqe > "$DIR/all.pacman"
-    pacman -Qqent > "$DIR/pkgs.pacman"
+    pacman -Qe > "$DIR/all.pacman"
+    pacman -Qen > "$DIR/native.pacman"
   echo "updating dependencies list..."
-    comm -13 <(pacman -Qqdt | sort) <(pacman -Qqdtt | sort) > "$DIR/opt.pacman"
+    comm -13 <(pacman -Qdt | sort) <(pacman -Qdtt | sort) > "$DIR/opt.pacman"
   echo "updating foreign packages list..."
-    pacman -Qqem > "$DIR/foreign.pacman"
+    pacman -Qem > "$DIR/foreign.pacman"
 
   echo "updating cargo commands list..."
     cargo install --list > "$DIR/pkgs.cargo"
