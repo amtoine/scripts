@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# parse the arguments.
+OPTIONS=$(getopt -o sh --long silent,help -n 'amtoine-gh-notify' -- "$@")
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+eval set -- "$OPTIONS"
+
 # environment variables.
 [ -z "$DUNST_ID" ] && DUNST_ID=8
 DUNST_HEADER="amtoine-gh-notify"
@@ -13,9 +18,9 @@ trap  'rm "$tmpfile"' 0 1 15
 
 
 pull_from_api () {
-    dunstify "$DUNST_HEADER" "pulling information from the API..." --replace "$DUNST_ID"
+    [ -z "$1" ] && dunstify "$DUNST_HEADER" "pulling information from the API..." --replace "$DUNST_ID"
     gh api notifications --jq '.' | tee "$tmpfile" > /dev/null
-    dunstify "$DUNST_HEADER" "pulling information from the API... done!" --replace "$DUNST_ID"
+    [ -z "$1" ] && dunstify "$DUNST_HEADER" "pulling information from the API... done!" --replace "$DUNST_ID"
 }
 
 
@@ -28,10 +33,19 @@ get_issues () { get_from_json '.[].subject.url' | sed 's|.*/||g'; }
 
 
 main () {
-    pull_from_api
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -h | --help )  help ;;
+            -s | --silent) SILENT="yes"; shift 1;;
+            -- ) shift; break ;;
+            * ) break ;;
+        esac
+    done
+
+    pull_from_api "$SILENT"
     if [ "$(get_nb_notifications)" -eq 0 ];
     then
-        dunstify "$DUNST_HEADER" "no notifications for now..." --urgency low
+        [ -z "$SILENT" ] && dunstify "$DUNST_HEADER" "no notifications for now..." --urgency low
     else
         readarray -t titles < <(get_titles)
         readarray -t repos < <(get_repos)
