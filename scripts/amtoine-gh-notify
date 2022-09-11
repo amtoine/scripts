@@ -32,6 +32,27 @@ get_users  () { get_from_json '.[].repository.owner.login'; }
 get_issues () { get_from_json '.[].subject.url' | sed 's|.*/||g'; }
 
 
+help () {
+  #
+  # the help function.
+  #
+  echo "amtoine-gh-notify:"
+  echo "     This script allows the user to pull notifications from GitHub."
+  echo "     Do not forget to puth it in your PATH."
+  echo ""
+  echo "Usage:"
+  echo "     amtoine-gh-notify [-hs]"
+  echo ""
+  echo "Switches:"
+  echo "     -h/--help               shows this help."
+  echo "     -s/--silent             pull the GitHub API silently and notify only when there are notifications."
+  echo ""
+  echo "Environment variables:"
+  echo "     DUNST_ID                the id of the sound notification, to replace them properly (defaults to 8)"
+  exit 0
+}
+
+
 main () {
     while [[ $# -gt 0 ]]; do
         case "$1" in
