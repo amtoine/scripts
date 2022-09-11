@@ -2,13 +2,13 @@
 
 # environment variables.
 [ -z "$DUNST_ID" ] && DUNST_ID=8
-DUNST_HEADER="amtoine-gh-api"
+DUNST_HEADER="amtoine-gh-notify"
 
 
 # create the temporary file to hold the result of the API pull.
 tmpdir="/tmp/amtoine-scripts-git"
 mkdir -p "$tmpdir"
-tmpfile=$(mktemp "$tmpdir/gh-api.XXXXXX")
+tmpfile=$(mktemp "$tmpdir/gh-notify.XXXXXX")
 trap  'rm "$tmpfile"' 0 1 15
 
 
