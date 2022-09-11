@@ -2,11 +2,11 @@
 
 # environment variables.
 [ -z "$DUNST_ID" ] && DUNST_ID=8
-DUNST_HEADER="a2n-s-gh-api"
+DUNST_HEADER="amtoine-gh-api"
 
 
 # create the temporary file to hold the result of the API pull.
-tmpdir="/tmp/a2n-s-scripts-git"
+tmpdir="/tmp/amtoine-scripts-git"
 mkdir -p "$tmpdir"
 tmpfile=$(mktemp "$tmpdir/gh-api.XXXXXX")
 trap  'rm "$tmpfile"' 0 1 15
@@ -31,7 +31,7 @@ main () {
     pull_from_api
     if [ "$(get_nb_notifications)" -eq 0 ];
     then
-        dunstify "$DUNST_HEADER" "no notifications for now..."
+        dunstify "$DUNST_HEADER" "no notifications for now..." --urgency low
     else
         readarray -t titles < <(get_titles)
         readarray -t repos < <(get_repos)
@@ -39,7 +39,7 @@ main () {
         readarray -t issues < <(get_issues)
         for ((i=0; i<"${#repos[@]}"; i++));
         do
-            dunstify "${users[$i]}/${repos[$i]}: ${issues[$i]}" "\n${titles[$i]}"
+            dunstify "${users[$i]}/${repos[$i]}: ${issues[$i]}" "\n${titles[$i]}" --urgency low
         done
     fi
 }
