@@ -18,9 +18,9 @@ trap  'rm "$tmpfile"' 0 1 15
 
 
 pull_from_api () {
-    [ -z "$1" ] && dunstify "$DUNST_HEADER" "pulling information from the API..." --replace "$DUNST_ID"
+    [ -z "$1" ] && dunstify "$DUNST_HEADER" "pulling information from the API..." --replace "$DUNST_ID" --timeout 10000
     gh api notifications --jq '.' | tee "$tmpfile" > /dev/null
-    [ -z "$1" ] && dunstify "$DUNST_HEADER" "pulling information from the API... done!" --replace "$DUNST_ID"
+    [ -z "$1" ] && dunstify "$DUNST_HEADER" "pulling information from the API... done!" --replace "$DUNST_ID" --timeout 10000
 }
 
 
@@ -66,7 +66,7 @@ main () {
     pull_from_api "$SILENT"
     if [ "$(get_nb_notifications)" -eq 0 ];
     then
-        [ -z "$SILENT" ] && dunstify "$DUNST_HEADER" "no notifications for now..." --urgency low
+        [ -z "$SILENT" ] && dunstify "$DUNST_HEADER" "no notifications for now..." --urgency low --timeout 10000
     else
         readarray -t titles < <(get_titles)
         readarray -t repos < <(get_repos)
@@ -74,7 +74,7 @@ main () {
         readarray -t issues < <(get_issues)
         for ((i=0; i<"${#repos[@]}"; i++));
         do
-            dunstify "${users[$i]}/${repos[$i]}: ${issues[$i]}" "\n${titles[$i]}" --urgency low
+            dunstify "${users[$i]}/${repos[$i]}: ${issues[$i]}" "\n${titles[$i]}" --urgency low --timeout 10000
         done
     fi
 }
