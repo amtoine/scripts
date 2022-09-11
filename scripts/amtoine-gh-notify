@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+# environment variables.
+[ -z "$DUNST_ID" ] && DUNST_ID=8
+DUNST_HEADER="amtoine-gh-api"
+
+
+# create the temporary file to hold the result of the API pull.
+tmpdir="/tmp/amtoine-scripts-git"
+mkdir -p "$tmpdir"
+tmpfile=$(mktemp "$tmpdir/gh-api.XXXXXX")
+trap  'rm "$tmpfile"' 0 1 15
+
+
+pull_from_api () {
+    dunstify "$DUNST_HEADER" "pulling information from the API..." --replace "$DUNST_ID"
+    gh api notifications --jq '.' | tee "$tmpfile" > /dev/null
+    dunstify "$DUNST_HEADER" "pulling information from the API... done!" --replace "$DUNST_ID"
+}
+
+
+get_from_json () { jq "$1" "$tmpfile" | sed 's/^"//g; s/"$//g'; }
+get_nb_notifications () { get_from_json '.[].subject.title' | wc -l; }
+get_titles () { get_from_json '.[].subject.title'; }
+get_repos  () { get_from_json '.[].repository.name'; }
+get_users  () { get_from_json '.[].repository.owner.login'; }
+get_issues () { get_from_json '.[].subject.url' | sed 's|.*/||g'; }
+
+
+main () {
+    pull_from_api
+    if [ "$(get_nb_notifications)" -eq 0 ];
+    then
+        dunstify "$DUNST_HEADER" "no notifications for now..." --urgency low
+    else
+        readarray -t titles < <(get_titles)
+        readarray -t repos < <(get_repos)
+        readarray -t users < <(get_users)
+        readarray -t issues < <(get_issues)
+        for ((i=0; i<"${#repos[@]}"; i++));
+        do
+            dunstify "${users[$i]}/${repos[$i]}: ${issues[$i]}" "\n${titles[$i]}" --urgency low
+        done
+    fi
+}
+
+
+main "$@"
