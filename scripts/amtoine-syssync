@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+
+# parse the arguments.
+OPTIONS=$(getopt -o ph --long post,help -n 'amtoine-syssync' -- "$@")
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+eval set -- "$OPTIONS"
+
+# the environment variables
+[ -z "$SYSTEM" ] && SYSTEM="$HOME/.local"
+[ -z "$CONFIG" ] && CONFIG="$XDG_CONFIG_HOME/amtoine-syssync/config.txt"
+
+
+sync_files () {
+    for file in $(cat "$CONFIG")
+    do
+        sudo cp "$SYSTEM/$file" "/$file" --verbose
+    done
+}
+
+
+run_post_sync_commands () {
+    sudo grub-mkconfig -o /boot/grub/grub.cfg
+}
+
+
+usage () {
+  #
+  # the usage function.
+  #
+  echo "Usage: amtoine-syssync [-hp]"
+  echo "Type -h or --help for the full help."
+  exit 0
+}
+
+
+help () {
+  #
+  # the help function.
+  #
+  echo "amtoine-syssync:"
+  echo "     This script allows the user to easily manage syssync devices."
+  echo "     Do not forget to puth it in your PATH."
+  echo ""
+  echo "Usage:"
+  echo "     amtoine-syssync [-hp]"
+  echo ""
+  echo "Switches:"
+  echo "     -h/--help               shows this help."
+  echo "     -p/--post               runs post sync commands, such as \`grub-mkconfig\`, ..."
+  echo ""
+  echo "Environment variables:"
+  echo "     SYSTEM                  the path where the system config files are stored (defaults to \`\$HOME/.local\`)"
+  echo "     CONFIG                  the path to the config file (defaults to \`\$XDG_CONFIG_HOME/amtoine-syssync/config.txt\`)"
+  exit 0
+}
+
+
+main () {
+  #
+  # TODO.
+  #
+  POST=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h | --help ) help ;;
+      -p | --post ) POST="true"; shift 1;;
+      -- ) shift; break ;;
+      * ) break ;;
+    esac
+  done
+
+  [ ! -f "$CONFIG" ] && {
+    echo "'$CONFIG' does not exist..."
+    echo -n "Please have a look at the default config file at "
+    echo "/usr/local/share/amtoine-scripts/examples/."
+    exit 1
+  }
+
+  sync_files
+  [ -n "$POST" ] && run_post_sync_commands
+}
+
+
+main "$@"
