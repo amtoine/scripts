@@ -83,6 +83,7 @@ main () {
 
   echo "updating python packages list..."
     /usr/bin/pip list > "$DIR/pkgs.pip"
+    /usr/bin/pipx list > "$DIR/pkgs.pipx"
 
   echo "all done!"
 }
