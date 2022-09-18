@@ -71,7 +71,8 @@ main () {
   }
 
   echo "updating packages list..."
-    pacman -Qe > "$DIR/all.pacman"
+    pacman -Q > "$DIR/all.pacman"
+    pacman -Qe > "$DIR/explicit.pacman"
     pacman -Qen > "$DIR/native.pacman"
   echo "updating dependencies list..."
     comm -13 <(pacman -Qdt | sort) <(pacman -Qdtt | sort) > "$DIR/opt.pacman"
