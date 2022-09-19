@@ -77,7 +77,10 @@ main () {
     esac
   done
 
-  [ ! -d "$SCREENSHOT_PATH" ] && { echo -e "'$SCREENSHOT_PATH' does not exist\nCreating it..."; mkdir "$SCREENSHOT_PATH"; }
+  [ ! -d "$SCREENSHOT_PATH" ] && {
+      echo -e "'$SCREENSHOT_PATH' does not exist\nCreating it...";
+      mkdir "$SCREENSHOT_PATH" -p;
+  }
 
 	case "$1" in
 	full)
