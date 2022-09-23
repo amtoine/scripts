@@ -1,93 +1,73 @@
-#! /bin/bash
-#           ___                       personal page: https://amtoine.github.io/
-#      __ _|_  )_ _    ___   ___      github   page: https://github.com/amtoine
-#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/amtoine/dotfiles
-#     \__,_/___|_||_|       /__/
-#           ___                          _
-#      __ _|_  )_ _ ___ ______ _  _ _ __| |
-#     / _` |/ /| ' \___(_-<___| || | '_ \ |
-#     \__,_/___|_||_|  /__/    \_,_| .__/_|
-#                                  |_|
-#
-# Description:  updates some lists of installed packages.
-# Dependencies: pacman, comm
-# License:      https://github.com/amtoine/scripts/blob/main/LICENSE
-# Contributors: Stevan Antoine
+#!/usr/bin/env nu
 
-# the environment variables.
-[ -z "$DIR" ] && DIR="$HOME/.pkgs"
+def pacman_deps_wrapper [
+    --flag (-f): string
+] {
+    echo $"pacman ($flag)"
 
-
-# parse the arguments
-OPTIONS=$(getopt -o h --long help -n 'amtoine-upl' -- "$@")
-if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
-eval set -- "$OPTIONS"
-
-
-usage () {
-  #
-  # the usage function.
-  #
-  echo "Usage: amtoine-upl [-h]"
-  echo "Type -h or --help for the full help."
-  exit 0
+    pacman $flag |
+        lines |
+        split column " " |
+        rename package version
 }
 
 
-help () {
-  #
-  # the help function.
-  #
-  echo "amtoine-upl:"
-  echo "     TODO."
-  echo ""
-  echo "Usage:"
-  echo "     amtoine-upl [-h]"
-  echo ""
-  echo "Switches:"
-  echo "     -h/--help             shows this help."
-  echo ""
-  echo "Environment variables:"
-  echo "     DIR                   the output directory to dump the lists to (defaults to \`$HOME/.pkgs\`)."
-  exit 0
+def cargo_deps [] {
+    echo "cargo install  --list"
+
+    cargo install --list |
+        lines |
+        find -rm ":\$" |
+        str replace ":$" "" |
+        split column " v" |
+        rename package version
 }
 
 
-main () {
-  #
-  # TODO.
-  #
-  while [[ $# -gt 0 ]]; do
-    case "$1" in
-      -h | --help )   help ;;
-      -- ) shift; break ;;
-      * ) break ;;
-    esac
-  done
+def pip_deps [] {
+    echo "pip freeze"
 
-  [ ! -d "$DIR" ] && {
-    echo "creating $DIR"
-    mkdir -p "$DIR"
-  }
-
-  echo "updating packages list..."
-    pacman -Q > "$DIR/all.pacman"
-    pacman -Qe > "$DIR/explicit.pacman"
-    pacman -Qen > "$DIR/native.pacman"
-  echo "updating dependencies list..."
-    comm -13 <(pacman -Qdt | sort) <(pacman -Qdtt | sort) > "$DIR/opt.pacman"
-  echo "updating foreign packages list..."
-    pacman -Qem > "$DIR/foreign.pacman"
-
-  echo "updating cargo commands list..."
-    cargo install --list > "$DIR/pkgs.cargo"
-
-  echo "updating python packages list..."
-    /usr/bin/pip list > "$DIR/pkgs.pip"
-    /usr/bin/pipx list > "$DIR/pkgs.pipx"
-
-  echo "all done!"
+    pip freeze  |
+        lines |
+        split column "==" |
+        rename package version
 }
 
 
-main "$@"
+def pipx_deps [] {
+    echo "pipx list"
+
+    pipx list |
+        lines |
+        find ", installed" |
+        str trim |
+        str replace "package " "" |
+        str replace ", installed using Python" "" |
+        split column " " |
+        rename package version python
+}
+
+
+let x = {
+    pkgs: {
+        pacman:
+            {
+                all: (pacman_deps_wrapper --flag "-Q"),
+                explicit: (pacman_deps_wrapper --flag "-Qe"),
+                native: (pacman_deps_wrapper --flag "-Qen"),
+                foreign: (pacman_deps_wrapper --flag "-Qem")
+            }
+        rust:
+            {
+                cargo: (cargo_deps)
+            }
+        python:
+            {
+                pip: (pip_deps),
+                pipx: (pipx_deps)
+            }
+    }
+}
+
+echo "Saving the system dependencies to ~/pkgs.toml"
+$x | save ~/pkgs.toml
