@@ -1,20 +1,4 @@
 #! /usr/bin/bash
-#             ___
-#       ____ |__ \ ____              _____      personal page: https://amtoine.github.io/ 
-#      / __ `/_/ // __ \   ______   / ___/      github   page: https://github.com/amtoine 
-#     / /_/ / __// / / /  /_____/  (__  )       my   dotfiles: https://github.com/amtoine/dotfiles 
-#     \__,_/____/_/ /_/           /____/
-#           ___                _       _       _
-#      __ _|_  )_ _ ___ ______| |_  __| |_ __ (_)
-#     / _` |/ /| ' \___(_-<___| ' \/ _` | '  \| |
-#     \__,_/___|_||_|  /__/   |_||_\__,_|_|_|_|_|
-#
-# Description:  manages hdmi monitors, increases or decreases the brightness of the screen by giving + or - to the script.
-#               one can use multiple flags, only the last one will be used.
-# Dependencies: xrandr
-# License:      https://github.com/amtoine/scripts/blob/main/LICENSE
-# Contributors: WinEunuuchs2Unix at https://askubuntu.com/questions/1150339/increment-brightness-by-value-using-xrandr (original idea)
-#               Stevan Antoine (adaptations)
 
 # parse the arguments.
 OPTIONS=$(getopt -o b:s:dlmrMSnhw \

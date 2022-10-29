@@ -1,6 +1,4 @@
 #!/usr/bin/bash
-#
-# Shows a list of pdf in the $HOME directory of the user inside dmenu and open the selected ones with okular.
 
 # parse the arguments
 OPTIONS=$(getopt -o h --long help -n 'amtoine-pdf' -- "$@")

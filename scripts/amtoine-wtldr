@@ -1,19 +1,4 @@
 #! /usr/bin/bash
-#           ___                       personal page: https://amtoine.github.io/
-#      __ _|_  )_ _    ___   ___      github   page: https://github.com/amtoine
-#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/amtoine/dotfiles
-#     \__,_/___|_||_|       /__/
-#           ___                       _   _    _
-#      __ _|_  )_ _ ___ ________ __ _| |_| |__| |_ _
-#     / _` |/ /| ' \___(_-<___\ V  V /  _| / _` | '_|
-#     \__,_/___|_||_|  /__/    \_/\_/ \__|_\__,_|_|
-#
-# Description:  an fzf wrapper around tldr for those who, like me, do not really know what there is
-#               on tldr.
-#               adapted from https://hiphish.github.io/blog/2020/05/31/macho-man-command-on-steroids
-# Dependencies: fzf, tldr
-# License:      https://github.com/amtoine/scripts/blob/main/LICENSE 
-# Contributors: Stevan Antoine
 
 export FZF_DEFAULT_OPTS='
 --height=100%
@@ -29,6 +14,8 @@ help () {
   echo "amtoine-wtldr:"
   echo "     This script allows the user to easily search tldr pages with fzf."
   echo "     Do not forget to puth it in your PATH."
+  echo ""
+  echo "     adapted from https://hiphish.github.io/blog/2020/05/31/macho-man-command-on-steroids"
   echo ""
   echo "Usage:"
   echo "     amtoine-wltdr [-h]"

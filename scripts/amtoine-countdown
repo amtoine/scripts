@@ -1,17 +1,4 @@
 #! /usr/bin/bash
-#           ___                       personal page: https://amtoine.github.io/
-#      __ _|_  )_ _    ___   ___      github   page: https://github.com/amtoine
-#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/amtoine/dotfiles
-#     \__,_/___|_||_|       /__/
-#           ___                                _      _
-#      __ _|_  )_ _ ___ ______ __ ___ _  _ _ _| |_ __| |_____ __ ___ _
-#     / _` |/ /| ' \___(_-<___/ _/ _ \ || | ' \  _/ _` / _ \ V  V / ' \
-#     \__,_/___|_||_|  /__/   \__\___/\_,_|_||_\__\__,_\___/\_/\_/|_||_|
-#
-# Description:  simple countdown
-# Dependencies: play, dunst
-# License:      https://github.com/amtoine/scripts/blob/main/LICENSE
-# Contributors: Stevan Antoine
 
 # parse the arguments
 OPTIONS=$(getopt -o ht: --long help,time: -n 'amtoine-countdown' -- "$@")

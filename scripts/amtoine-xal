@@ -1,17 +1,4 @@
 #! /usr/bin/bash
-#           ___                       personal page: https://amtoine.github.io/ 
-#      __ _|_  )_ _    ___   ___      github   page: https://github.com/amtoine 
-#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/amtoine/dotfiles 
-#     \__,_/___|_||_|       /__/
-#           ___                         _
-#      __ _|_  )_ _ ___ ________ ____ _| |
-#     / _` |/ /| ' \___(_-<___\ \ / _` | |
-#     \__,_/___|_||_|  /__/   /_\_\__,_|_|
-#
-# Description:  wraps the xautolock command with some notifications.
-# Dependencies: xautolock, dunst
-# License:      https://github.com/amtoine/scripts/blob/main/LICENSE
-# Contributors: Stevan Antoine
 
 # parse the arguments
 OPTIONS=$(getopt -o hedn --long help,nable,disable,notify \
