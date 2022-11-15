@@ -1,23 +1,14 @@
 #! /usr/bin/bash
-#           ___                       personal page: https://amtoine.github.io/
-#      __ _|_  )_ _    ___   ___      github   page: https://github.com/amtoine
-#     / _` |/ /| ' \  |___| (_-<      my   dotfiles: https://github.com/amtoine/dotfiles
-#     \__,_/___|_||_|       /__/
-#           ___                                        _
-#      __ _|_  )_ _ ___ ______ _ __ _ _ ___ _ __  _ __| |_
-#     / _` |/ /| ' \___(_-<___| '_ \ '_/ _ \ '  \| '_ \  _|
-#     \__,_/___|_||_|  /__/   | .__/_| \___/_|_|_| .__/\__|
-#                             |_|                |_|
-#
-# Description:  a dmenu binary prompt inspired by https://www.youtube.com/watch?v=R9m723tAurA 
-#               Gives a dmenu prompt labeled with $1 and ask to perform command $2.
-
-#               For example:
-#               ~/scripts/prompt "Do you really want to shutdown your machine?" "shutdown -h now"
-#               will ask you before shutting down.
-# Dependencies: dmenu
-# License:      https://github.com/amtoine/scripts/blob/main/LICENSE
-# Contributors: Stevan Antoine
+#*
+#*                 _    __ _ _
+#*  __ _ ___  __ _| |_ / _(_) |___ ___  WEBSITE: https://goatfiles.github.io
+#* / _` / _ \/ _` |  _|  _| | / -_|_-<  REPOS: https://github.com/goatfiles
+#* \__, \___/\__,_|\__|_| |_|_\___/__/  LICENCE: https://github.com/goatfiles/dotfiles/blob/main/LICENSE
+#* |___/
+#*          MAINTAINERS:
+#*              AMTOINE: https://github.com/amtoine antoine#1306 7C5EE50BA27B86B7F9D5A7BA37AAE9B486CFF1AB
+#*              ATXR:    https://github.com/atxr    atxr#6214    AF97503EDC65A06845114630F00A52147514670B
+#*
 
 # parse the arguments.
 OPTIONS=$(getopt -o h --long help -n 'amtoine-prompt' -- "$@")
@@ -45,6 +36,12 @@ help () {
   echo "amtoine-prompt:"
   echo "     This script opens a binary prompt to launch or discard applications."
   echo "     Do not forget to puth it in your PATH."
+  echo ""
+  echo "     a dmenu binary prompt inspired by https://www.youtube.com/watch?v=R9m723tAurA"
+  echo "     Gives a dmenu prompt labeled with \$1 and ask to perform command \$2."
+  echo "     For example:"
+  echo "     ~/scripts/prompt \"Do you really want to shutdown your machine?\" \"shutdown -h now\""
+  echo "     will ask you before shutting down."
   echo ""
   echo "Usage:"
   echo "     amtoine-prompt [-h] MESSAGE COMMAND"
