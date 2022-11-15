@@ -15,4 +15,4 @@ cd ./pkgbuilds
 ** Usage
 The scripts are installed by default in ~/usr/local/bin/~.
 
-Try running one of them, e.g. ~goat-{script} --help~ to get the help for ~{script}~.
+Try running one of them, e.g. ~{script} --help~ to get the help for ~{script}~.
