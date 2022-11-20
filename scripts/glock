@@ -11,7 +11,7 @@
 #*
 
 # parse the arguments
-OPTIONS=$(getopt -o h --long help -n 'amtoine-slock' -- "$@")
+OPTIONS=$(getopt -o h --long help -n 'glock' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -20,7 +20,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: amtoine-slock [-h]"
+  echo "Usage: glock [-h]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -30,11 +30,11 @@ help () {
   #
   # the help function.
   #
-  echo "amtoine-slock:"
+  echo "glock:"
   echo "     TODO."
   echo ""
   echo "Usage:"
-  echo "     amtoine-slock [-h]"
+  echo "     glock [-h]"
   echo ""
   echo "Switches:"
   echo "     -h/--help             shows this help."

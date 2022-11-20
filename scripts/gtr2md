@@ -11,7 +11,7 @@
 #*
 
 # parse the arguments
-OPTIONS=$(getopt -o h --long help -n 'amtoine-tr2md' -- "$@")
+OPTIONS=$(getopt -o h --long help -n 'gtr2md' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -20,7 +20,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: amtoine-tr2md [-h]"
+  echo "Usage: gtr2md [-h]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -30,11 +30,11 @@ help () {
   #
   # the help function.
   #
-  echo "amtoine-tr2md:"
+  echo "gtr2md:"
   echo "     TODO."
   echo ""
   echo "Usage:"
-  echo "     amtoine-tr2md [-h]"
+  echo "     gtr2md [-h]"
   echo ""
   echo "Switches:"
   echo "     -h/--help             shows this help."

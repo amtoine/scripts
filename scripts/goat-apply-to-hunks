@@ -11,7 +11,7 @@
 #*
 
 
-OPTIONS=$(getopt -o h --long help -n 'amtoine-apply-to-hunks' -- "$@")
+OPTIONS=$(getopt -o h --long help -n 'goat-apply-to-hunks' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -281,7 +281,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: amtoine-apply-to-hunks [-h] CONFIG_NAME HUNK1 VALUES1 HUNK2 VALUES2 ..."
+  echo "Usage: goat-apply-to-hunks [-h] CONFIG_NAME HUNK1 VALUES1 HUNK2 VALUES2 ..."
   echo "Type -h or --help for the full help."
 }
 
@@ -290,12 +290,12 @@ help () {
   #
   # the help function.
   #
-  echo "amtoine-apply-to-hunks:"
+  echo "goat-apply-to-hunks:"
   echo "     This script allows the user to easily apply some configuration to a config file."
   echo "     Do not forget to put it in your PATH."
   echo ""
   echo "Usage:"
-  echo "     amtoine-apply-to-hunks [-h] CONFIG_NAME HUNK1 VALUES1 HUNK2 VALUES2 ..."
+  echo "     goat-apply-to-hunks [-h] CONFIG_NAME HUNK1 VALUES1 HUNK2 VALUES2 ..."
   echo ""
   echo "          - CONFIG_NAME is the name of the config in the json config file of this script"
   echo "          - HUNK is the name of the hunk to apply the values to"

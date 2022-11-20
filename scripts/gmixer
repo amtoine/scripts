@@ -12,7 +12,7 @@
 
 # parse the arguments
 OPTIONS=$(getopt -o udtmbc:s:nh --long up,down,toggle,bluetooth,channel:,step:,notify,help \
-              -n 'amtoine-sound' -- "$@")
+              -n 'gmixer' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -95,7 +95,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: amtoine-sound [-hudtbn] -c CHANNEL [-s STEP]"
+  echo "Usage: gmixer [-hudtbn] -c CHANNEL [-s STEP]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -105,12 +105,12 @@ help () {
   #
   # the help function.
   #
-  echo "amtoine-sound:"
+  echo "gmixer:"
   echo "     This script allows the user to easily control the sound."
   echo "     Do not forget to puth it in your PATH."
   echo ""
   echo "Usage:"
-  echo "     amtoine-sound [-hudtbn] -c CHANNEL [-s STEP]"
+  echo "     gmixer [-hudtbn] -c CHANNEL [-s STEP]"
   echo ""
   echo "Switches:"
   echo "     -h/--help               shows this help."

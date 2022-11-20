@@ -11,13 +11,13 @@
 #*
 
 # parse the arguments.
-OPTIONS=$(getopt -o sh --long silent,help -n 'amtoine-gh-notify' -- "$@")
+OPTIONS=$(getopt -o sh --long silent,help -n 'gghn' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
 # environment variables.
 [ -z "$DUNST_ID" ] && DUNST_ID=8
-DUNST_HEADER="amtoine-gh-notify"
+DUNST_HEADER="gghn"
 
 
 # create the temporary file to hold the result of the API pull.
@@ -46,12 +46,12 @@ help () {
   #
   # the help function.
   #
-  echo "amtoine-gh-notify:"
+  echo "gghn:"
   echo "     This script allows the user to pull notifications from GitHub."
   echo "     Do not forget to puth it in your PATH."
   echo ""
   echo "Usage:"
-  echo "     amtoine-gh-notify [-hs]"
+  echo "     gghn [-hs]"
   echo ""
   echo "Switches:"
   echo "     -h/--help               shows this help."

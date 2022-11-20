@@ -11,7 +11,7 @@
 #*
 
 # parse the arguments
-OPTIONS=$(getopt -o hu:a: --long help,url:,archive: -n 'amtoine-ytdl' -- "$@")
+OPTIONS=$(getopt -o hu:a: --long help,url:,archive: -n 'gytdl' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -23,7 +23,7 @@ usage () {
      #
      # the usage function.
      #
-     echo "Usage: amtoine-ytdl [-h] -u URL -a ARCHIVE"
+     echo "Usage: gytdl [-h] -u URL -a ARCHIVE"
      echo "Type -h or --help for the full help."
      exit 0
 }
@@ -33,11 +33,11 @@ help () {
      #
      # the help function.
      #
-     echo "amtoine-ytdl:"
+     echo "gytdl:"
      echo "     a script to download music from youtube."
      echo ""
      echo "Usage:"
-     echo "     amtoine-ytdl [-h] -u URL -a ARCHIVE"
+     echo "     gytdl [-h] -u URL -a ARCHIVE"
      echo ""
      echo "Switches:"
      echo "     -h/--help             shows this help."

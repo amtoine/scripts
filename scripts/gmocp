@@ -12,7 +12,7 @@
 
 # parse the arguments
 OPTIONS=$(getopt -o fh --long follow,help \
-              -n 'amtoine-mocp' -- "$@")
+              -n 'gmocp' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -81,7 +81,7 @@ show_moc_server_once () {
     total_time=$(_get_mocp_info "TotalTime")
     current_time=$(_get_mocp_info "CurrentTime")
     progress=$(_compute_progress "$current_sec" "$total_sec")
-    dunstify "amtoine-mocp" "$title\n$current_time/$total_time" -h "int:value:$progress" -u low --icon="$icon" --replace="$DUNST_ID"
+    dunstify "gmocp" "$title\n$current_time/$total_time" -h "int:value:$progress" -u low --icon="$icon" --replace="$DUNST_ID"
 }
 
 
@@ -99,7 +99,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: amtoine-mocp [-hf]"
+  echo "Usage: gmocp [-hf]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -109,11 +109,11 @@ help () {
   #
   # the help function.
   #
-  echo "amtoine-mocp:"
+  echo "gmocp:"
   echo "     show the current state of the MOC server."
   echo ""
   echo "Usage:"
-  echo "     amtoine-mocp [-hf]"
+  echo "     gmocp [-hf]"
   echo ""
   echo "Switches:"
   echo "     -h/--help               shows this help."
@@ -147,7 +147,7 @@ main () {
   title=$(_get_mocp_info "Title")
 
   # state won't be set if the server is not running, quit properly.
-  [ -z "$state" ] && { dunstify "amtoine-mocp" "server is not running" -u critical -t 5000 --icon="$ICONS/audio/mute.png"; exit 1; }
+  [ -z "$state" ] && { dunstify "gmocp" "server is not running" -u critical -t 5000 --icon="$ICONS/audio/mute.png"; exit 1; }
 
   # otherwise show a nice notification.
   icon="$(_compute_icon "$state")"

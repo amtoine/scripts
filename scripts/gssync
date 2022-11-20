@@ -11,13 +11,13 @@
 #*
 
 # parse the arguments.
-OPTIONS=$(getopt -o ph --long post,help -n 'amtoine-syssync' -- "$@")
+OPTIONS=$(getopt -o ph --long post,help -n 'gssync' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
 # the environment variables
 [ -z "$SYSTEM" ] && SYSTEM="$HOME/.local"
-[ -z "$CONFIG" ] && CONFIG="$XDG_CONFIG_HOME/amtoine-syssync/config.txt"
+[ -z "$CONFIG" ] && CONFIG="$XDG_CONFIG_HOME/gssync/config.txt"
 
 
 sync_files () {
@@ -37,7 +37,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: amtoine-syssync [-hp]"
+  echo "Usage: gssync [-hp]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -47,12 +47,12 @@ help () {
   #
   # the help function.
   #
-  echo "amtoine-syssync:"
+  echo "gssync:"
   echo "     This script allows the user to easily manage syssync devices."
   echo "     Do not forget to puth it in your PATH."
   echo ""
   echo "Usage:"
-  echo "     amtoine-syssync [-hp]"
+  echo "     gssync [-hp]"
   echo ""
   echo "Switches:"
   echo "     -h/--help               shows this help."
@@ -60,7 +60,7 @@ help () {
   echo ""
   echo "Environment variables:"
   echo "     SYSTEM                  the path where the system config files are stored (defaults to \`\$HOME/.local\`)"
-  echo "     CONFIG                  the path to the config file (defaults to \`\$XDG_CONFIG_HOME/amtoine-syssync/config.txt\`)"
+  echo "     CONFIG                  the path to the config file (defaults to \`\$XDG_CONFIG_HOME/gssync/config.txt\`)"
   exit 0
 }
 

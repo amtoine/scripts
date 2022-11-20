@@ -13,7 +13,7 @@
 set -e
 
 # parse the arguments
-OPTIONS=$(getopt -o h --long help -n 'amtoine-lfrun' -- "$@")
+OPTIONS=$(getopt -o h --long help -n 'glf' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -50,7 +50,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: amtoine-lfrun [-h]"
+  echo "Usage: glf [-h]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -60,11 +60,11 @@ help () {
   #
   # the help function.
   #
-  echo "amtoine-lfrun:"
+  echo "glf:"
   echo "     TODO."
   echo ""
   echo "Usage:"
-  echo "     amtoine-lfrun [-h]"
+  echo "     glf [-h]"
   echo ""
   echo "Switches:"
   echo "     -h/--help             shows this help."

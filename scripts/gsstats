@@ -11,7 +11,7 @@
 #*
 
 # parse the arguments
-OPTIONS=$(getopt -o h --long help -n 'amtoine-sys-stats' -- "$@")
+OPTIONS=$(getopt -o h --long help -n 'gsstats' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -23,7 +23,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: amtoine-sys-stats [-h]"
+  echo "Usage: gsstats [-h]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -33,11 +33,11 @@ help () {
   #
   # the help function.
   #
-  echo "amtoine-sys-stats:"
+  echo "gsstats:"
   echo "     TODO."
   echo ""
   echo "Usage:"
-  echo "     amtoine-sys-stats [-h]"
+  echo "     gsstats [-h]"
   echo ""
   echo "Switches:"
   echo "     -h/--help             shows this help."
@@ -60,7 +60,7 @@ main () {
     esac
   done
 
-  dunstify "amtoine-sys-stats" "polling the system for information..." --icon="$ICONS/misc/iphone-spinner.png"
+  dunstify "gsstats" "polling the system for information..." --icon="$ICONS/misc/iphone-spinner.png"
 
   memory=$(free -m | awk 'NR==2{printf "%s/%sMB (%.2f%%)\n", $3,$2,$3*100/$2 }')
   load=$(top -bn1 | grep load | awk '{printf "%.2f\n", $(NF-2)}')

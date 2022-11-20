@@ -23,7 +23,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: amtoine-time-date [-h]"
+  echo "Usage: gdate [-h]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -33,11 +33,11 @@ help () {
   #
   # the help function.
   #
-  echo "amtoine-time-date:"
+  echo "gdate:"
   echo "     TODO."
   echo ""
   echo "Usage:"
-  echo "     amtoine-time-date [-h]"
+  echo "     gdate [-h]"
   echo ""
   echo "Switches:"
   echo "     -h/--help             shows this help."

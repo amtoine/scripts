@@ -11,7 +11,7 @@
 #*
 
 # parse the arguments.
-OPTIONS=$(getopt -o tbnh --long toggle,blur,notify,help -n 'amtoine-pcm' -- "$@")
+OPTIONS=$(getopt -o tbnh --long toggle,blur,notify,help -n 'gpcm' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -25,7 +25,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: amtoine-pcm [-htbn]"
+  echo "Usage: gpcm [-htbn]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -35,12 +35,12 @@ help () {
   #
   # the help function.
   #
-  echo "amtoine-pcm:"
+  echo "gpcm:"
   echo "     This script allows the user to easily manage picom."
   echo "     Do not forget to puth it in your PATH."
   echo ""
   echo "Usage:"
-  echo "     amtoine-pcm [-htbn]"
+  echo "     gpcm [-htbn]"
   echo ""
   echo "Switches:"
   echo "     -h/--help       shows this help."
@@ -77,19 +77,19 @@ main () {
       if pgrep -x "picom" > /dev/null
       then
         killall picom
-        [[ "$NOTIFY" == "yes" ]] && dunstify "amtoine-pcm" "picom killed" --icon="$ICONS/video/compositor/off.png" --replace "$DUNST_ID"
+        [[ "$NOTIFY" == "yes" ]] && dunstify "gpcm" "picom killed" --icon="$ICONS/video/compositor/off.png" --replace "$DUNST_ID"
       else
         picom  --daemon $PICOM_EXTRA_FLAGS
-        [[ "$NOTIFY" == "yes" ]] && dunstify "amtoine-pcm" "picom started" --icon="$ICONS/video/compositor/on.png" --replace "$DUNST_ID"
+        [[ "$NOTIFY" == "yes" ]] && dunstify "gpcm" "picom started" --icon="$ICONS/video/compositor/on.png" --replace "$DUNST_ID"
       fi;;
     blur )
       if grep "^#blur-method" ~/.config/picom/picom.conf > /dev/null
       then
         sed -i 's/^#\?blur-method/blur-method/' ~/.config/picom/picom.conf
-        [[ "$NOTIFY" == "yes" ]] && dunstify "amtoine-pcm" "blur ON" --icon="$ICONS/video/blur/on.png" --replace "$DUNST_ID"
+        [[ "$NOTIFY" == "yes" ]] && dunstify "gpcm" "blur ON" --icon="$ICONS/video/blur/on.png" --replace "$DUNST_ID"
       else
         sed -i 's/^#\?blur-method/#blur-method/' ~/.config/picom/picom.conf
-        [[ "$NOTIFY" == "yes" ]] && dunstify "amtoine-pcm" "blur OFF" --icon="$ICONS/video/blur/off.png" --replace "$DUNST_ID"
+        [[ "$NOTIFY" == "yes" ]] && dunstify "gpcm" "blur OFF" --icon="$ICONS/video/blur/off.png" --replace "$DUNST_ID"
       fi;;
     * ) echo "an error occured (got unexpected '$ACTION')" ;;
   esac

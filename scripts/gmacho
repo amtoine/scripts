@@ -21,12 +21,12 @@ help () {
   #
   # the help function.
   #
-  echo "amtoine-macho:"
+  echo "gmacho:"
   echo "     This script allows the user to easily search man pages with fzf."
   echo "     Do not forget to puth it in your PATH."
   echo ""
   echo "Usage:"
-  echo "     amtoine-macho [-h] [-s SECTION]"
+  echo "     gmacho [-h] [-s SECTION]"
   echo ""
   echo "Switches:"
   echo "     -h         show this help."

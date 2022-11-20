@@ -11,7 +11,7 @@
 #*
 
 # parse the arguments
-OPTIONS=$(getopt -o h --long help -n 'amtoine-dmrun' -- "$@")
+OPTIONS=$(getopt -o h --long help -n 'gmrun' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -27,7 +27,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: amtoine-dmrun [-h]"
+  echo "Usage: gmrun [-h]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -37,11 +37,11 @@ help () {
   #
   # the help function.
   #
-  echo "amtoine-dmrun:"
+  echo "gmrun:"
   echo "     a wrapper around dmenu_run, with some extra flags to make it prettier."
   echo ""
   echo "Usage:"
-  echo "     amtoine-dmrun [-h]"
+  echo "     gmrun [-h]"
   echo ""
   echo "Switches:"
   echo "     -h/--help             shows this help."

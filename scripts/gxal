@@ -12,7 +12,7 @@
 
 # parse the arguments
 OPTIONS=$(getopt -o hedn --long help,nable,disable,notify \
-              -n 'amtoine-xal' -- "$@")
+              -n 'gxal' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -24,7 +24,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: amtoine-xal [-hedn]"
+  echo "Usage: gxal [-hedn]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -34,12 +34,12 @@ help () {
   #
   # the help function.
   #
-  echo "amtoine-xal:"
+  echo "gxal:"
   echo "     This script allows the user to easily toggle xautolock."
   echo "     Do not forget to puth it in your PATH."
   echo ""
   echo "Usage:"
-  echo "     amtoine-xal [-hedn]"
+  echo "     gxal [-hedn]"
   echo ""
   echo "Switches:"
   echo "     -h/--help               shows this help."
@@ -69,8 +69,8 @@ main () {
   done
   [ -z "$ACTION" ] && usage
   case "$ACTION" in
-    disable ) xautolock -disable; [[ "$NOTIFY" == "yes" ]] && dunstify "amtoine-xal" "xautolock disabled" --icon="$ICONS/lock/padlock.png" ;;
-    enable) xautolock -enable; [[ "$NOTIFY" == "yes" ]] && dunstify "amtoine-xal" "xautolock enabled" --icon="$ICONS/lock/lock.png" ;;
+    disable ) xautolock -disable; [[ "$NOTIFY" == "yes" ]] && dunstify "gxal" "xautolock disabled" --icon="$ICONS/lock/padlock.png" ;;
+    enable) xautolock -enable; [[ "$NOTIFY" == "yes" ]] && dunstify "gxal" "xautolock enabled" --icon="$ICONS/lock/lock.png" ;;
     * ) echo "an error occured (got unexpected '$ACTION')" ;;
   esac
 }

@@ -11,7 +11,7 @@
 #*
 
 # parse the arguments
-OPTIONS=$(getopt -o ht: --long help,time: -n 'amtoine-countdown' -- "$@")
+OPTIONS=$(getopt -o ht: --long help,time: -n 'goat-countdown' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -46,10 +46,10 @@ ring () {
 countdown () {
     for t in $(seq 0 "$1" | tac); do
         progress=$(_compute_progress "$t" "$1")
-        dunstify --urgency low "amtoine-countdown" "total:${1}s\nremaining:${t}s" -h "int:value:$progress" --replace "$DUNST_ID"
+        dunstify --urgency low "goat-countdown" "total:${1}s\nremaining:${t}s" -h "int:value:$progress" --replace "$DUNST_ID"
         sleep 1
     done
-    dunstify --urgency normal "amtoine-countdown" "time is over" --replace "$DUNST_ID"
+    dunstify --urgency normal "goat-countdown" "time is over" --replace "$DUNST_ID"
 }
 
 
@@ -57,7 +57,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: amtoine-countdown [-h] -t TIME"
+  echo "Usage: goat-countdown [-h] -t TIME"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -67,11 +67,11 @@ help () {
   #
   # the help function.
   #
-  echo "amtoine-battery:"
+  echo "gbat:"
   echo "     a script to launch a countdown, displayed as notifications, and with a bell at the end."
   echo ""
   echo "Usage:"
-  echo "     amtoine-countdown [-h] -t TIME"
+  echo "     goat-countdown [-h] -t TIME"
   echo ""
   echo "Switches:"
   echo "     -h/--help             shows this help."
@@ -104,7 +104,7 @@ main () {
       countdown "$TIME"
       ring
   else
-      dunstify --urgency critical --timeout 5000 "amtoine-countdown" "Please provide a time as the only argument"
+      dunstify --urgency critical --timeout 5000 "goat-countdown" "Please provide a time as the only argument"
   fi
 }
 

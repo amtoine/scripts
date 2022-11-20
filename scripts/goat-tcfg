@@ -11,7 +11,7 @@
 #*
 
 # parse the arguments
-OPTIONS=$(getopt -o h --long help -n 'amtoine-tcfg' -- "$@")
+OPTIONS=$(getopt -o h --long help -n 'goat-tcfg' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -24,7 +24,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: amtoine-tcfg [-h]"
+  echo "Usage: goat-tcfg [-h]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -34,11 +34,11 @@ help () {
   #
   # the help function.
   #
-  echo "amtoine-tcfg:"
+  echo "goat-tcfg:"
   echo "     TODO."
   echo ""
   echo "Usage:"
-  echo "     amtoine-tcfg [-h]"
+  echo "     goat-tcfg [-h]"
   echo ""
   echo "Switches:"
   echo "     -h/--help             shows this help."

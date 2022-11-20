@@ -13,7 +13,7 @@
 # parse the arguments.
 OPTIONS=$(getopt -o b:s:dlmrMSnhw \
               --long brightness:,step:,disconnect,left,mirror,right,main,second,notify,restart-wm,help \
-              -n 'amtoine-hdmi' -- "$@")
+              -n 'grandr' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -97,7 +97,7 @@ notify_brightness () {
   #
   # TODO.
   #
-  dunstify "amtoine-hdmi" "Brightness ($1)\n$2" -h "int:value:$2" -u low --icon="$ICONS/video/sun.png" --replace="$DUNST_ID"
+  dunstify "grandr" "Brightness ($1)\n$2" -h "int:value:$2" -u low --icon="$ICONS/video/sun.png" --replace="$DUNST_ID"
 }
 
 
@@ -105,7 +105,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: amtoine-hdmi [-hdlmrMSn] [-b BRIGHTNESS/DELTA -s STEP]"
+  echo "Usage: grandr [-hdlmrMSn] [-b BRIGHTNESS/DELTA -s STEP]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -115,12 +115,12 @@ help () {
   #
   # the help function.
   #
-  echo "amtoine-hdmi:"
+  echo "grandr:"
   echo "     This script allows the user to easily manage hdmi devices."
   echo "     Do not forget to puth it in your PATH."
   echo ""
   echo "Usage:"
-  echo "     amtoine-hdmi [-hdlmrMSn] [-b BRIGHTNESS/DELTA -s STEP]"
+  echo "     grandr [-hdlmrMSn] [-b BRIGHTNESS/DELTA -s STEP]"
   echo ""
   echo "Switches:"
   echo "     -h/--help               shows this help."
@@ -186,11 +186,11 @@ main () {
       fi
       exit 0
       ;;
-    disconnect ) xrandr --output "$MAIN" --auto --output "$SECOND" --off; [ -v WM ] && wm_restart; [ -v NOTIFY ] && dunstify "amtoine-hdmi" "$SECOND disconnected" --icon="$ICONS/video/monitor/disconnected.png" ;;
-    left )       connect "$MAIN" "$SECOND" "left-of"; [ -v WM ] && wm_restart;  [ -v NOTIFY ] && dunstify "amtoine-hdmi" "$SECOND is now on the left of $MAIN" --icon="$ICONS/video/monitor/left.png" ;;
-    mirror )     connect "$MAIN" "$SECOND" "same-as"; [ -v WM ] && wm_restart;  [ -v NOTIFY ] && dunstify "amtoine-hdmi" "$SECOND is now the same as $MAIN" --icon="$ICONS/video/monitor/mirror.png" ;;
-    right )      connect "$MAIN" "$SECOND" "right-of"; [ -v WM ] && wm_restart; [ -v NOTIFY ] && dunstify "amtoine-hdmi" "$SECOND is now on the right of $MAIN" --icon="$ICONS/video/monitor/right.png" ;;
-    * ) echo "an error occured (got unexpected '$ACTION')"; [ -v NOTIFY ] && dunstify "amtoine-hdmi" "an error occured (got unexpected '$ACTION')"; break ;;
+    disconnect ) xrandr --output "$MAIN" --auto --output "$SECOND" --off; [ -v WM ] && wm_restart; [ -v NOTIFY ] && dunstify "grandr" "$SECOND disconnected" --icon="$ICONS/video/monitor/disconnected.png" ;;
+    left )       connect "$MAIN" "$SECOND" "left-of"; [ -v WM ] && wm_restart;  [ -v NOTIFY ] && dunstify "grandr" "$SECOND is now on the left of $MAIN" --icon="$ICONS/video/monitor/left.png" ;;
+    mirror )     connect "$MAIN" "$SECOND" "same-as"; [ -v WM ] && wm_restart;  [ -v NOTIFY ] && dunstify "grandr" "$SECOND is now the same as $MAIN" --icon="$ICONS/video/monitor/mirror.png" ;;
+    right )      connect "$MAIN" "$SECOND" "right-of"; [ -v WM ] && wm_restart; [ -v NOTIFY ] && dunstify "grandr" "$SECOND is now on the right of $MAIN" --icon="$ICONS/video/monitor/right.png" ;;
+    * ) echo "an error occured (got unexpected '$ACTION')"; [ -v NOTIFY ] && dunstify "grandr" "an error occured (got unexpected '$ACTION')"; break ;;
   esac
 }
 

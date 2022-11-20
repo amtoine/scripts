@@ -11,7 +11,7 @@
 #*
 
 # parse the arguments
-OPTIONS=$(getopt -o h --long help -n 'amtoine-togkb' -- "$@")
+OPTIONS=$(getopt -o h --long help -n 'gtogkb' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -20,7 +20,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: amtoine-togkb [-h]"
+  echo "Usage: gtogkb [-h]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -30,11 +30,11 @@ help () {
   #
   # the help function.
   #
-  echo "amtoine-togkb:"
+  echo "gtogkb:"
   echo "     TODO."
   echo ""
   echo "Usage:"
-  echo "     amtoine-togkb [-h]"
+  echo "     gtogkb [-h]"
   echo ""
   echo "Switches:"
   echo "     -h/--help             shows this help."

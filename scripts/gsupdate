@@ -12,7 +12,7 @@
 
 # parse the arguments
 OPTIONS=$(getopt -o hcus --long help,check,update,silent \
-              -n 'amtoine-update' -- "$@")
+              -n 'gsupdate' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -23,21 +23,21 @@ eval set -- "$OPTIONS"
 
 check_updates () {
   # Check the system for updates.
-  [ -z "$1" ] && dunstify "amtoine-update" "pulling updates..." --icon="$ICONS/notification/notification.png"
+  [ -z "$1" ] && dunstify "gsupdate" "pulling updates..." --icon="$ICONS/notification/notification.png"
   updates=$(checkupdates | wc -l)
   if [ "$updates" -eq "0" ]; then
-    [ -z "$1" ] && dunstify "amtoine-update" "everything is up to date!" --icon="$ICONS/misc/empty-treasure-chest.png"
+    [ -z "$1" ] && dunstify "gsupdate" "everything is up to date!" --icon="$ICONS/misc/empty-treasure-chest.png"
   else
-    dunstify "amtoine-update" "there are $updates updates." --icon="$ICONS/misc/treasure-chest.png"
+    dunstify "gsupdate" "there are $updates updates." --icon="$ICONS/misc/treasure-chest.png"
   fi
 }
 
 
 update () {
   # Update the system with pacman in a popup terminal.
-  dunstify "amtoine-update" "please confirm your password in the popup window" --icon="$ICONS/lock/lock.png"
+  dunstify "gsupdate" "please confirm your password in the popup window" --icon="$ICONS/lock/lock.png"
   $TERMINAL sudo pacman -Syyu
-  dunstify "amtoine-update" "update did complete successfully" --icon="$ICONS/lock/padlock.png"
+  dunstify "gsupdate" "update did complete successfully" --icon="$ICONS/lock/padlock.png"
   check_updates
 }
 
@@ -46,7 +46,7 @@ usage () {
   #
   # the usage function.
   #
-  echo "Usage: amtoine-update [-hcus]"
+  echo "Usage: gsupdate [-hcus]"
   echo "Type -h or --help for the full help."
   exit 0
 }
@@ -55,11 +55,11 @@ help () {
   #
   # the help function.
   #
-  echo "amtoine-update:"
+  echo "gsupdate:"
   echo "     a tool to check and update the system."
   echo ""
   echo "Usage:"
-  echo "     amtoine-update [-hcus]"
+  echo "     gsupdate [-hcus]"
   echo ""
   echo "Switches:"
   echo "     -h/--help             shows this help."

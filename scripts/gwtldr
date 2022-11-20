@@ -21,7 +21,7 @@ help () {
   #
   # the help function.
   #
-  echo "amtoine-wtldr:"
+  echo "gwtldr:"
   echo "     This script allows the user to easily search tldr pages with fzf."
   echo "     Do not forget to puth it in your PATH."
   echo ""

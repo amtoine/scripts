@@ -11,7 +11,7 @@
 #*
 
 # parse the arguments.
-OPTIONS=$(getopt -o h --long help -n 'amtoine-pedit' -- "$@")
+OPTIONS=$(getopt -o h --long help -n 'gedit' -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
@@ -24,12 +24,12 @@ help () {
   #
   # the help function.
   #
-  echo "amtoine-pedit:"
+  echo "gedit:"
   echo "     This script searches and edits \`pass\` entries."
   echo "     Do not forget to puth it in your PATH."
   echo ""
   echo "Usage:"
-  echo "     amtoine-pedit [-h]"
+  echo "     gedit [-h]"
   echo ""
   echo "Switches:"
   echo "     -h/--help       shows this help."
