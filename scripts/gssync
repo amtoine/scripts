@@ -82,7 +82,7 @@ main () {
   [ ! -f "$CONFIG" ] && {
     echo "'$CONFIG' does not exist..."
     echo -n "Please have a look at the default config file at "
-    echo "/usr/local/share/amtoine-scripts/examples/."
+    echo "/usr/local/share/goat-scripts-git/examples/."
     exit 1
   }
 

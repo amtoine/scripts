@@ -28,7 +28,7 @@ help () {
   echo "     adapted from https://hiphish.github.io/blog/2020/05/31/macho-man-command-on-steroids"
   echo ""
   echo "Usage:"
-  echo "     amtoine-wltdr [-h]"
+  echo "     gwltdr [-h]"
   echo ""
   echo "Switches:"
   echo "     -h         show this help."
