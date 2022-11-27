@@ -17,7 +17,7 @@ eval set -- "$OPTIONS"
 
 # the environment variables
 [ -z "$SYSTEM" ] && SYSTEM="$HOME/.local"
-[ -z "$CONFIG" ] && CONFIG="$XDG_CONFIG_HOME/gssync/config.txt"
+[ -z "$CONFIG" ] && CONFIG="$XDG_CONFIG_HOME/goat/gssync.txt"
 
 
 sync_files () {
