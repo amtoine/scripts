@@ -18,7 +18,7 @@ eval set -- "$OPTIONS"
 # the environment variables
 [[ ! -v SCREENSHOT_PATH ]] && SCREENSHOT_PATH="$HOME/media/images/scrot"
 [[ ! -v FORMAT ]] && FORMAT='%Y-%m-%d_%H-%M-%S_$wx$h'
-[[ ! -v ICONS ]] && ICONS="/usr/share/icons/amtoine-icons-git/stickers/100x100"
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/goat-icons-git/stickers/100x100"
 
 usage () {
   #
@@ -54,7 +54,7 @@ help () {
   echo "Environment variables:"
   echo "     SCREENSHOT_PATH       the place where to store screenshots (defaults to '~/images/scrot')"
   echo "     FORMAT                the format for the filenames (defaults to '%Y-%m-%d_%H-%M-%S_\$wx\$h')"
-  echo "     ICONS                 the path the the icons (defaults to '/usr/share/icons/amtoine-icons-git/dark/128x128')"
+  echo "     ICONS                 the path the the icons (defaults to '/usr/share/icons/goat-icons-git/dark/128x128')"
   exit 0
 }
 

@@ -20,7 +20,7 @@ eval set -- "$OPTIONS"
 # the environment variables
 [ ! -v MAIN ] && MAIN="eDP-1"
 [ ! -v SECOND ] && SECOND="HDMI-2"
-[[ ! -v ICONS ]] && ICONS="/usr/share/icons/amtoine-icons-git/stickers/100x100"
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/goat-icons-git/stickers/100x100"
 [ -z "$DUNST_ID" ] && DUNST_ID=5
 
 
@@ -140,7 +140,7 @@ help () {
   echo "Environment variables:"
   echo "     MAIN                    the name of the main monitor (defaults to 'eDP-1')"
   echo "     SECOND                  the name of the main monitor (defaults to 'HDMI-2')"
-  echo "     ICONS                   the path the the icons (defaults to '/usr/share/icons/amtoine-icons-git/dark/128x128')"
+  echo "     ICONS                   the path the the icons (defaults to '/usr/share/icons/goat-icons-git/dark/128x128')"
   echo "     DUNST_ID                the id of the sound notification, to replace them properly (defaults to 5)"
   exit 0
 }

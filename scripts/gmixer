@@ -20,7 +20,7 @@ eval set -- "$OPTIONS"
 [[ ! -v DEVICE ]] && DEVICE="JBL Xtreme"
 [[ ! -v ON ]] && ON="a2dp_sink"
 [[ ! -v OFF ]] && OFF="off"
-[[ ! -v ICONS ]] && ICONS="/usr/share/icons/amtoine-icons-git/stickers/100x100"
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/goat-icons-git/stickers/100x100"
 [ -z "$DUNST_ID" ] && DUNST_ID=2
 
 
@@ -126,7 +126,7 @@ help () {
   echo "     DEVICE                  the bluetooth device connected (defaults to 'JBL Xtreme')"
   echo "     ON                      the 'on' sink related to the \`device\` (defaults to 'a2dp_sink')"
   echo "     OFF                     the 'on' sink related to the \`device\` (defaults to 'off')"
-  echo "     ICONS                   the path the the icons (defaults to '/usr/share/icons/amtoine-icons-git/dark/128x128')"
+  echo "     ICONS                   the path the the icons (defaults to '/usr/share/icons/goat-icons-git/dark/128x128')"
   echo "     DUNST_ID                the id of the sound notification, to replace them properly (defaults to 2)"
   exit 0
 }

@@ -17,7 +17,7 @@ if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
 # environment variables
-[[ ! -v ICONS ]] && ICONS="/usr/share/icons/amtoine-icons-git/stickers/100x100"
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/goat-icons-git/stickers/100x100"
 [[ ! -v TERMINAL ]] && TERMINAL="st -e"
 
 
@@ -68,7 +68,7 @@ help () {
   echo "     -s/--silent           pull the Arch repositories silently and notify only when there are updates."
   echo ""
   echo "Environment variables:"
-  echo "     ICONS                   the path the the icons (defaults to '/usr/share/icons/amtoine-icons-git/dark/128x128')"
+  echo "     ICONS                   the path the the icons (defaults to '/usr/share/icons/goat-icons-git/dark/128x128')"
   echo "     TERMINAL                the terminal to update the system (defaults to 'st -e')"
   exit 0
 }

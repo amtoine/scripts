@@ -19,7 +19,7 @@ eval set -- "$OPTIONS"
 [ -z "$BATTERY" ] && BATTERY="BAT0"
 [ -z "$LOW" ] && LOW=15
 [ -z "$HIGH" ] && HIGH=85
-[ -z "$ICONS" ] && ICONS="/usr/share/icons/amtoine-icons-git/stickers/100x100"
+[ -z "$ICONS" ] && ICONS="/usr/share/icons/goat-icons-git/stickers/100x100"
 [ -z "$DUNST_ID" ] && DUNST_ID=1
 
 # the location of the battery information files
@@ -171,7 +171,7 @@ help () {
   echo "     BATTERY               the name of the battery to check, inside '/sys/class/power_supply'(defaults to 'BAT0')"
   echo "     LOW                   the threshold below which a discharging battery is considered critical (defaults to 15)"
   echo "     HIGH                  the threshold above which a charging battery is considered critical (defaults to 85)"
-  echo "     ICONS                 the path the the icons (defaults to '/usr/share/icons/amtoine-icons-git/dark/128x128')"
+  echo "     ICONS                 the path the the icons (defaults to '/usr/share/icons/goat-icons-git/dark/128x128')"
   echo "     DUNST_ID              the id of the sound notification, to replace them properly (defaults to 1)"
   exit 0
 }

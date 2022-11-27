@@ -17,7 +17,7 @@ if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
 # environment variables.
-[[ ! -v ICONS ]] && ICONS="/usr/share/icons/amtoine-icons-git/stickers/100x100"
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/goat-icons-git/stickers/100x100"
 [[ ! -v DUNST_ID ]] && DUNST_ID=3
 [[ ! -v FOLLOW_SLEEP ]] && FOLLOW_SLEEP=1
 [[ ! -v FOLLOW_LOOPS ]] && FOLLOW_LOOPS=10
@@ -120,7 +120,7 @@ help () {
   echo "     -f/--follow             follow the song instead of showing a single notification."
   echo ""
   echo "Environment variables:"
-  echo "     ICONS                   the path the the icons (defaults to '/usr/share/icons/amtoine-icons-git/dark/128x128')"
+  echo "     ICONS                   the path the the icons (defaults to '/usr/share/icons/goat-icons-git/dark/128x128')"
   echo "     DUNST_ID                the id of the dunst notification to be replaced (defaults to 3)"
   echo "     FOLLOW_SLEEP            the time to sleep between two server polls when following (defaults to 1)"
   echo "     FOLLOW_LOOPS            the number of time to follow the server (defaults to 10)"

@@ -18,7 +18,7 @@ eval set -- "$OPTIONS"
 # environment variables
 [[ ! -v DUNST_ID ]] && DUNST_ID=6
 [[ ! -v PICOM_EXTRA_FLAGS ]] && PICOM_EXTRA_FLAGS="--experimental-backends"
-[[ ! -v ICONS ]] && ICONS="/usr/share/icons/amtoine-icons-git/stickers/100x100"
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/goat-icons-git/stickers/100x100"
 
 
 usage () {
@@ -50,7 +50,7 @@ help () {
   echo ""
   echo "Environment variables:"
   echo "     DUNST_ID        the id of the dunst notification to be replaced (defaults to 6)"
-  echo "     ICONS           the path the the icons (defaults to '/usr/share/icons/amtoine-icons-git/dark/128x128')"
+  echo "     ICONS           the path the the icons (defaults to '/usr/share/icons/goat-icons-git/dark/128x128')"
   echo "     PICOM_EXTRA_FLAGS     extra flags to pass to \`picom\` (defaults to '--experimental-backends')"
 
   exit 0
