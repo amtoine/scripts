@@ -58,26 +58,30 @@ def pipx_deps [] {
 }
 
 
-let x = {
-    pkgs: {
-        pacman:
-            {
-                all: (pacman_deps_wrapper --flag "-Q"),
-                explicit: (pacman_deps_wrapper --flag "-Qe"),
-                native: (pacman_deps_wrapper --flag "-Qen"),
-                foreign: (pacman_deps_wrapper --flag "-Qem")
-            }
-        rust:
-            {
-                cargo: (cargo_deps)
-            }
-        python:
-            {
-                pip: (pip_deps),
-                pipx: (pipx_deps)
-            }
+def main [
+    output: string = "~/pkgs.toml"
+] {
+    let x = {
+        pkgs: {
+            pacman:
+                {
+                    all: (pacman_deps_wrapper --flag "-Q"),
+                    explicit: (pacman_deps_wrapper --flag "-Qe"),
+                    native: (pacman_deps_wrapper --flag "-Qen"),
+                    foreign: (pacman_deps_wrapper --flag "-Qem")
+                }
+            rust:
+                {
+                    cargo: (cargo_deps)
+                }
+            python:
+                {
+                    pip: (pip_deps),
+                    pipx: (pipx_deps)
+                }
+        }
     }
-}
 
-echo "Saving the system dependencies to ~/pkgs.toml"
-$x | save ~/pkgs.toml
+    print $"Saving the system dependencies to ($output | path expand)"
+    $x | save ($output | path expand)
+}
