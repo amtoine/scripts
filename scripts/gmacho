@@ -1,0 +1,64 @@
+#! /usr/bin/bash
+#*
+#*                 _    __ _ _
+#*  __ _ ___  __ _| |_ / _(_) |___ ___  WEBSITE: https://goatfiles.github.io
+#* / _` / _ \/ _` |  _|  _| | / -_|_-<  REPOS: https://github.com/goatfiles
+#* \__, \___/\__,_|\__|_| |_|_\___/__/  LICENCE: https://github.com/goatfiles/dotfiles/blob/main/LICENSE
+#* |___/
+#*          MAINTAINERS:
+#*              AMTOINE: https://github.com/amtoine antoine#1306 7C5EE50BA27B86B7F9D5A7BA37AAE9B486CFF1AB
+#*              ATXR:    https://github.com/atxr    atxr#6214    AF97503EDC65A06845114630F00A52147514670B
+#*
+
+export FZF_DEFAULT_OPTS='
+--height=100%
+--layout=reverse
+--prompt="Manual: "
+--preview="echo {1} | sed -E \"s/^\((.+)\)/\1/\" | xargs -I{S} man -Pcat {S} {2} 2>/dev/null"'
+
+
+help () {
+  #
+  # the help function.
+  #
+  echo "gmacho:"
+  echo "     This script allows the user to easily search man pages with fzf."
+  echo "     Do not forget to puth it in your PATH."
+  echo ""
+  echo "Usage:"
+  echo "     gmacho [-h] [-s SECTION]"
+  echo ""
+  echo "Switches:"
+  echo "     -h         show this help."
+  echo "     -s         select a particular section to search from amongst man pages."
+  exit 0
+}
+
+
+main () {
+  #
+  # TODO.
+  #
+  while getopts ":s:h" opt; do
+      case "$opt" in
+          h ) help;;
+          s ) SECTION=$OPTARG; shift 2;;
+          \?) echo "Invalid option: -$OPTARG" >&2; exit 1;;
+          : ) echo "Option -$OPTARG requires an argument" >&2; exit 1;;
+      esac
+  done
+
+  manual=$(apropos -s ${SECTION:-''} ${@:-.} | \
+    grep -v -E '^.+ \(0\)' |\
+    awk '{print $2 "    " $1}' | \
+    sort | \
+    fzf | \
+    sed 's/^(.*)\s\+//' \
+  )
+
+  [ -z "$manual" ] && exit 0
+  man "$manual"
+}
+
+
+main "$@"

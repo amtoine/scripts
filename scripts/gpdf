@@ -1,0 +1,72 @@
+#!/usr/bin/bash
+#*
+#*                 _    __ _ _
+#*  __ _ ___  __ _| |_ / _(_) |___ ___  WEBSITE: https://goatfiles.github.io
+#* / _` / _ \/ _` |  _|  _| | / -_|_-<  REPOS: https://github.com/goatfiles
+#* \__, \___/\__,_|\__|_| |_|_\___/__/  LICENCE: https://github.com/goatfiles/dotfiles/blob/main/LICENSE
+#* |___/
+#*          MAINTAINERS:
+#*              AMTOINE: https://github.com/amtoine antoine#1306 7C5EE50BA27B86B7F9D5A7BA37AAE9B486CFF1AB
+#*              ATXR:    https://github.com/atxr    atxr#6214    AF97503EDC65A06845114630F00A52147514670B
+#*
+
+# parse the arguments
+OPTIONS=$(getopt -o h --long help -n 'gpdf' -- "$@")
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+eval set -- "$OPTIONS"
+
+# allow the user to change the environment variables.
+[[ ! -v BASE ]] && BASE="$HOME"
+[[ ! -v EXCLUDE ]] && EXCLUDE="$HOME/.cache"
+
+
+usage () {
+  #
+  # the usage function.
+  #
+  echo "Usage: gpdf [-h]"
+  echo "Type -h or --help for the full help."
+  exit 0
+}
+
+
+help () {
+  #
+  # the help function.
+  #
+  echo "gpdf:"
+  echo "     TODO."
+  echo ""
+  echo "Usage:"
+  echo "     gpdf [-h]"
+  echo ""
+  echo "Switches:"
+  echo "     -h/--help             shows this help."
+  echo ""
+  echo "Environment variables:"
+  echo "     BASE                  the path where to search \`.pdf\` files from (defaults to \"\$HOME\")"
+  echo "     EXCLUDE               paths to exclude from the search (defaults to \"\$HOME/.cache\")"
+  exit 0
+}
+
+
+main () {
+  #
+  # TODO.
+  #
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h | --help )   help ;;
+      -- ) shift; break ;;
+      * ) break ;;
+    esac
+  done
+
+  dunstify "pdf.sh" "pulling pdfs from:\n'$BASE'\nexcluding:\n'$EXCLUDE'"
+  choices=$(find "$BASE" -type f -name "*\.pdf" -not -path "$EXCLUDE/*" | dmenu -c -l 10 -bw 5 -p "Choose a pdf:" | sort -u)
+  [ ! "$choices" ] && { echo -e "User choose to exit"; exit 1; }
+  okular $choices
+}
+
+
+main "$@"

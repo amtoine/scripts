@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+#*
+#*                 _    __ _ _
+#*  __ _ ___  __ _| |_ / _(_) |___ ___  WEBSITE: https://goatfiles.github.io
+#* / _` / _ \/ _` |  _|  _| | / -_|_-<  REPOS: https://github.com/goatfiles
+#* \__, \___/\__,_|\__|_| |_|_\___/__/  LICENCE: https://github.com/goatfiles/dotfiles/blob/main/LICENSE
+#* |___/
+#*          MAINTAINERS:
+#*              AMTOINE: https://github.com/amtoine antoine#1306 7C5EE50BA27B86B7F9D5A7BA37AAE9B486CFF1AB
+#*              ATXR:    https://github.com/atxr    atxr#6214    AF97503EDC65A06845114630F00A52147514670B
+#*
+
+# parse the arguments.
+OPTIONS=$(getopt -o sh --long silent,help -n 'gghn' -- "$@")
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+eval set -- "$OPTIONS"
+
+# environment variables.
+[ -z "$DUNST_ID" ] && DUNST_ID=8
+DUNST_HEADER="gghn"
+
+
+# create the temporary file to hold the result of the API pull.
+tmpdir="/tmp/goatfiles/goat-scripts-git"
+mkdir -p "$tmpdir"
+tmpfile=$(mktemp "$tmpdir/gh-notify.XXXXXX")
+trap  'rm "$tmpfile"' 0 1 15
+
+
+pull_from_api () {
+    [ -z "$1" ] && dunstify "$DUNST_HEADER" "pulling information from the API..." --replace "$DUNST_ID" --timeout 10000
+    gh api notifications --jq '.' | tee "$tmpfile" > /dev/null
+    [ -z "$1" ] && dunstify "$DUNST_HEADER" "pulling information from the API... done!" --replace "$DUNST_ID" --timeout 10000
+}
+
+
+get_from_json () { jq "$1" "$tmpfile" | sed 's/^"//g; s/"$//g'; }
+get_nb_notifications () { get_from_json '.[].subject.title' | wc -l; }
+get_titles () { get_from_json '.[].subject.title'; }
+get_repos  () { get_from_json '.[].repository.name'; }
+get_users  () { get_from_json '.[].repository.owner.login'; }
+get_issues () { get_from_json '.[].subject.url' | sed 's|.*/||g'; }
+
+
+help () {
+  #
+  # the help function.
+  #
+  echo "gghn:"
+  echo "     This script allows the user to pull notifications from GitHub."
+  echo "     Do not forget to puth it in your PATH."
+  echo ""
+  echo "Usage:"
+  echo "     gghn [-hs]"
+  echo ""
+  echo "Switches:"
+  echo "     -h/--help               shows this help."
+  echo "     -s/--silent             pull the GitHub API silently and notify only when there are notifications."
+  echo ""
+  echo "Environment variables:"
+  echo "     DUNST_ID                the id of the sound notification, to replace them properly (defaults to 8)"
+  exit 0
+}
+
+
+main () {
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -h | --help )  help ;;
+            -s | --silent) SILENT="yes"; shift 1;;
+            -- ) shift; break ;;
+            * ) break ;;
+        esac
+    done
+
+    pull_from_api "$SILENT"
+    if [ "$(get_nb_notifications)" -eq 0 ];
+    then
+        [ -z "$SILENT" ] && dunstify "$DUNST_HEADER" "no notifications for now..." --urgency low --timeout 10000
+    else
+        readarray -t titles < <(get_titles)
+        readarray -t repos < <(get_repos)
+        readarray -t users < <(get_users)
+        readarray -t issues < <(get_issues)
+        for ((i=0; i<"${#repos[@]}"; i++));
+        do
+            dunstify "${users[$i]}/${repos[$i]}: ${issues[$i]}" "\n${titles[$i]}" --urgency low --timeout 10000
+        done
+    fi
+}
+
+
+main "$@"

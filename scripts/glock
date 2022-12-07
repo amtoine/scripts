@@ -1,0 +1,65 @@
+#! /usr/bin/bash
+#*
+#*                 _    __ _ _
+#*  __ _ ___  __ _| |_ / _(_) |___ ___  WEBSITE: https://goatfiles.github.io
+#* / _` / _ \/ _` |  _|  _| | / -_|_-<  REPOS: https://github.com/goatfiles
+#* \__, \___/\__,_|\__|_| |_|_\___/__/  LICENCE: https://github.com/goatfiles/dotfiles/blob/main/LICENSE
+#* |___/
+#*          MAINTAINERS:
+#*              AMTOINE: https://github.com/amtoine antoine#1306 7C5EE50BA27B86B7F9D5A7BA37AAE9B486CFF1AB
+#*              ATXR:    https://github.com/atxr    atxr#6214    AF97503EDC65A06845114630F00A52147514670B
+#*
+
+# parse the arguments
+OPTIONS=$(getopt -o h --long help -n 'glock' -- "$@")
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+eval set -- "$OPTIONS"
+
+
+usage () {
+  #
+  # the usage function.
+  #
+  echo "Usage: glock [-h]"
+  echo "Type -h or --help for the full help."
+  exit 0
+}
+
+
+help () {
+  #
+  # the help function.
+  #
+  echo "glock:"
+  echo "     TODO."
+  echo ""
+  echo "Usage:"
+  echo "     glock [-h]"
+  echo ""
+  echo "Switches:"
+  echo "     -h/--help             shows this help."
+  exit 0
+}
+
+
+main () {
+  #
+  # TODO.
+  #
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h | --help )   help ;;
+      -- ) shift; break ;;
+      * ) break ;;
+    esac
+  done
+
+  # slock -m "$(cowsay $(fortune -c) | lolcat -ft)"
+  # slock -m "$(figlet -tcf slant "Screen Is Locked. Type Your Password To Unlock." -w 100)"
+  # slock -m "$(figlet -tcf slant "Screen Is Locked. Type Your Password To Unlock." -w 100 | lolcat -ft)"
+  # slock -m "$(figlet -tf small "Bet you can't crack it open.")"
+  slock -m ""
+}
+
+
+main "$@"

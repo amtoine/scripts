@@ -1,0 +1,112 @@
+#! /usr/bin/bash
+#*
+#*                 _    __ _ _
+#*  __ _ ___  __ _| |_ / _(_) |___ ___  WEBSITE: https://goatfiles.github.io
+#* / _` / _ \/ _` |  _|  _| | / -_|_-<  REPOS: https://github.com/goatfiles
+#* \__, \___/\__,_|\__|_| |_|_\___/__/  LICENCE: https://github.com/goatfiles/dotfiles/blob/main/LICENSE
+#* |___/
+#*          MAINTAINERS:
+#*              AMTOINE: https://github.com/amtoine antoine#1306 7C5EE50BA27B86B7F9D5A7BA37AAE9B486CFF1AB
+#*              ATXR:    https://github.com/atxr    atxr#6214    AF97503EDC65A06845114630F00A52147514670B
+#*
+
+# parse the arguments
+OPTIONS=$(getopt -o ht: --long help,time: -n 'goat-countdown' -- "$@")
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+eval set -- "$OPTIONS"
+
+# allow the user to change the environment variables.
+[[ ! -v DUNST_ID ]] && DUNST_ID=4
+
+
+_compute_progress () {
+    # Compute the progress of the current countdown.
+    #
+    # Args:
+    #   $1: the current time, in seconds.
+    #   $2: the total time, in seconds.
+    #
+    # Returns:
+    #   progress: the progress, in percent.
+    progress=$(awk -v c="$1" -v t="$2" 'BEGIN { print 100 * c / t }')
+    echo "$progress"
+}
+
+
+ring () {
+    for _ in $(seq 3); do
+        for _ in $(seq 5); do
+            play -q -n synth .1 sine 880 vol 0.5
+        done
+        sleep .5
+    done
+}
+
+
+countdown () {
+    for t in $(seq 0 "$1" | tac); do
+        progress=$(_compute_progress "$t" "$1")
+        dunstify --urgency low "goat-countdown" "total:${1}s\nremaining:${t}s" -h "int:value:$progress" --replace "$DUNST_ID"
+        sleep 1
+    done
+    dunstify --urgency normal "goat-countdown" "time is over" --replace "$DUNST_ID"
+}
+
+
+usage () {
+  #
+  # the usage function.
+  #
+  echo "Usage: goat-countdown [-h] -t TIME"
+  echo "Type -h or --help for the full help."
+  exit 0
+}
+
+
+help () {
+  #
+  # the help function.
+  #
+  echo "gbat:"
+  echo "     a script to launch a countdown, displayed as notifications, and with a bell at the end."
+  echo ""
+  echo "Usage:"
+  echo "     goat-countdown [-h] -t TIME"
+  echo ""
+  echo "Switches:"
+  echo "     -h/--help             shows this help."
+  echo "     -t/--time             the total duration of the countdown, in seconds."
+  echo ""
+  echo "Environment variables:"
+  echo "     DUNST_ID              the id of the countdown notifications, to replace them properly (defaults to 4)"
+  exit 0
+}
+
+
+main () {
+  #
+  # TODO.
+  #
+  ACTION=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h | --help )   help ;;
+      -t | --time )   ACTION="count down"; TIME="$2"; shift 2 ;;
+      -- ) shift; break ;;
+      * ) break ;;
+    esac
+  done
+
+  # an action is required
+  [ -z "$ACTION" ] && usage
+  [ -z "$TIME" ] && usage
+  if [ "$TIME" -gt 0 ]; then
+      countdown "$TIME"
+      ring
+  else
+      dunstify --urgency critical --timeout 5000 "goat-countdown" "Please provide a time as the only argument"
+  fi
+}
+
+
+main "$@"
