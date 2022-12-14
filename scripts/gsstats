@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+#*
+#*                 _    __ _ _
+#*  __ _ ___  __ _| |_ / _(_) |___ ___  WEBSITE: https://goatfiles.github.io
+#* / _` / _ \/ _` |  _|  _| | / -_|_-<  REPOS: https://github.com/goatfiles
+#* \__, \___/\__,_|\__|_| |_|_\___/__/  LICENCE: https://github.com/goatfiles/dotfiles/blob/main/LICENSE
+#* |___/
+#*          MAINTAINERS:
+#*              AMTOINE: https://github.com/amtoine antoine#1306 7C5EE50BA27B86B7F9D5A7BA37AAE9B486CFF1AB
+#*              ATXR:    https://github.com/atxr    atxr#6214    AF97503EDC65A06845114630F00A52147514670B
+#*
+
+# parse the arguments
+OPTIONS=$(getopt -o h --long help -n 'gsstats' -- "$@")
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+eval set -- "$OPTIONS"
+
+# allow the user to change the environment variables.
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/goat-icons-git/stickers/100x100"
+
+
+usage () {
+  #
+  # the usage function.
+  #
+  echo "Usage: gsstats [-h]"
+  echo "Type -h or --help for the full help."
+  exit 0
+}
+
+
+help () {
+  #
+  # the help function.
+  #
+  echo "gsstats:"
+  echo "     TODO."
+  echo ""
+  echo "Usage:"
+  echo "     gsstats [-h]"
+  echo ""
+  echo "Switches:"
+  echo "     -h/--help             shows this help."
+  echo ""
+  echo "Environment variables:"
+  echo "     ICONS                 TODO (defaults to \"/usr/share/icons/goat-icons-git/dark/128x128\")"
+  exit 0
+}
+
+
+main () {
+  #
+  # TODO.
+  #
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h | --help )   help ;;
+      -- ) shift; break ;;
+      * ) break ;;
+    esac
+  done
+
+  dunstify "gsstats" "polling the system for information..." --icon="$ICONS/misc/iphone-spinner.png"
+
+  memory=$(free -m | awk 'NR==2{printf "%s/%sMB (%.2f%%)\n", $3,$2,$3*100/$2 }')
+  load=$(top -bn1 | grep load | awk '{printf "%.2f\n", $(NF-2)}')
+  cpu_temp=$(sensors | grep 'Core .:' | awk -F' ' '{ print $3 }')
+
+  dunstify "Usage" "$memory" --icon="$ICONS/misc/usage-chart.png"
+  dunstify "Load" "$load" --icon="$ICONS/misc/processor.png"
+  dunstify "CPU" "$cpu_temp" --icon="$ICONS/misc/temperature.png"
+}
+
+
+main "$@"

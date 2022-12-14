@@ -1,0 +1,97 @@
+#!/bin/sh
+#*
+#*                 _    __ _ _
+#*  __ _ ___  __ _| |_ / _(_) |___ ___  WEBSITE: https://goatfiles.github.io
+#* / _` / _ \/ _` |  _|  _| | / -_|_-<  REPOS: https://github.com/goatfiles
+#* \__, \___/\__,_|\__|_| |_|_\___/__/  LICENCE: https://github.com/goatfiles/dotfiles/blob/main/LICENSE
+#* |___/
+#*          MAINTAINERS:
+#*              AMTOINE: https://github.com/amtoine antoine#1306 7C5EE50BA27B86B7F9D5A7BA37AAE9B486CFF1AB
+#*              ATXR:    https://github.com/atxr    atxr#6214    AF97503EDC65A06845114630F00A52147514670B
+#*
+
+# parse the arguments.
+OPTIONS=$(getopt -o hn --long help,notify -n 'gshot' -- "$@")
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+eval set -- "$OPTIONS"
+
+# the environment variables
+[[ ! -v SCREENSHOT_PATH ]] && SCREENSHOT_PATH="$HOME/media/images/scrot"
+[[ ! -v FORMAT ]] && FORMAT='%Y-%m-%d_%H-%M-%S_$wx$h'
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/goat-icons-git/stickers/100x100"
+
+usage () {
+  #
+  # the usage function.
+  #
+  echo "Usage: gshot [-hn] METHOD"
+  echo "Type -h or --help for the full help."
+  exit 0
+}
+
+
+help () {
+  #
+  # the help function.
+  #
+  echo "gshot:"
+  echo "     This script takes screenshot of either a window or the whole screen."
+  echo "     (see the METHOD section)"
+  echo "     Do not forget to puth it in your PATH."
+  echo ""
+  echo "Usage:"
+  echo "     gshot [-hn] METHOD"
+  echo ""
+  echo "Switches:"
+  echo "     -h/--help             shows this help."
+  echo "     -n/--notify           enable notifications"
+  echo ""
+  echo "METHOD:"
+  echo "the \`gshot\` script allows two methods:"
+  echo "     - the \`window\` method which lets the user click a window to take a photo of."
+  echo "     - the \`full\` method that takes a picture of the entire monitors."
+  echo ""
+  echo "Environment variables:"
+  echo "     SCREENSHOT_PATH       the place where to store screenshots (defaults to '~/images/scrot')"
+  echo "     FORMAT                the format for the filenames (defaults to '%Y-%m-%d_%H-%M-%S_\$wx\$h')"
+  echo "     ICONS                 the path the the icons (defaults to '/usr/share/icons/goat-icons-git/dark/128x128')"
+  exit 0
+}
+
+
+main () {
+  #
+  # TODO.
+  #
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h | --help ) help ;;
+      -n | --notify ) NOTIFY="yes"; shift 1 ;;
+      -- ) shift; break ;;
+      * ) break ;;
+    esac
+  done
+
+  [ ! -d "$SCREENSHOT_PATH" ] && {
+      echo -e "'$SCREENSHOT_PATH' does not exist\nCreating it...";
+      mkdir "$SCREENSHOT_PATH" -p;
+  }
+
+	case "$1" in
+	full)
+		name=$(scrot -m "$FORMAT.png" -e "echo \$f; mv \$f $SCREENSHOT_PATH/$name");
+		;;
+	window)
+    [ -v NOTIFY ] && dunstify "gshot" "please select a window" --icon="$ICONS/misc/camera.png";
+		name=$(scrot -s "$FORMAT.png" -e "echo \$f; mv \$f $SCREENSHOT_PATH/$name");
+		;;
+	*) usage
+		;;
+	esac;
+
+  echo "name: $SCREENSHOT_PATH/$name"
+  [ -n "$name" ] && [ -v NOTIFY ] && dunstify "gshot" "$1 screenshot at\n$SCREENSHOT_PATH/$name" --icon="$ICONS/misc/camera.png"
+}
+
+
+main "$@"

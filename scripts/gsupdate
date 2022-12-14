@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+#*
+#*                 _    __ _ _
+#*  __ _ ___  __ _| |_ / _(_) |___ ___  WEBSITE: https://goatfiles.github.io
+#* / _` / _ \/ _` |  _|  _| | / -_|_-<  REPOS: https://github.com/goatfiles
+#* \__, \___/\__,_|\__|_| |_|_\___/__/  LICENCE: https://github.com/goatfiles/dotfiles/blob/main/LICENSE
+#* |___/
+#*          MAINTAINERS:
+#*              AMTOINE: https://github.com/amtoine antoine#1306 7C5EE50BA27B86B7F9D5A7BA37AAE9B486CFF1AB
+#*              ATXR:    https://github.com/atxr    atxr#6214    AF97503EDC65A06845114630F00A52147514670B
+#*
+
+# parse the arguments
+OPTIONS=$(getopt -o hcus --long help,check,update,silent \
+              -n 'gsupdate' -- "$@")
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+eval set -- "$OPTIONS"
+
+# environment variables
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/goat-icons-git/stickers/100x100"
+[[ ! -v TERMINAL ]] && TERMINAL="st -e"
+
+
+check_updates () {
+  # Check the system for updates.
+  [ -z "$1" ] && dunstify "gsupdate" "pulling updates..." --icon="$ICONS/notification/notification.png"
+  updates=$(checkupdates | wc -l)
+  if [ "$updates" -eq "0" ]; then
+    [ -z "$1" ] && dunstify "gsupdate" "everything is up to date!" --icon="$ICONS/misc/empty-treasure-chest.png"
+  else
+    dunstify "gsupdate" "there are $updates updates." --icon="$ICONS/misc/treasure-chest.png"
+  fi
+}
+
+
+update () {
+  # Update the system with pacman in a popup terminal.
+  dunstify "gsupdate" "please confirm your password in the popup window" --icon="$ICONS/lock/lock.png"
+  $TERMINAL sudo pacman -Syyu
+  dunstify "gsupdate" "update did complete successfully" --icon="$ICONS/lock/padlock.png"
+  check_updates
+}
+
+
+usage () {
+  #
+  # the usage function.
+  #
+  echo "Usage: gsupdate [-hcus]"
+  echo "Type -h or --help for the full help."
+  exit 0
+}
+
+help () {
+  #
+  # the help function.
+  #
+  echo "gsupdate:"
+  echo "     a tool to check and update the system."
+  echo ""
+  echo "Usage:"
+  echo "     gsupdate [-hcus]"
+  echo ""
+  echo "Switches:"
+  echo "     -h/--help             shows this help."
+  echo "     -c/--check            check for system updates."
+  echo "     -u/--update           update the system."
+  echo "     -s/--silent           pull the Arch repositories silently and notify only when there are updates."
+  echo ""
+  echo "Environment variables:"
+  echo "     ICONS                   the path the the icons (defaults to '/usr/share/icons/goat-icons-git/dark/128x128')"
+  echo "     TERMINAL                the terminal to update the system (defaults to 'st -e')"
+  exit 0
+}
+
+
+main () {
+  #
+  # TODO.
+  #
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h | --help )    help ;;
+      -s | --silent )  SILENT="yes"; shift 1 ;;
+      -c | --check )   ACTION="check"; shift 1 ;;
+      -u | --update )  ACTION="update"; shift 1 ;;
+      -- ) shift; break ;;
+      * ) break ;;
+    esac
+  done
+
+  # an action is required
+  [ -z "$ACTION" ] && usage
+  case "$ACTION" in
+    check ) check_updates "$SILENT" ;;
+    update ) update ;;
+    * ) echo "an error occured (got unexpected '$ACTION')"; exit 1 ;;
+  esac
+}
+
+
+main "$@"

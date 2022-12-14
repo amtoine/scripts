@@ -1,0 +1,79 @@
+#! /usr/bin/bash
+#*
+#*                 _    __ _ _
+#*  __ _ ___  __ _| |_ / _(_) |___ ___  WEBSITE: https://goatfiles.github.io
+#* / _` / _ \/ _` |  _|  _| | / -_|_-<  REPOS: https://github.com/goatfiles
+#* \__, \___/\__,_|\__|_| |_|_\___/__/  LICENCE: https://github.com/goatfiles/dotfiles/blob/main/LICENSE
+#* |___/
+#*          MAINTAINERS:
+#*              AMTOINE: https://github.com/amtoine antoine#1306 7C5EE50BA27B86B7F9D5A7BA37AAE9B486CFF1AB
+#*              ATXR:    https://github.com/atxr    atxr#6214    AF97503EDC65A06845114630F00A52147514670B
+#*
+
+# parse the arguments
+OPTIONS=$(getopt -o hedn --long help,nable,disable,notify \
+              -n 'gxal' -- "$@")
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+eval set -- "$OPTIONS"
+
+# environment variables
+[[ ! -v ICONS ]] && ICONS="/usr/share/icons/goat-icons-git/stickers/100x100"
+
+
+usage () {
+  #
+  # the usage function.
+  #
+  echo "Usage: gxal [-hedn]"
+  echo "Type -h or --help for the full help."
+  exit 0
+}
+
+
+help () {
+  #
+  # the help function.
+  #
+  echo "gxal:"
+  echo "     This script allows the user to easily toggle xautolock."
+  echo "     Do not forget to puth it in your PATH."
+  echo ""
+  echo "Usage:"
+  echo "     gxal [-hedn]"
+  echo ""
+  echo "Switches:"
+  echo "     -h/--help               shows this help."
+  echo "     -e/--enable             enable the xautolock"
+  echo "     -d/--disable            disable the xautolock"
+  echo "     -n/--notify             enable notifications"
+  echo ""
+  echo "Environment variables:"
+  echo "     ICONS                   the path the the icons (defaults to '/usr/share/icons/goat-icons-git/dark/128x128')"
+  exit 0
+}
+
+
+main () {
+  #
+  # TODO.
+  #
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h | --help )      help ;;
+      -e | --enable)   ACTION="enable"; shift 1 ;;
+      -d | --disable ) ACTION="disable"; shift 1 ;;
+      -n | --notify )  NOTIFY="yes"; shift 1 ;;
+      -- ) shift; break ;;
+      * ) break ;;
+    esac
+  done
+  [ -z "$ACTION" ] && usage
+  case "$ACTION" in
+    disable ) xautolock -disable; [[ "$NOTIFY" == "yes" ]] && dunstify "gxal" "xautolock disabled" --icon="$ICONS/lock/padlock.png" ;;
+    enable) xautolock -enable; [[ "$NOTIFY" == "yes" ]] && dunstify "gxal" "xautolock enabled" --icon="$ICONS/lock/lock.png" ;;
+    * ) echo "an error occured (got unexpected '$ACTION')" ;;
+  esac
+}
+
+
+main "$@"
