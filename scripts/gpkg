@@ -10,10 +10,15 @@
 #*              ATXR:    https://github.com/atxr    atxr#6214    AF97503EDC65A06845114630F00A52147514670B
 #*
 
+def pretty-cmd [] {
+    let cmd = $in
+    $"(ansi -e {fg: default attr: di})($cmd)(ansi reset)"
+}
+
 def pacman_deps_wrapper [
     --flag (-f): string
 ] {
-    print $"pacman ($flag)"
+    print $"running ($'pacman ($flag)' | pretty-cmd)"
 
     pacman $flag
     | lines
@@ -22,7 +27,7 @@ def pacman_deps_wrapper [
 }
 
 def cargo_deps [] {
-    print "cargo install  --list"
+    print $"running ('cargo install  --list' | pretty-cmd)"
 
     cargo install --list
     | lines
@@ -33,7 +38,7 @@ def cargo_deps [] {
 }
 
 def pip_deps [] {
-    print "pip freeze"
+    print $"running ('pip freeze' | pretty-cmd)"
 
     pip freeze
     | lines
@@ -42,7 +47,7 @@ def pip_deps [] {
 }
 
 def pipx_deps [] {
-    print "pipx list"
+    print $"running ('pipx list' | pretty-cmd)"
 
     pipx list
     | lines
