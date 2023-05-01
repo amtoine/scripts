@@ -26,7 +26,7 @@ def cargo_deps [] {
 
     cargo install --list
     | lines
-    | find -rm ":\$"
+    | find --multiline --regex ":\$"
     | str replace ":$" ""
     | split column " v"
     | rename package version
