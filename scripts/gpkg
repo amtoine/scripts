@@ -58,23 +58,18 @@ def main [
     output: string = "~/pkgs.toml"
 ] {
     let x = {
-        pkgs: {
-            pacman:
-                {
-                    all: (pacman_deps_wrapper --flag "-Q"),
-                    explicit: (pacman_deps_wrapper --flag "-Qe"),
-                    native: (pacman_deps_wrapper --flag "-Qen"),
-                    foreign: (pacman_deps_wrapper --flag "-Qem")
-                }
-            rust:
-                {
-                    cargo: (cargo_deps)
-                }
-            python:
-                {
-                    pip: (pip_deps),
-                    pipx: (pipx_deps)
-                }
+        pacman: {
+            all: (pacman_deps_wrapper --flag "-Q"),
+            explicit: (pacman_deps_wrapper --flag "-Qe"),
+            native: (pacman_deps_wrapper --flag "-Qen"),
+            foreign: (pacman_deps_wrapper --flag "-Qem")
+        }
+        rust: {
+            cargo: (cargo_deps)
+        }
+        python: {
+            pip: (pip_deps),
+            pipx: (pipx_deps)
         }
     }
 
