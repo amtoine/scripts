@@ -13,7 +13,7 @@
 def pacman_deps_wrapper [
     --flag (-f): string
 ] {
-    echo $"pacman ($flag)"
+    print $"pacman ($flag)"
 
     pacman $flag |
         lines |
@@ -23,7 +23,7 @@ def pacman_deps_wrapper [
 
 
 def cargo_deps [] {
-    echo "cargo install  --list"
+    print "cargo install  --list"
 
     cargo install --list |
         lines |
@@ -35,7 +35,7 @@ def cargo_deps [] {
 
 
 def pip_deps [] {
-    echo "pip freeze"
+    print "pip freeze"
 
     pip freeze  |
         lines |
@@ -45,7 +45,7 @@ def pip_deps [] {
 
 
 def pipx_deps [] {
-    echo "pipx list"
+    print "pipx list"
 
     pipx list |
         lines |
