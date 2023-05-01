@@ -74,5 +74,5 @@ def main [
     }
 
     print $"Saving the system dependencies to ($output | path expand)"
-    $x | save ($output | path expand)
+    $x | save --force ($output | path expand)
 }
