@@ -21,7 +21,6 @@ def pacman_deps_wrapper [
     | rename package version
 }
 
-
 def cargo_deps [] {
     print "cargo install  --list"
 
@@ -33,7 +32,6 @@ def cargo_deps [] {
     | rename package version
 }
 
-
 def pip_deps [] {
     print "pip freeze"
 
@@ -42,7 +40,6 @@ def pip_deps [] {
     | split column "=="
     | rename package version
 }
-
 
 def pipx_deps [] {
     print "pipx list"
@@ -56,7 +53,6 @@ def pipx_deps [] {
     | split column " "
     | rename package version python
 }
-
 
 def main [
     output: string = "~/pkgs.toml"
