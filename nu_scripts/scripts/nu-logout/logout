@@ -1,0 +1,100 @@
+#!/usr/bin/env nu
+
+use std log
+
+def builtin [prompt: string] {
+    $in | input list --fuzzy $"($prompt): "
+}
+
+def fzf [prompt: string] {
+    $in | str join "\n" | ^fzf --prompt $"($prompt): "
+}
+
+def dmenu [prompt: string] {
+    $in | str join "\n" | ^dmenu -p $prompt
+}
+
+def rofi [prompt: string] {
+    $in | str join "\n" | ^rofi -dmenu -p $prompt
+}
+
+def user-confirmation [msg: string] {
+    match (
+        [no yes] | fzf $"($msg)?" | default "no"
+    ) {
+        yes => true,
+        no | "" => false,
+    }
+}
+
+def main [
+    --lock: string
+] {
+    let options = [
+        "Lock screen"
+        "Logout"
+        "Reboot"
+        "Shutdown"
+        "Suspend"
+        "Quit"
+    ]
+
+    print $env.MENUS
+
+    let choice = ($options | builtin "Please choose an option to run")
+
+    if ($choice | is-empty) {
+        return
+    }
+
+    match $choice {
+        "Lock screen" => {
+            if $lock == null {
+                error make --unspanned {
+                    msg: $"(ansi red_bold)`nu-logout` requires `--lock` when trying to lock the screen(ansi reset)"
+                }
+            }
+
+            if not (user-confirmation $choice) {
+                log debug "User chose not to lock the screen."
+                return
+            }
+
+            ^bash -c $lock
+        },
+        "Logout" => {
+            if not (user-confirmation $choice) {
+                log debug "User chose not to logout."
+                return
+            }
+            pkill -kill -u $env.USERNAME
+        },
+        "Reboot" => {
+            if not (user-confirmation $choice) {
+                log debug "User chose not to reboot."
+                return
+            }
+            systemctl reboot
+        },
+        "Shutdown" => {
+            if not (user-confirmation $choice) {
+                log debug "User chose not to shutdown."
+                return
+            }
+            systemctl poweroff
+        },
+        "Suspend" => {
+            if not (user-confirmation $choice) {
+                log debug "User chose not to suspend."
+                return
+            }
+            systemctl suspend
+        },
+        "Quit" => { return },
+        _ => {
+            error make --unspanned {
+                msg: $"Unknown choice '($choice)'"
+            }
+        }
+    }
+}
