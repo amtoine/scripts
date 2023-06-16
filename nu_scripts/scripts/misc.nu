@@ -629,3 +629,22 @@ export def rg [
 
     $matches
 }
+
+export def "hash dir" [directory: path] {
+    if ($directory | path type) != "dir" {
+        let span = (metadata $directory | get span)
+        error make {
+            msg: $"(ansi red_bold)not_a_directory(ansi reset)"
+            label: {
+                text: $"expected a directory, found a ($directory | path type)"
+                start: $span.start
+                end: $span.end
+            }
+        }
+    }
+
+    ls ($directory | path join "**" "*")
+    | each { get name | open | hash sha256 }
+    | str join
+    | hash sha256
+}
