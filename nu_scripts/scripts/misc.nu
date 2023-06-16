@@ -611,3 +611,21 @@ export def edit [
 
     ^$env.EDITOR $files
 }
+
+export def rg [
+    pattern: string
+    path?: path
+    --files: bool
+] {
+    let matches = (
+        ^rg $pattern ($path | default "." | path expand)
+        | lines
+        | parse "{file}:{match}"
+    )
+
+    if $files {
+        return ($matches | get file | uniq)
+    }
+
+    $matches
+}
