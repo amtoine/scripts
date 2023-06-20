@@ -699,3 +699,19 @@ def hash-merkle [] {
 
     assert error {|| [foo bar baz] | hash merkle}
 }
+
+# downloads reveal.js in a local directory
+export def "reveal.js download" [
+    destination: path  # the path to the local project
+] {
+    let dump_dir = ($nu.temp-path | path join "reveal.js" (random uuid))
+    let archive = ($dump_dir | path join "master.zip")
+
+    mkdir $dump_dir
+    http get https://github.com/hakimel/reveal.js/archive/master.zip | save $archive
+
+    unzip $archive -d $dump_dir
+
+    mkdir $destination
+    cp --recursive --progress ($dump_dir | path join "reveal*" "*") $destination
+}
