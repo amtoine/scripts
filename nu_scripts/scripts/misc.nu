@@ -643,8 +643,9 @@ export def "hash dir" [directory: path] {
         }
     }
 
-    ls ($directory | path join "**" "*")
-    | each { get name | open | hash sha256 }
+    ls ($directory | path join "**" "*") | where type == file | each {
+        get name | open --raw | hash sha256
+    }
     | str join
     | hash sha256
 }
