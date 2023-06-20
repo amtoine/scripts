@@ -355,7 +355,7 @@ export def "youtube share" [
 
 # TODO: docstring
 export def "list todos" [] {
-    rg "//.? ?TODO" . -n
+    ^rg "//.? ?TODO" . -n
     | lines
     | parse "{file}:{line}:{match}"
     | try {
