@@ -648,3 +648,53 @@ export def "hash dir" [directory: path] {
     | str join
     | hash sha256
 }
+
+# compute the merkle tree of a sequence of tokens
+export def "hash merkle" [
+    --last: bool
+    --pretty: bool
+] {
+    let tokens = $in
+
+    let nb_steps = ($tokens | length | math log 2)
+    if $nb_steps mod 1 != 0 {
+        error make --unspanned {
+            msg: $"(ansi red_bold)invalid_argument(ansi reset): there should be a power of 2 tokens, found ($tokens | length)"
+        }
+    }
+
+    let all_hashes = (
+        seq 1 $nb_steps | reduce -f [($tokens | each { hash sha256 })] {|it, acc|
+            [($acc | first | group 2 | each { str join | hash sha256 })] | append $acc
+        }
+    )
+
+    if $last {
+        return ($all_hashes.0.0)
+    }
+
+    $all_hashes | if $pretty { each { each { str substring 0..7 } } } else { $in } | reverse
+}
+
+# test
+def hash-merkle [] {
+    use std assert
+
+    assert equal ([foo bar baz foooo] | hash merkle) [
+        [
+            2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae,
+            fcde2b2edba56bf408601fb721fe9b5c338d10ee429ea04fae5511b68fbf8fb9,
+            baa5a0964d3320fbc0c6a922140453c8513ea24ab8fd0577034804a967248096,
+            440d25b8ad0abf5db0f9940dd749434f9267c0f699b57f0c68d4134ad90d4ae9
+        ],
+        [
+            ec321de56af3b66fb49e89cfe346562388af387db689165d6f662a3950286a57,
+            eb8744e2fc92ff512d96a5cf731412c254b895ae85f31c75cd08511de3a4a2d8
+        ],
+        [
+            63ab1f8440bd551f46f58651d3390650fdeb1c63c70957ee529dc17f087638be
+        ]
+    ]
+
+    assert error {|| [foo bar baz] | hash merkle}
+}
