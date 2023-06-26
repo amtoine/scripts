@@ -585,7 +585,7 @@ def _throw-not-a-list-of-strings [files: any] {
 export def edit [
     ...rest: path
     --no-auto-cmd (-n): bool
-    --auto-cmd: string = "lua require('telescope.builtin').find_files()"
+    --auto-cmd: string
     --projects (-p): bool
 ] {
     let files = ($in | default [])
@@ -602,7 +602,13 @@ export def edit [
             } else if $projects {
                 "lua require('telescope').extensions.projects.projects{}"
             } else {
-                $auto_cmd
+                $auto_cmd | default (
+                    if (".git/" | path exists) {
+                        "lua require('telescope.builtin').git_files()"
+                    } else {
+                        "lua require('telescope.builtin').find_files()"
+                    }
+                )
             }
         )
 
