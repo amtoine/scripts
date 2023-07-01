@@ -8,15 +8,15 @@ i run the following:
 
 - define the upstream remote URL
 ```bash
-let-env NU_SCRIPTS_REMOTE = "ssh://git@github.com/goatfiles/nu_scripts.git"
+$env.NU_SCRIPTS_REMOTE = "ssh://git@github.com/goatfiles/nu_scripts.git"
 ```
 - define the local location of the `nu_scripts`
 ```bash
-let-env NU_SCRIPTS_DIR = ($env.GIT_REPOS_HOME | path join "github.com/goatfiles/nu_scripts")
+$env.NU_SCRIPTS_DIR = ($env.GIT_REPOS_HOME | path join "github.com/goatfiles/nu_scripts")
 ```
 - make the local `nu_scripts` available to `nushell`
 ```bash
-let-env NU_LIB_DIRS = [
+$env.NU_LIB_DIRS = [
     ...
     $env.NU_SCRIPTS_DIR
 ]

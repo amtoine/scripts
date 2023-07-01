@@ -229,7 +229,7 @@ export def-env setup [
     --use-right-prompt: bool
     --indicators = {}
 ] {
-  let-env PROMPT_COMMAND = if ($no_left_prompt) {
+  $env.PROMPT_COMMAND = if ($no_left_prompt) {
     ""
   } else if ($use_eldyj_prompt) {
     {|| create_left_prompt_eldyj}
@@ -237,7 +237,7 @@ export def-env setup [
     {|| create_left_prompt}
   }
 
-  let-env PROMPT_COMMAND_RIGHT = if ($use_right_prompt) {
+  $env.PROMPT_COMMAND_RIGHT = if ($use_right_prompt) {
     {|| create_right_prompt --cwd --repo --cfg}
   } else {
     ""
@@ -250,7 +250,7 @@ export def-env setup [
     vi: {insert: ": ", normal: "> "}
   } | merge ($indicators))
 
-  let-env PROMPT_INDICATOR = if ($show_prompt_indicator) { $indicators.plain } else { "" }
-  let-env PROMPT_INDICATOR_VI_INSERT = if ($show_prompt_indicator) { $indicators.vi.insert } else { "" }
-  let-env PROMPT_INDICATOR_VI_NORMAL = if ($show_prompt_indicator) { $indicators.vi.normal } else { "" }
+  $env.PROMPT_INDICATOR = if ($show_prompt_indicator) { $indicators.plain } else { "" }
+  $env.PROMPT_INDICATOR_VI_INSERT = if ($show_prompt_indicator) { $indicators.vi.insert } else { "" }
+  $env.PROMPT_INDICATOR_VI_NORMAL = if ($show_prompt_indicator) { $indicators.vi.normal } else { "" }
 }
