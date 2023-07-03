@@ -1,9 +1,12 @@
 #!/usr/bin/env nu
 
+use std log
+
 # check a file for common mistakes
 def main [
     file: path  # the path to the script to check
     --no-mutable: bool  # disallow the use of the `mut` keyword
+    --error (-D): string = "errors"  # transform warnings into errors
 ] {
     let ast = nu --ide-ast $file | from json
 
@@ -18,6 +21,27 @@ def main [
                     start: $span.start
                     end: $span.end
                 }
+            }
+        }
+    }
+
+    for token in ($ast | enumerate) {
+        if $token.item.shape == "shape_vardecl" {
+            let next = $ast | get ($token.index + 1)
+            if ($next.shape == "shape_block") and (($next.content | str trim) == "(") {
+                if $error == "warnings" {
+                    let span = metadata $file | get span
+                    error make {
+                        msg: $"(ansi red_bold)clippy::useless_parentheses(ansi reset)"
+                        label: {
+                            text: $"found useless parentheses at cursor position ($next.span.start)"
+                            start: $span.start
+                            end: $span.end
+                        }
+                    }
+                }
+
+                log warning $"(ansi red_bold)clippy::useless_parentheses(ansi reset): found useless parentheses in ($file) at cursor position ($next.span.start)"
             }
         }
     }
