@@ -8,12 +8,13 @@ def main [
     let ast = nu --ide-ast $file | from json
 
     if $no_mutable {
-        if not ($ast | where shape == shape_internalcall and content == mut | is-empty) {
+        let muts = $ast | where shape == shape_internalcall and content == mut
+        if not ($muts | is-empty) {
             let span = metadata $file | get span
             error make {
                 msg: $"(ansi red_bold)clippy::mutable_not_allowed(ansi reset)"
                 label: {
-                    text: "found `mut` keyword in the script"
+                    text: $"found `mut` keyword at cursor positions ($muts | get span.start | str join ', ')"
                     start: $span.start
                     end: $span.end
                 }
