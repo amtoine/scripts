@@ -5,11 +5,11 @@ def main [
     file: path  # the path to the script to check
     --no-mutable: bool  # disallow the use of the `mut` keyword
 ] {
-    let ast = (nu --ide-ast $file | from json)
+    let ast = nu --ide-ast $file | from json
 
     if $no_mutable {
         if not ($ast | where shape == shape_internalcall and content == mut | is-empty) {
-            let span = (metadata $file | get span)
+            let span = metadata $file | get span
             error make {
                 msg: $"(ansi red_bold)clippy::mutable_not_allowed(ansi reset)"
                 label: {
