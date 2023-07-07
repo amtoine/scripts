@@ -1,5 +1,5 @@
 def downloads_dir [] {
-    $env.DOWNLOADS_DIR? | default (
+    $env.XDG_DOWNLOAD_DIR? | default (
         $env.HOME | path join "downloads"
     )
 }
@@ -24,7 +24,7 @@ export def-env go [] {
 
 export def clean [--force (-f): bool] {
     if (show | is-empty) {
-        print $"no files in ($env.DOWNLOADS_DIR)..."
+        print $"no files in (downloads_dir)..."
         return
     }
 
