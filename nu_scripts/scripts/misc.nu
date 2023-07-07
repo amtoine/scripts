@@ -531,7 +531,7 @@ export def pipeif [
 
 # TODO
 def "nu-complete list-images" [] {
-    ls ($env.IMAGES_HOME | path join "**" "*") | get name
+    ls ($env.XDG_PICTURES_HOME | path join "**" "*") | get name
 }
 
 def get-image [
