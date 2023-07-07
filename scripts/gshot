@@ -16,7 +16,7 @@ if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$OPTIONS"
 
 # the environment variables
-[[ ! -v SCREENSHOT_PATH ]] && SCREENSHOT_PATH="$HOME/media/images/scrot"
+[[ ! -v XDG_PICTURES_DIR ]] && XDG_PICTURES_DIR="$HOME/Pictures/"
 [[ ! -v FORMAT ]] && FORMAT='%Y-%m-%d_%H-%M-%S_$wx$h'
 [[ ! -v ICONS ]] && ICONS="/usr/share/icons/goat-icons-git/stickers/100x100"
 
@@ -52,7 +52,7 @@ help () {
   echo "     - the \`full\` method that takes a picture of the entire monitors."
   echo ""
   echo "Environment variables:"
-  echo "     SCREENSHOT_PATH       the place where to store screenshots (defaults to '~/images/scrot')"
+  echo "     XDG_PICTURES_DIR      the place where to store screenshots (defaults to '~/Pictures/')"
   echo "     FORMAT                the format for the filenames (defaults to '%Y-%m-%d_%H-%M-%S_\$wx\$h')"
   echo "     ICONS                 the path the the icons (defaults to '/usr/share/icons/goat-icons-git/dark/128x128')"
   exit 0
@@ -72,25 +72,25 @@ main () {
     esac
   done
 
-  [ ! -d "$SCREENSHOT_PATH" ] && {
-      echo -e "'$SCREENSHOT_PATH' does not exist\nCreating it...";
-      mkdir "$SCREENSHOT_PATH" -p;
+  [ ! -d "$XDG_PICTURES_DIR" ] && {
+      echo -e "'$XDG_PICTURES_DIR' does not exist\nCreating it...";
+      mkdir "$XDG_PICTURES_DIR" -p;
   }
 
 	case "$1" in
 	full)
-		name=$(scrot -m "$FORMAT.png" -e "echo \$f; mv \$f $SCREENSHOT_PATH/$name");
+		name=$(scrot -m "$FORMAT.png" -e "echo \$f; mv \$f $XDG_PICTURES_DIR/$name");
 		;;
 	window)
     [ -v NOTIFY ] && dunstify "gshot" "please select a window" --icon="$ICONS/misc/camera.png";
-		name=$(scrot -s "$FORMAT.png" -e "echo \$f; mv \$f $SCREENSHOT_PATH/$name");
+		name=$(scrot -s "$FORMAT.png" -e "echo \$f; mv \$f $XDG_PICTURES_DIR/$name");
 		;;
 	*) usage
 		;;
 	esac;
 
-  echo "name: $SCREENSHOT_PATH/$name"
-  [ -n "$name" ] && [ -v NOTIFY ] && dunstify "gshot" "$1 screenshot at\n$SCREENSHOT_PATH/$name" --icon="$ICONS/misc/camera.png"
+  echo "name: $XDG_PICTURES_DIR/$name"
+  [ -n "$name" ] && [ -v NOTIFY ] && dunstify "gshot" "$1 screenshot at\n$XDG_PICTURES_DIR/$name" --icon="$ICONS/misc/camera.png"
 }
 
 
