@@ -1,3 +1,35 @@
+# an example usage to import some keys back:
+# - copy the keys archive to the system
+# ```nushell
+# let mount_point = /mnt/
+# let key_dump = /tmp/keys/
+#
+# sudo mount /dev/sdb1 $mount_point
+# mkdir $key_dump
+# cp ($mount_point | path join "keys.tar.gpg.asc") $key_dump
+# sudo umount $mount_point
+# ```
+#
+# - import the keys in the new keyring
+# ```nushell
+# use nu-goat-scripts gpg
+# let keyring = /tmp/gnupg/
+#
+# cd $key_dump
+# gpg --decrypt keys.tar.gpg.asc | save keys.tar
+# tar -xf keys.tar
+# mkdir $keyring
+# with-env [GNUPGHOME $keyring] { gpg -k }
+# with-env [GNUPGHOME $keyring] { gpg import --dump_dir ($key_dump | path join "keys/gpg/") }
+# ```
+#
+# - check the new keyring and the SSH keys
+# ```nushell
+# gpg -k
+# with-env [GNUPGHOME $keyring] { gpg -k }
+# ssh -i ($key_dump | path join "keys/ssh/keys/github.com") git@github.com
+# ```
+
 # TODO: documentation
 def poll_gpg [
   key: string = ""
