@@ -1,36 +1,19 @@
-# credit to @Eldyj
-# https://discord.com/channels/601130461678272522/615253963645911060/1036225475288252446
-# revised by @eldyj in
-# https://discord.com/channels/601130461678272522/615253963645911060/1037327061481701468
-# revised by @fdncred in
-# https://discord.com/channels/601130461678272522/615253963645911060/1037354164147200050
-#
-# i've fixed a bug when outside `$env.HOME` and refactored the source to use `str`
-# subcommands
-def spwd [sep?: string] {
-    let sep = (if ($sep | is-empty) {
-        char path_sep
-    } else { $sep })
+def spwd [path: path, sep?: string] {
+    let sep = $sep | default (char path_sep)
 
-    let tokens = (
-        ["!" $env.PWD] | str join
-        | str replace (["!" $nu.home-path] | str join) "~"
-        | split row $sep
-    )
+    let tokens = $"!($path)" | str replace $"!($nu.home-path)" "~" | split row $sep
+    let last_token_index = ($tokens | length) - 1
 
-    $tokens
-    | enumerate
-    | each {|it|
-        $it.item
-        | if ($it.index != (($tokens | length) - 1)) {
-            str substring (
-                if ($it.item | str starts-with '.') { 0..2 } else { 0..1 }
+    $tokens | enumerate | each {|token|
+        if $token.index != $last_token_index {
+            $token.item | str substring (
+                if ($token.item | str starts-with '.') { 0..2 } else { 0..1 }
             )
-        } else { $it.item }
-    }
-    | path join
+        } else {
+            $token.item
+        }
+    } | path join
 }
-
 
 # credit to @Eldyj
 # https://discord.com/channels/601130461678272522/615253963645911060/1036274988950487060
@@ -92,18 +75,17 @@ def clean_list [
     list
     --key (-k): string
 ] {
-  $list
-  | each {|el|
-    let val = if not ($key in [null, ""]) {
-        $el | get $key
-    } else {
-        $el
-    }
+    $list | each {|el|
+        let val = if not ($key in [null, ""]) {
+            $el | get $key
+        } else {
+            $el
+        }
 
-    if not ($val in [null, ""]) {
-      $el
+        if not ($val in [null, ""]) {
+            $el
+        }
     }
-  }
 }
 
 
@@ -115,56 +97,52 @@ def create_left_prompt [] {
         $"(ansi green_bold)(spwd)"
     }
 
-    let branch = (do -i { git branch --show-current } | str trim)
+    let branch = do --ignore-errors { git branch --show-current } | str trim
 
-    if ($branch == '') {
+    if $branch == '' {
         $path_segment
     } else {
         $path_segment + $" (ansi reset)\((ansi yellow_bold)($branch)(ansi reset)\)"
     }
 }
 
+def external-output [command: closure] {
+    do --ignore-errors $command | complete | get stdout | str trim
+}
 
 # credit to @Eldyj
 # https://discord.com/channels/601130461678272522/615253963645911060/1036274988950487060
 def create_left_prompt_eldyj [] {
-    let fail = {bg: "#BF616A", fg: "#D8DEE9"}
-    let user = {bg: "#2e3440", fg: "#88c0d0"}
-    let pwd = {bg: "#3b4252", fg: "#81a1c1"}
-    let git = {bg: "#434C5E", fg: "#A3BE8C"}
-
     let common = [
         [bg fg text];
-        [$fail.bg, $fail.fg, (if $env.LAST_EXIT_CODE != 0 {char failed})]
-        [$user.bg $user.fg $env.USER]
-        [$pwd.bg $pwd.fg $"(spwd)"]
+
+        ["#BF616A", "#D8DEE9", (if $env.LAST_EXIT_CODE != 0 {char failed})]
+        ["#2e3440", "#88c0d0", $env.USER]
+        ["#3b4252", "#81a1c1", (spwd)]
     ]
 
-    let segments = if ((do -i { git branch --show-current } | complete | get stderr) == "") {
-        let git_branch = {
-            bg: $git.bg,
-            fg: $git.fg,
-            text: (git branch --show-current | str replace --all "\n" "")
+    let segments = if (external-output { git rev-parse --is-inside-work-tree }) == "true" {
+        let revision = if (git branch --show-current | is-empty) {
+            git rev-parse HEAD | str substring 0..7
+        } else {
+            git branch --show-current
         }
-        $common | append $git_branch
+
+        $common | append {bg: "#434C5E", fg: "#A3BE8C", text: $revision}
     } else {
         $common
     }
 
-    build-prompt (char nf_left_segment) (clean_list $segments -k text)
+    build-prompt (char nf_left_segment) (clean_list $segments --key text)
 }
 
 
-def color [
-    text: string
-    color: string
-] {
+def color [text: string, color: string] {
     [(ansi $color) $text (ansi reset)] | str join
 }
 
 def build_colored_string [separator: string = " "] {
-    each {|it| color $it.text $it.color}
-    | str join $separator
+    each {|it| color $it.text $it.color} | str join $separator
 }
 
 
@@ -222,35 +200,36 @@ def create_right_prompt [
 }
 
 
-# TODO: documentation
-export def-env setup [
-    --no-left-prompt: bool
-    --use-eldyj-prompt: bool
-    --use-right-prompt: bool
-    --indicators = {}
+# set the left and right prompts of Nushell
+export def-env main [
+    --no-left-prompt: bool  # disable the left prompt completely
+    --use-eldyj-prompt: bool  # use the left prompt of @Eldyj
+    --use-right-prompt: bool  # use a right prompt
+    --indicators  # manually set indicators (defaults to `{plain: "> ", vi: {insert: ": ", normal: "> "}}`)
 ] {
-  $env.PROMPT_COMMAND = (if ($no_left_prompt) {
-    ""
-  } else if ($use_eldyj_prompt) {
-    {|| create_left_prompt_eldyj}
-  } else {
-    {|| create_left_prompt}
-  })
+    $env.PROMPT_COMMAND = if $no_left_prompt {
+        ""
+    } else if $use_eldyj_prompt {
+        { create_left_prompt_eldyj }
+    } else {
+        { create_left_prompt }
+    }
 
-  $env.PROMPT_COMMAND_RIGHT = (if ($use_right_prompt) {
-    {|| create_right_prompt --cwd --repo --cfg}
-  } else {
-    ""
-  })
+    $env.PROMPT_COMMAND_RIGHT = if $use_right_prompt {
+        { create_right_prompt --cwd --repo --cfg }
+    } else {
+        ""
+    }
 
-  let show_prompt_indicator = not $use_eldyj_prompt
+    let show_prompt_indicator = not $use_eldyj_prompt or $no_left_prompt
 
-  let indicators = ({
-    plain: "> ",
-    vi: {insert: ": ", normal: "> "}
-  } | merge ($indicators))
-
-  $env.PROMPT_INDICATOR = (if ($show_prompt_indicator) { $indicators.plain } else { "" })
-  $env.PROMPT_INDICATOR_VI_INSERT = (if ($show_prompt_indicator) { $indicators.vi.insert } else { "" })
-  $env.PROMPT_INDICATOR_VI_NORMAL = (if ($show_prompt_indicator) { $indicators.vi.normal } else { "" })
+    if $show_prompt_indicator {
+        $env.PROMPT_INDICATOR = ""
+        $env.PROMPT_INDICATOR_VI_INSERT = ""
+        $env.PROMPT_INDICATOR_VI_NORMAL = ""
+    } else {
+        $env.PROMPT_INDICATOR = $indicators.plain? | default "> "
+        $env.PROMPT_INDICATOR_VI_INSERT = $indicators.vi.insert? | default ": "
+        $env.PROMPT_INDICATOR_VI_NORMAL = $indicators.vi.normal? | default "> "
+    }
 }
