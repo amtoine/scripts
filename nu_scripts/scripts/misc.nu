@@ -578,12 +578,12 @@ export def edit [
     --auto-cmd: string
     --projects (-p): bool
 ] {
-    let files = ($in | default [])
+    let files = $in | default []
     if (not ($files | is-empty)) and (($files | describe) != "list<string>") {
         _throw-not-a-list-of-strings $files
     }
 
-    let files = ($rest | append $files | uniq)
+    let files = $rest | append $files
 
     if ($files | is-empty) {
         ^$env.EDITOR -c (
@@ -605,7 +605,7 @@ export def edit [
         return
     }
 
-    ^$env.EDITOR $files
+    ^$env.EDITOR ($files | uniq)
 }
 
 export def rg [
