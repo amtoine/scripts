@@ -186,28 +186,35 @@ export def "get ldd deps" [exec: string] {
 
 # TODO: docstring
 export def "open pdf" [
+    ...from: path
     --launcher: string = "okular"
     --no-swallow: bool
     --swallower: string = "devour"
-    --from = [~/documents/ ~/downloads/]
 ] {
-    let choices = (
+    let from = if $from == [] {
+        [$env.XDG_DOCUMENTS_DIR $env.XDG_DOWNLOAD_DIR]
+    } else {
         $from
-        | each {|| ls $"($in)/**/*.pdf"}
+    }
+
+    let choices = $from
+        | each { try { ls ($in | path join "**" "*.pdf") } }
         | flatten
         | get name
-        | to text
-    )
 
-    let choice = (
-        $choices | prompt fzf_ask "What PDF to open? " "pdftotext {} /dev/stdout"
-    )
+    if ($choices | is-empty) {
+        error make --unspanned {
+            msg: $"no PDF file found in ($from | str join ', ')"
+        }
+    }
+
+    let choice = $choices | input list --fuzzy "What PDF to open? "
     if ($choice | is-empty) {
         print "user chose to exit..."
         return
     }
 
-    if ($no_swallow) {
+    if $no_swallow {
         ^$launcher $choice
     } else {
         ^$swallower $launcher $choice
