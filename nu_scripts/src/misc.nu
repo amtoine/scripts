@@ -718,3 +718,50 @@ export def "reveal.js download" [
     mkdir $destination
     cp --recursive --progress ($dump_dir | path join "reveal*" "*") $destination
 }
+
+# a wrapper around `nmap` to scan a local network for hosts
+#
+# # Example:
+#     > scan lan 192.***.***
+#     Scanning hosts connected locally to 192.168.***.0/24...
+#     ╭─────────┬──────────────────────────────────────────────────────────────────╮
+#     │ header  │ Starting Nmap 7.80 ( https://nmap.org ) at 2023-07-25 15:43 CEST │
+#     │         │ ╭───┬────────────────────────────────┬───────┬──────────╮        │
+#     │ scans   │ │ # │               ip               │ state │ latency  │        │
+#     │         │ ├───┼────────────────────────────────┼───────┼──────────┤        │
+#     │         │ │ 0 │ ************* (192.168.***.**) │ up    │ 0.00017s │        │
+#     │         │ │ 1 │ ******** (192.168.***.***)     │ up    │ 0.015s   │        │
+#     │         │ ╰───┴────────────────────────────────┴───────┴──────────╯        │
+#     │ summary │ Nmap done: 256 IP addresses (2 hosts up) scanned in 6.91 seconds │
+#     ╰─────────┴──────────────────────────────────────────────────────────────────╯
+#
+# true return type (should be addressed by https://github.com/nushell/nushell/pull/9769):
+# record<
+#     header: string,
+#     scans: table<ip: string, state: string, latency: string>,
+#     summary: string
+# >
+def "scan lan" [
+    base_ip: string = "192.168.1"  # the base IP to look for host, ($base_ip).0/24
+]: nothing -> record {
+    print $"Scanning hosts connected locally to (ansi default_italic)($base_ip).0/24(ansi reset)..."
+    let results = ^nmap -sP $"($base_ip).0/24" | lines
+
+    {
+        header: ($results | first 1 | to text | str trim)
+        scans: (
+            $results
+            | skip 1
+            | reverse
+            | skip 1
+            | reverse
+            | group 2
+            | each {|host| {
+                ip: ($host.0 | parse "Nmap scan report for {ip}" | get ip.0)
+                state: ($host.1 | parse "Host is {state} ({latency} latency).")
+            }}
+            | flatten --all
+        )
+        summary: ($results | last 1 | to text | str trim)
+    }
+}
