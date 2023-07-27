@@ -590,7 +590,7 @@ export def edit [
         _throw-not-a-list-of-strings $files
     }
 
-    let files = $rest | append $files
+    let files = $rest | append $files | uniq
 
     if ($files | is-empty) {
         ^$env.EDITOR -c (
@@ -612,7 +612,7 @@ export def edit [
         return
     }
 
-    ^$env.EDITOR ($files | uniq)
+    ^$env.EDITOR $files
 }
 
 export def rg [
