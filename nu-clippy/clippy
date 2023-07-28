@@ -44,5 +44,24 @@ def main [
                 log warning $"(ansi red_bold)clippy::useless_parentheses(ansi reset): found useless parentheses in ($file) at cursor position ($next.span.start)"
             }
         }
+
+        if $token.item.shape == "shape_internalcall" and $token.item.content == "while" {
+            let next = $ast | get ($token.index + 1)
+            if ($next.shape == "shape_bool") and ($next.content == "true") {
+                if $error == "warnings" {
+                    let span = metadata $file | get span
+                    error make {
+                        msg: $"(ansi red_bold)clippy::use_of_while_true(ansi reset)"
+                        label: {
+                            text: $"`while true` can be collapsed into `loop` at cursor position ($next.span.start)"
+                            start: $span.start
+                            end: $span.end
+                        }
+                    }
+                }
+
+                log warning $"(ansi red_bold)clippy::use_of_while_true(ansi reset): `while true` can be collapsed into `loop` in ($file) at cursor position ($next.span.start)"
+            }
+        }
     }
 }
