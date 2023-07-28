@@ -17,7 +17,7 @@ export def main [output: string] {
     print ""
     menu-help
 
-    while true {
+    loop {
         match (input listen --types ["key"]) {
             {code: "?", modifiers: []} => { menu-help },
             {code: "j", modifiers: []} => {
