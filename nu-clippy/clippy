@@ -2,6 +2,28 @@
 
 use std log
 
+def error-or-warning [
+    error: string,
+    message: string,
+    --error-level: string,
+    --cursor: int,
+    --file: path,
+    --span: record<start: int, end: int>
+] {
+    if $error_level == "warnings" {
+        error make {
+            msg: $"(ansi red_bold)($error)(ansi reset)"
+            label: {
+                text: $"($message) at cursor position ($cursor)"
+                start: $span.start
+                end: $span.end
+            }
+        }
+    }
+
+    log warning $"(ansi red_bold)($error)(ansi reset): ($message) in ($file) at cursor position ($cursor)"
+}
+
 # check a file for common mistakes
 def main [
     file: path  # the path to the script to check
@@ -12,56 +34,36 @@ def main [
 
     if $no_mutable {
         let muts = $ast | where shape == shape_internalcall and content == mut
-        if not ($muts | is-empty) {
-            let span = metadata $file | get span
-            error make {
-                msg: $"(ansi red_bold)clippy::mutable_not_allowed(ansi reset)"
-                label: {
-                    text: $"found `mut` keyword at cursor positions ($muts | get span.start | str join ', ')"
-                    start: $span.start
-                    end: $span.end
-                }
-            }
-        }
+        if not ($muts | is-empty) {(
+            error-or-warning "clippy::mutable_not_allowed" "found `mut` keyword"
+                --error-level $error
+                --cursor $muts.0.span.start
+                --file $file
+                --span (metadata $file | get span)
+        )}
     }
 
     for token in ($ast | enumerate) {
         if $token.item.shape == "shape_vardecl" {
             let next = $ast | get ($token.index + 1)
-            if ($next.shape == "shape_block") and (($next.content | str trim) == "(") {
-                if $error == "warnings" {
-                    let span = metadata $file | get span
-                    error make {
-                        msg: $"(ansi red_bold)clippy::useless_parentheses(ansi reset)"
-                        label: {
-                            text: $"found useless parentheses at cursor position ($next.span.start)"
-                            start: $span.start
-                            end: $span.end
-                        }
-                    }
-                }
-
-                log warning $"(ansi red_bold)clippy::useless_parentheses(ansi reset): found useless parentheses in ($file) at cursor position ($next.span.start)"
-            }
+            if ($next.shape == "shape_block") and (($next.content | str trim) == "(") {(
+                error-or-warning "clippy::useless_parentheses" "useless parentheses"
+                    --error-level $error
+                    --cursor $next.span.start
+                    --file $file
+                    --span (metadata $file | get span)
+            )}
         }
 
         if $token.item.shape == "shape_internalcall" and $token.item.content == "while" {
             let next = $ast | get ($token.index + 1)
-            if ($next.shape == "shape_bool") and ($next.content == "true") {
-                if $error == "warnings" {
-                    let span = metadata $file | get span
-                    error make {
-                        msg: $"(ansi red_bold)clippy::use_of_while_true(ansi reset)"
-                        label: {
-                            text: $"`while true` can be collapsed into `loop` at cursor position ($next.span.start)"
-                            start: $span.start
-                            end: $span.end
-                        }
-                    }
-                }
-
-                log warning $"(ansi red_bold)clippy::use_of_while_true(ansi reset): `while true` can be collapsed into `loop` in ($file) at cursor position ($next.span.start)"
-            }
+            if ($next.shape == "shape_bool") and ($next.content == "true") {(
+                error-or-warning "clippy::use_of_while_true" "`while true` can be collapsed into `loop`"
+                    --error-level $error
+                    --cursor $next.span.start
+                    --file $file
+                    --span (metadata $file | get span)
+            )}
         }
     }
 }
