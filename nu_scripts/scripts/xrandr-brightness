@@ -1,0 +1,73 @@
+#!/usr/bin/env nu
+use std log
+
+const ICONS = "/usr/share/icons/goat-icons-git/stickers/100x100"
+const DUNST_ID = 5
+
+# set the brightness of XRANDR monitors
+def main [
+    output: string  # the monitor to change the brightness of
+    step: decimal  # the  brightness step
+    --invert (-v): bool  # trigger this option to turn the step into a negative value
+    --notify: bool  # give a notification
+]: nothing -> nothing {
+    let monitor = ^xrandr --verbose --current
+        | rg $output -A5
+        | lines
+        | skip 1
+        | split column ": "
+        | str trim
+        | transpose -r
+        | into record
+
+    if $monitor == {} {
+        let monitors = ^xrandr --query
+            | lines
+            | find " connected"
+            | split column " " monitors
+            | get monitors
+        let span = metadata $output | get span
+        error make {
+            msg: $"(ansi red_bold)monitor_not_found(ansi reset)"
+            label: {
+                text: $"no such monitor reported by xrandr.
+        available xrandr monitors: ($monitors | str join ', ')"
+                start: $span.start
+                end: $span.end
+            }
+        }
+    }
+
+    if $monitor.Brightness? == null {
+        let span = metadata $output | get span
+        error make {
+            msg: $"(ansi red_bold)monitor_not_active(ansi reset)"
+            label: {
+                text: "looks like this monitor is connected but not active."
+                start: $span.start
+                end: $span.end
+            }
+        }
+    }
+
+    let brightness = $monitor.Brightness | into decimal
+
+    let brightness = if $invert {
+        $brightness - $step
+    } else {
+        $brightness + $step
+    }
+    let brightness = [0.0 $brightness] | math max
+    let brightness = [$brightness 1.0] | math min
+
+    log debug $"setting brightness of ($output) to ($brightness | math round --precision 2)"
+    xrandr --output $output --brightness $brightness
+
+    if $notify {(
+        dunstify "foo" $"Brightness ($output)\n($brightness | math round --precision 2)"
+            --hints $"int:value:($brightness | math round --precision 2 | $in * 100)"
+            --urgency low
+            --icon ($ICONS | path join "video" "sun.png")
+            --replace $DUNST_ID
+    )}
+}
