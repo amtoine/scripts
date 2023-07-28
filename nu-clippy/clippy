@@ -46,7 +46,7 @@ def main [
     for token in ($ast | enumerate) {
         if $token.item.shape == "shape_vardecl" {
             let next = $ast | get ($token.index + 1)
-            if ($next.shape == "shape_block") and (($next.content | str trim) == "(") {(
+            if $next.shape == "shape_block" and ($next.content | str trim) == "(" {(
                 error-or-warning "clippy::useless_parentheses" "useless parentheses"
                     --error-level $error
                     --cursor $next.span.start
@@ -57,7 +57,7 @@ def main [
 
         if $token.item.shape == "shape_internalcall" and $token.item.content == "while" {
             let next = $ast | get ($token.index + 1)
-            if ($next.shape == "shape_bool") and ($next.content == "true") {(
+            if $next.shape == "shape_bool" and $next.content == "true" {(
                 error-or-warning "clippy::use_of_while_true" "`while true` can be collapsed into `loop`"
                     --error-level $error
                     --cursor $next.span.start
