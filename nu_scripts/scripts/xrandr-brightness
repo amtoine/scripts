@@ -64,7 +64,7 @@ def main [
     xrandr --output $output --brightness $brightness
 
     if $notify {(
-        dunstify "foo" $"Brightness ($output)\n($brightness | math round --precision 2)"
+        dunstify "xrandr-brightness" $"Brightness ($output)\n($brightness | math round --precision 2)"
             --hints $"int:value:($brightness | math round --precision 2 | $in * 100)"
             --urgency low
             --icon ($ICONS | path join "video" "sun.png")
