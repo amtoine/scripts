@@ -38,13 +38,17 @@ use std log
 #     > when there is no new post
 #     2023-07-27T10:40:39.015|INF|Pulling down the Nushell news...
 #     2023-07-27T10:40:40.507|INF|No news for Nushell today!
-export def main []: nothing -> nothing {
-    let last = $nu.home-path | path join ".local" "state" "nushell" "latest"
-    if ($last | path exists) and ((open $last) == (date now | date format "%F")) {
-        return
-    }
+export def main [
+    --force: bool  # pull the news even if they have been today
+]: nothing -> nothing {
+    if not $force {
+        let last = $nu.home-path | path join ".local" "state" "nushell" "latest"
+        if ($last | path exists) and ((open $last) == (date now | date format "%F")) {
+            return
+        }
 
-    date now | date format "%F" | save --force $last
+        date now | date format "%F" | save --force $last
+    }
 
     log info "Pulling down the Nushell news..."
     let news = http get https://api.github.com/repos/nushell/nushell.github.io/contents/blog
