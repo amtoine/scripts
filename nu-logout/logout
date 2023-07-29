@@ -17,6 +17,7 @@ def user-confirmation [cmd: closure, prompt: string]: nothing -> bool {
 def main [
     --lock: string
     --launcher: string
+    --no-confirm (-y): bool
 ] {
     let cmd: closure = match ($launcher | default "builtin") {
         "builtin" => {{|prompt| input list --fuzzy $prompt }},
@@ -46,7 +47,7 @@ def main [
                 }
             }
 
-            if not (user-confirmation $cmd $confirmation_prompt) {
+            if (not $no_confirm) and (not (user-confirmation $cmd $confirmation_prompt)) {
                 log debug "User chose not to lock the screen."
                 return
             }
@@ -54,28 +55,28 @@ def main [
             ^bash -c $lock
         },
         "Logout" => {
-            if not (user-confirmation $cmd $confirmation_prompt) {
+            if (not $no_confirm) and (not (user-confirmation $cmd $confirmation_prompt)) {
                 log debug "User chose not to logout."
                 return
             }
             pkill -kill -u $env.USERNAME
         },
         "Reboot" => {
-            if not (user-confirmation $cmd $confirmation_prompt) {
+            if (not $no_confirm) and (not (user-confirmation $cmd $confirmation_prompt)) {
                 log debug "User chose not to reboot."
                 return
             }
             systemctl reboot
         },
         "Shutdown" => {
-            if not (user-confirmation $cmd $confirmation_prompt) {
+            if (not $no_confirm) and (not (user-confirmation $cmd $confirmation_prompt)) {
                 log debug "User chose not to shutdown."
                 return
             }
             systemctl poweroff
         },
         "Suspend" => {
-            if not (user-confirmation $cmd $confirmation_prompt) {
+            if (not $no_confirm) and (not (user-confirmation $cmd $confirmation_prompt)) {
                 log debug "User chose not to suspend."
                 return
             }
