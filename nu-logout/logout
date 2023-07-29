@@ -14,10 +14,11 @@ def user-confirmation [cmd: closure, prompt: string]: nothing -> bool {
     (["no" "yes"] | do $cmd $prompt | default "no") == "yes"
 }
 
+# a menu to quit the system interactively
 def main [
-    --lock: string
-    --launcher: string
-    --no-confirm (-y): bool
+    --lock: string  # the application to lock the screen
+    --launcher: string  # the app launcher to use as a menu
+    --no-confirm (-y): bool  # do not ask for confirmation
 ] {
     let cmd: closure = match ($launcher | default "builtin") {
         "builtin" => {{|prompt| input list --fuzzy $prompt }},
