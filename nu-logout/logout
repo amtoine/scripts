@@ -1,51 +1,36 @@
 #!/usr/bin/env nu
-
 use std log
 
-def builtin [prompt: string] {
-    $in | input list --fuzzy $"($prompt): "
-}
+const OPTIONS = [
+    "Lock screen"
+    "Logout"
+    "Reboot"
+    "Shutdown"
+    "Suspend"
+    "Quit"
+]
 
-def fzf [prompt: string] {
-    $in | str join "\n" | ^fzf --prompt $"($prompt): "
-}
-
-def dmenu [prompt: string] {
-    $in | str join "\n" | ^dmenu -p $prompt
-}
-
-def rofi [prompt: string] {
-    $in | str join "\n" | ^rofi -dmenu -p $prompt
-}
-
-def user-confirmation [msg: string] {
-    match (
-        [no yes] | fzf $"($msg)?" | default "no"
-    ) {
-        yes => true,
-        no | "" => false,
-    }
+def user-confirmation [cmd: closure, prompt: string]: nothing -> bool {
+    (["no" "yes"] | do $cmd $prompt | default "no") == "yes"
 }
 
 def main [
     --lock: string
+    --launcher: string
 ] {
-    let options = [
-        "Lock screen"
-        "Logout"
-        "Reboot"
-        "Shutdown"
-        "Suspend"
-        "Quit"
-    ]
+    let cmd: closure = match ($launcher | default "builtin") {
+        "builtin" => {{|prompt| input list --fuzzy $prompt }},
+        "dmenu" => {{|prompt|  str join "\n" | ^dmenu -p $prompt -l 10 -bw 5 | str trim }},
+        "fzf" => {{|prompt|  str join "\n" | ^fzf --prompt $prompt | str trim }},
+        "rofi" => {{|prompt|  str join "\n" | ^rofi -dmenu -p $prompt | str trim }},
+    }
 
-    print $env.MENUS
-
-    let choice = ($options | builtin "Please choose an option to run")
-
+    let choice = $OPTIONS | do $cmd "Please choose an option to run: "
     if ($choice | is-empty) {
         return
     }
+
+    let confirmation_prompt = $"($choice)? "
 
     match $choice {
         "Lock screen" => {
@@ -55,7 +40,7 @@ def main [
                 }
             }
 
-            if not (user-confirmation $choice) {
+            if not (user-confirmation $cmd $confirmation_prompt) {
                 log debug "User chose not to lock the screen."
                 return
             }
@@ -63,28 +48,28 @@ def main [
             ^bash -c $lock
         },
         "Logout" => {
-            if not (user-confirmation $choice) {
+            if not (user-confirmation $cmd $confirmation_prompt) {
                 log debug "User chose not to logout."
                 return
             }
             pkill -kill -u $env.USERNAME
         },
         "Reboot" => {
-            if not (user-confirmation $choice) {
+            if not (user-confirmation $cmd $confirmation_prompt) {
                 log debug "User chose not to reboot."
                 return
             }
             systemctl reboot
         },
         "Shutdown" => {
-            if not (user-confirmation $choice) {
+            if not (user-confirmation $cmd $confirmation_prompt) {
                 log debug "User chose not to shutdown."
                 return
             }
             systemctl poweroff
         },
         "Suspend" => {
-            if not (user-confirmation $choice) {
+            if not (user-confirmation $cmd $confirmation_prompt) {
                 log debug "User chose not to suspend."
                 return
             }
