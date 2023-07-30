@@ -22,7 +22,7 @@ def main [
 ] {
     let cmd: closure = match ($launcher | default "builtin") {
         "builtin" => {{|prompt| input list --fuzzy $prompt }},
-        "dmenu" => {{|prompt|  str join "\n" | ^dmenu -p $prompt -l 10 -bw 5 | str trim }},
+        "dmenu" => {{|prompt|  str join "\n" | ^dmenu -p $prompt -l 10 -bw 5 -i | str trim }},
         "fzf" => {{|prompt|  str join "\n" | ^fzf --prompt $prompt | str trim }},
         "rofi" => {{|prompt|  str join "\n" | ^rofi -dmenu -p $prompt | str trim }},
         _ => {
