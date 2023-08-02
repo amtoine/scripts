@@ -14,9 +14,15 @@ def list-sessions [] {
 }
 
 def switch-session [session?: string] {
+    let current_session = ^tmux display-message -p '#S' | str trim
     let session = if $session == null {
         let choice = list-sessions
-            | each {|it| (if $it.attached { "* " } else { "  " }) ++ $it.name}
+            | each {|it| (
+                (if $it.name == $current_session { ansi red } else { ansi default })
+                ++ (if $it.attached { "* " } else { "  " })
+                ++ $it.name
+                ++ (ansi reset)
+            )}
             | input list --fuzzy $"(ansi cyan)Choose a session to switch to(ansi reset)"
             | str trim --left --char '*'
             | str trim
@@ -52,9 +58,19 @@ def new-session [] {
 
 def remove-sessions [] {
     let sessions = list-sessions
+    let current_session = ^tmux display-message -p '#S' | str trim
     let prompt = $"(ansi cyan)Please choose sessions to kill(ansi reset)"
 
-    let choices = $sessions | get name | input list --multi $prompt
+    let choices = $sessions
+        | each {|it| (
+            (if $it.name == $current_session { ansi red } else { ansi default })
+            ++ (if $it.attached { "* " } else { "  " })
+            ++ $it.name
+            ++ (ansi reset)
+        )}
+        | input list --multi $prompt
+        | str trim --left --char '*'
+        | str trim
 
     $sessions | where name in $choices | sort-by attached | each {|session|
         if $session.attached {
