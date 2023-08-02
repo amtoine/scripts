@@ -51,14 +51,14 @@ def new-session [] {
 }
 
 def remove-sessions [] {
-    let sessions = list-sessions | where name != "default"
+    let sessions = list-sessions
     let prompt = $"(ansi cyan)Please choose sessions to kill(ansi reset)"
 
     let choices = $sessions | get name | input list --multi $prompt
 
     $sessions | where name in $choices | sort-by attached | each {|session|
         if $session.attached {
-            ^tmux switch-client -t "default"
+            new-session
         }
         ^tmux kill-session -t $session.name
     }
