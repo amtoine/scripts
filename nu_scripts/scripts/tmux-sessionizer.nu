@@ -16,9 +16,9 @@ def list-sessions [] {
 def switch-session [session?: string] {
     let session = if $session == null {
         let choice = list-sessions
-            | each {|it| if $it.attached { $it.name ++ " *" } else { $it.name }}
+            | each {|it| (if $it.attached { "* " } else { "  " }) ++ $it.name}
             | input list --fuzzy $"(ansi cyan)Choose a session to switch to(ansi reset)"
-            | str trim --right  --char '*'
+            | str trim --left --char '*'
             | str trim
         if ($choice | is-empty) {
             return
