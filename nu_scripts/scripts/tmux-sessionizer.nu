@@ -13,20 +13,31 @@ def list-sessions [] {
         | update attached {|it| $it.attached != ""}
 }
 
+def pick-session-with-style [
+    message: string, current_session: string, session_color: string, --multi: bool
+]: [table -> string, table -> list<string>] { # table<name: string, attached: bool>
+    let styled_sessions = $in | each {|it| (
+        (if $it.name == $current_session { ansi $session_color } else { ansi default })
+        ++ (if $it.attached { "* " } else { "  " })
+        ++ $it.name
+        ++ (ansi reset)
+    )}
+
+    let choices = if $multi {
+        $styled_sessions | input list --multi $message
+    } else {
+        $styled_sessions | input list --fuzzy $message
+    }
+
+    $choices | ansi strip | str trim --left --char '*' | str trim
+}
+
 def switch-session [session?: string] {
-    let current_session = ^tmux display-message -p '#S' | str trim
     let session = if $session == null {
-        let choice = list-sessions
-            | each {|it| (
-                (if $it.name == $current_session { ansi yellow } else { ansi default })
-                ++ (if $it.attached { "* " } else { "  " })
-                ++ $it.name
-                ++ (ansi reset)
-            )}
-            | input list --fuzzy $"(ansi cyan)Choose a session to switch to(ansi reset)"
-            | ansi strip
-            | str trim --left --char '*'
-            | str trim
+        let current_session = ^tmux display-message -p '#S' | str trim
+
+        let prompt = $"(ansi cyan)Choose a session to switch to(ansi reset)"
+        let choice = list-sessions | pick-session-with-style $prompt $current_session "yellow"
         if ($choice | is-empty) {
             return
         }
@@ -60,19 +71,9 @@ def new-session [] {
 def remove-sessions [] {
     let sessions = list-sessions
     let current_session = ^tmux display-message -p '#S' | str trim
-    let prompt = $"(ansi cyan)Please choose sessions to kill(ansi reset)"
 
-    let choices = $sessions
-        | each {|it| (
-            (if $it.name == $current_session { ansi red } else { ansi default })
-            ++ (if $it.attached { "* " } else { "  " })
-            ++ $it.name
-            ++ (ansi reset)
-        )}
-        | input list --multi $prompt
-        | ansi strip
-        | str trim --left --char '*'
-        | str trim
+    let prompt = $"(ansi cyan)Please choose sessions to kill(ansi reset)"
+    let choices = $sessions | pick-session-with-style --multi $prompt $current_session "red"
 
     $sessions | where name in $choices | sort-by attached | each {|session|
         if $session.attached {
