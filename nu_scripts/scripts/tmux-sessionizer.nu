@@ -50,13 +50,38 @@ def new-session [] {
     ^tmux switch-client -t $session_name
 }
 
-def main [...paths: path, --switch (-s): bool, --new (-n): bool, --list (-l): bool] {
+def remove-sessions [] {
+    let sessions = list-sessions | where name != "default"
+    let prompt = $"(ansi cyan)Please choose sessions to kill(ansi reset)"
+
+    let choices = $sessions | get name | input list --multi $prompt
+
+    $sessions | where name in $choices | sort-by attached | each {|session|
+        if $session.attached {
+            ^tmux switch-client -t "default"
+        }
+        ^tmux kill-session -t $session.name
+    }
+}
+
+def main [
+    ...paths: path,
+    --switch (-s): bool,
+    --remove (-r): bool,
+    --new (-n): bool,
+    --list (-l): bool
+] {
     if $list {
         return (list-sessions | to nuon --raw)
     }
 
     if $new {
         new-session
+        return
+    }
+
+    if $remove {
+        remove-sessions
         return
     }
 
