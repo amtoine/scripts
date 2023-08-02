@@ -83,12 +83,25 @@ def remove-sessions [] {
     }
 }
 
+# manage any Tmux session in a single script
+#
+# > **Note**  
+# > in the following the options are in reverse order of priority, meaning the
+# > the further down the list, the more it will be executed first and overrides
+# > previous options when both set.
+#
+# # Examples
+#     open a session in a Git repository managed by `nu-git-manager`
+#     > tmux-sessionizer.nu (gm list --full-path)
+#
+#     list open sessions
+#     > tmux-sessionizer.nu | from nuon
 def main [
-    ...paths: path,
-    --switch (-s): bool,
-    --remove (-r): bool,
-    --new (-n): bool,
-    --list (-l): bool
+    ...paths: path,  # the list of paths to fuzzy find and jump to in a new session
+    --switch (-s): bool,  # switch to another open session
+    --remove (-r): bool,  # remove any amount of open sessions (creates a new random one if current is deleted)
+    --new (-n): bool,  # create a new random session
+    --list (-l): bool  # list all open sessions, in raw NUON format
 ] {
     if $list {
         return (list-sessions | to nuon --raw)
