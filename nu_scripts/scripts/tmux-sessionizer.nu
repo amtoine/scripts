@@ -109,6 +109,13 @@ def main [
         return
     }
 
+    if ($paths | is-empty) {
+        error make --unspanned {
+            msg: $"(ansi red_bold)missing_argument_error(ansi reset):
+            tmux-sessionizer.nu requires paths as positional arguments"
+        }
+    }
+
     let choice = $paths
         | input list --fuzzy $"(ansi cyan)Choose a directory to open a session in(ansi reset)"
     if ($choice | is-empty) {
