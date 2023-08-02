@@ -18,7 +18,7 @@ def switch-session [session?: string] {
     let session = if $session == null {
         let choice = list-sessions
             | each {|it| (
-                (if $it.name == $current_session { ansi red } else { ansi default })
+                (if $it.name == $current_session { ansi yellow } else { ansi default })
                 ++ (if $it.attached { "* " } else { "  " })
                 ++ $it.name
                 ++ (ansi reset)
