@@ -24,6 +24,7 @@ def switch-session [session?: string] {
                 ++ (ansi reset)
             )}
             | input list --fuzzy $"(ansi cyan)Choose a session to switch to(ansi reset)"
+            | ansi strip
             | str trim --left --char '*'
             | str trim
         if ($choice | is-empty) {
@@ -69,6 +70,7 @@ def remove-sessions [] {
             ++ (ansi reset)
         )}
         | input list --multi $prompt
+        | ansi strip
         | str trim --left --char '*'
         | str trim
 
