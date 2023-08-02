@@ -42,9 +42,22 @@ def switch-session [session?: string] {
     ^tmux switch-client -t $session
 }
 
-def main [...paths: path, --switch (-s): bool, --list (-l): bool] {
+def new-session [] {
+    let session_name = random uuid
+    if not ($session_name in (list-sessions | get name)) {
+        ^tmux new-session -ds $session_name
+    }
+    ^tmux switch-client -t $session_name
+}
+
+def main [...paths: path, --switch (-s): bool, --new (-n): bool, --list (-l): bool] {
     if $list {
         return (list-sessions | to nuon --raw)
+    }
+
+    if $new {
+        new-session
+        return
     }
 
     if $switch {
