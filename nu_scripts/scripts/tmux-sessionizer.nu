@@ -42,7 +42,11 @@ def switch-session [session?: string] {
     ^tmux switch-client -t $session
 }
 
-def main [...paths: path, --switch (-s): bool] {
+def main [...paths: path, --switch (-s): bool, --list (-l): bool] {
+    if $list {
+        return (list-sessions | to nuon --raw)
+    }
+
     if $switch {
         switch-session
         return
