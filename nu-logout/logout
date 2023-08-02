@@ -60,7 +60,7 @@ def main [
                 log debug "User chose not to logout."
                 return
             }
-            pkill -kill -u $env.USERNAME
+            pkill -kill -u $env.USER
         },
         "Reboot" => {
             if (not $no_confirm) and (not (user-confirmation $cmd $confirmation_prompt)) {
