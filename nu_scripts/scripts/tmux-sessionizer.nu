@@ -64,13 +64,13 @@ def pick-session-with-style [
         return
     }
 
-    $choices
-        | get name
-        | ansi strip
-        | split column " | "
-        | get column1
-        | str trim --left --char '*'
-        | str trim
+    let choices = if $expand {
+        $choices | get name
+    } else {
+        $choices
+    }
+
+    $choices | ansi strip | split column " | " | get column1 | str trim --left --char '*' | str trim
 }
 
 def switch-session [session?: string, --expand: bool = false] {
