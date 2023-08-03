@@ -1,7 +1,9 @@
 #!/usr/bin/env nu
 use std log
 
-def run [cmd: closure]: nothing -> record { # record<stdout: string, stderr: string, exit_code: int>
+# FIXME: complex type annotation, waiting for https://github.com/nushell/nushell/pull/9769
+# record<stdout: string, stderr: string, exit_code: int>
+def run [cmd: closure]: nothing -> record {
     do --ignore-errors $cmd | complete
 }
 
@@ -16,8 +18,8 @@ def list-sessions [--expand: bool] {
     if not $expand {
         return $sessions
     }
-
-    # : table<name: string, pwd: path>
+    # FIXME: complex type annotation, waiting for https://github.com/nushell/nushell/pull/9769
+    # let pwds: table<name: string, pwd: path> = ...
     let pwds = ^tmux list-sessions -F '#S:#{pane_current_path}' | lines | parse "{name}:{pwd}"
 
     $sessions | join --outer $pwds name | update windows {|session|
@@ -31,13 +33,15 @@ def list-sessions [--expand: bool] {
     }
 }
 
+# FIXME: complex type annotation, waiting for https://github.com/nushell/nushell/pull/9769
+# table<name: string, attached: bool, windows: table<app: string>, pwd: path>
 def pick-session-with-style [
     message: string,
     current_session: string,
     session_color: string,
     --multi: bool,
     --expand: bool = false
-]: [table -> string, table -> list<string>] { # table<name: string, attached: bool, windows: table<app: string>, pwd: path>
+]: [table -> string, table -> list<string>] {
     let named_sessions = $in | update name {|it| (
             (if $it.name == $current_session { ansi $session_color } else { ansi default })
             ++ (if $it.attached { "* " } else { "  " })
