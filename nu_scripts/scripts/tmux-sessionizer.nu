@@ -204,7 +204,7 @@ def main [
         return
     }
 
-    let name = $choice | path basename | str replace --all --string '.' '_'
+    let name = $choice | path split | last 2 | path join
 
     if ($env.TMUX? | is-empty) and (pgrep tmux | is-empty) {
         ^tmux new-session -s $name -c $choice
