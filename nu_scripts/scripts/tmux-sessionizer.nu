@@ -32,7 +32,11 @@ def list-sessions [--expand: bool] {
 }
 
 def pick-session-with-style [
-    message: string, current_session: string, session_color: string, --multi: bool
+    message: string,
+    current_session: string,
+    session_color: string,
+    --multi: bool,
+    --expand: bool = false
 ]: [table -> string, table -> list<string>] { # table<name: string, attached: bool, windows: table<app: string>, pwd: path>
     let styled_sessions = $in | update name {|it| (
             (if $it.name == $current_session { ansi $session_color } else { ansi default })
@@ -40,9 +44,15 @@ def pick-session-with-style [
             ++ $it.name
             ++ (ansi reset)
         )}
-        | select name windows.app pwd
-        | rename name apps pwd
-        | update apps { str join ", " }
+
+    let styled_sessions = if $expand {
+        $styled_sessions
+            | select name windows.app pwd
+            | rename name apps pwd
+            | update apps { str join ", " }
+    } else {
+        $styled_sessions | get name
+    }
 
     let choices = if $multi {
         $styled_sessions | input list --multi $message
@@ -57,12 +67,18 @@ def pick-session-with-style [
     $choices | get name | ansi strip | split column " | " | get column1 | str trim --left --char '*' | str trim
 }
 
-def switch-session [session?: string] {
+def switch-session [session?: string, --expand: bool = false] {
     let session = if $session == null {
+        let sessions = if $expand {
+            list-sessions --expand
+        } else {
+            list-sessions
+        }
         let current_session = ^tmux display-message -p '#S' | str trim
 
         let prompt = $"(ansi cyan)Choose a session to switch to(ansi reset)"
-        let choice = list-sessions --expand | pick-session-with-style $prompt $current_session "yellow"
+        let choice = $sessions
+            | pick-session-with-style --expand $expand $prompt $current_session "yellow"
         if ($choice | is-empty) {
             return
         }
@@ -93,12 +109,17 @@ def new-session [] {
     ^tmux switch-client -t $session_name
 }
 
-def remove-sessions [] {
-    let sessions = list-sessions --expand
+def remove-sessions [--expand: bool = false] {
+    let sessions = if $expand {
+        list-sessions --expand
+    } else {
+        list-sessions
+    }
     let current_session = ^tmux display-message -p '#S' | str trim
 
     let prompt = $"(ansi cyan)Please choose sessions to kill(ansi reset)"
-    let choices = $sessions | pick-session-with-style --multi $prompt $current_session "red"
+    let choices = $sessions
+        | pick-session-with-style --expand $expand --multi $prompt $current_session "red"
 
     if ($choices | is-empty) {
         return
@@ -148,12 +169,12 @@ def main [
     }
 
     if $remove {
-        remove-sessions
+        remove-sessions --expand $expand
         return
     }
 
     if $switch {
-        switch-session
+        switch-session --expand $expand
         return
     }
 
