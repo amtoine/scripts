@@ -88,7 +88,7 @@ def switch-session [session?: string] {
 def new-session [] {
     let session_name = random uuid
     if not ($session_name in (list-sessions | get name)) {
-        ^tmux new-session -ds $session_name
+        ^tmux new-session -ds $session_name -c $nu.home-path
     }
     ^tmux switch-client -t $session_name
 }
