@@ -20,7 +20,9 @@ def list-sessions [--expand: bool] {
     }
     # FIXME: complex type annotation, waiting for https://github.com/nushell/nushell/pull/9769
     # let pwds: table<name: string, pwd: path> = ...
-    let pwds = ^tmux list-sessions -F '#S:#{pane_current_path}' | lines | parse "{name}:{pwd}"
+    let pwds = ^tmux list-sessions -F '#{session_name}:#{pane_current_path}'
+        | lines
+        | parse "{name}:{pwd}"
 
     $sessions | join --outer $pwds name | update windows {|session|
         ^tmux list-windows -t $session.name
@@ -84,7 +86,7 @@ def switch-session [session?: string, --expand: bool = false] {
         } else {
             list-sessions
         }
-        let current_session = ^tmux display-message -p '#S' | str trim
+        let current_session = ^tmux display-message -p '#{session_name}' | str trim
 
         let prompt = $"(ansi cyan)Choose a session to switch to(ansi reset)"
         let choice = $sessions
@@ -125,7 +127,7 @@ def remove-sessions [--expand: bool = false] {
     } else {
         list-sessions
     }
-    let current_session = ^tmux display-message -p '#S' | str trim
+    let current_session = ^tmux display-message -p '#{session_name}' | str trim
 
     let prompt = $"(ansi cyan)Please choose sessions to kill(ansi reset)"
     let choices = $sessions
