@@ -35,12 +35,14 @@ def pick-session-with-style [
     message: string, current_session: string, session_color: string, --multi: bool
 ]: [table -> string, table -> list<string>] { # table<name: string, attached: bool, windows: table<app: string>, pwd: path>
     let styled_sessions = $in | update name {|it| (
-        (if $it.name == $current_session { ansi $session_color } else { ansi default })
-        ++ (if $it.attached { "* " } else { "  " })
-        ++ $it.name
-        ++ (ansi reset)
-    )} | select name windows.app pwd
-    | update windows_app { str join ", " }
+            (if $it.name == $current_session { ansi $session_color } else { ansi default })
+            ++ (if $it.attached { "* " } else { "  " })
+            ++ $it.name
+            ++ (ansi reset)
+        )}
+        | select name windows.app pwd
+        | rename name apps pwd
+        | update apps { str join ", " }
 
     let choices = if $multi {
         $styled_sessions | input list --multi $message
