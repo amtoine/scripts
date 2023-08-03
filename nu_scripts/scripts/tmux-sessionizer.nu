@@ -1,4 +1,5 @@
 #!/usr/bin/env nu
+use std log
 
 def run [cmd: closure]: nothing -> record { # record<stdout: string, stderr: string, exit_code: int>
     do --ignore-errors $cmd | complete
@@ -101,6 +102,7 @@ def remove-sessions [] {
     let choices = $sessions | pick-session-with-style --multi $prompt $current_session "red"
 
     $sessions | where name in $choices | sort-by attached | each {|session|
+        log debug $"killing session '($session.name)'"
         if $session.attached {
             new-session
         }
