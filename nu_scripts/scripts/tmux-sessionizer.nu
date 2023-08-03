@@ -34,20 +34,13 @@ def list-sessions [--expand: bool] {
 def pick-session-with-style [
     message: string, current_session: string, session_color: string, --multi: bool
 ]: [table -> string, table -> list<string>] { # table<name: string, attached: bool, windows: table<app: string>, pwd: path>
-    let styled_sessions = $in | each {|it| (
+    let styled_sessions = $in | update name {|it| (
         (if $it.name == $current_session { ansi $session_color } else { ansi default })
         ++ (if $it.attached { "* " } else { "  " })
         ++ $it.name
         ++ (ansi reset)
-        ++ " | "
-        ++ (ansi grey)
-        ++ ($it.windows.app | str join ", ")
-        ++ (ansi reset)
-        ++ " | "
-        ++ (ansi grey)
-        ++ $it.pwd
-        ++ (ansi reset)
-    )}
+    )} | select name windows.app pwd
+    | update windows_app { str join ", " }
 
     let choices = if $multi {
         $styled_sessions | input list --multi $message
@@ -55,7 +48,11 @@ def pick-session-with-style [
         $styled_sessions | input list --fuzzy $message
     }
 
-    $choices | ansi strip | split column " | " | get column1 | str trim --left --char '*' | str trim
+    if ($choices | is-empty) {
+        return
+    }
+
+    $choices | get name | ansi strip | split column " | " | get column1 | str trim --left --char '*' | str trim
 }
 
 def switch-session [session?: string] {
@@ -100,6 +97,10 @@ def remove-sessions [] {
 
     let prompt = $"(ansi cyan)Please choose sessions to kill(ansi reset)"
     let choices = $sessions | pick-session-with-style --multi $prompt $current_session "red"
+
+    if ($choices | is-empty) {
+        return
+    }
 
     $sessions | where name in $choices | sort-by attached | each {|session|
         log debug $"killing session '($session.name)'"
