@@ -38,7 +38,7 @@ def pick-session-with-style [
     --multi: bool,
     --expand: bool = false
 ]: [table -> string, table -> list<string>] { # table<name: string, attached: bool, windows: table<app: string>, pwd: path>
-    let styled_sessions = $in | update name {|it| (
+    let named_sessions = $in | update name {|it| (
             (if $it.name == $current_session { ansi $session_color } else { ansi default })
             ++ (if $it.attached { "* " } else { "  " })
             ++ $it.name
@@ -46,12 +46,12 @@ def pick-session-with-style [
         )}
 
     let styled_sessions = if $expand {
-        $styled_sessions
+        $named_sessions
             | select name windows.app pwd
             | rename name apps pwd
             | update apps { str join ", " }
     } else {
-        $styled_sessions | get name
+        $named_sessions | get name
     }
 
     let choices = if $multi {
