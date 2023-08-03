@@ -4,22 +4,47 @@ def run [cmd: closure]: nothing -> record { # record<stdout: string, stderr: str
     do --ignore-errors $cmd | complete
 }
 
-def list-sessions [] {
-    ^tmux list-sessions
+def list-sessions [--expand: bool] {
+    let sessions = ^tmux list-sessions
         | lines
         | parse "{name}: {windows} windows (created {date}){attached}"
         | into int windows
         | into datetime date
         | update attached {|it| $it.attached != ""}
+
+    if not $expand {
+        return $sessions
+    }
+
+    # : table<name: string, pwd: path>
+    let pwds = ^tmux list-sessions -F '#S:#{pane_current_path}' | lines | parse "{name}:{pwd}"
+
+    $sessions | join --outer $pwds name | update windows {|session|
+        ^tmux list-windows -t $session.name
+            | lines
+            | parse "{id}: {app} ({panes} panes) {rest}"
+            | str trim --right --char '*' app
+            | str trim --right --char '-' app
+            | insert active {|it| not ($it.rest | find '(active)' | is-empty)}
+            | reject rest
+    }
 }
 
 def pick-session-with-style [
     message: string, current_session: string, session_color: string, --multi: bool
-]: [table -> string, table -> list<string>] { # table<name: string, attached: bool>
+]: [table -> string, table -> list<string>] { # table<name: string, attached: bool, windows: table<app: string>, pwd: path>
     let styled_sessions = $in | each {|it| (
         (if $it.name == $current_session { ansi $session_color } else { ansi default })
         ++ (if $it.attached { "* " } else { "  " })
         ++ $it.name
+        ++ (ansi reset)
+        ++ " | "
+        ++ (ansi grey)
+        ++ ($it.windows.app | str join ", ")
+        ++ (ansi reset)
+        ++ " | "
+        ++ (ansi grey)
+        ++ $it.pwd
         ++ (ansi reset)
     )}
 
@@ -29,7 +54,7 @@ def pick-session-with-style [
         $styled_sessions | input list --fuzzy $message
     }
 
-    $choices | ansi strip | str trim --left --char '*' | str trim
+    $choices | ansi strip | split column " | " | get column1 | str trim --left --char '*' | str trim
 }
 
 def switch-session [session?: string] {
@@ -37,7 +62,7 @@ def switch-session [session?: string] {
         let current_session = ^tmux display-message -p '#S' | str trim
 
         let prompt = $"(ansi cyan)Choose a session to switch to(ansi reset)"
-        let choice = list-sessions | pick-session-with-style $prompt $current_session "yellow"
+        let choice = list-sessions --expand | pick-session-with-style $prompt $current_session "yellow"
         if ($choice | is-empty) {
             return
         }
@@ -69,7 +94,7 @@ def new-session [] {
 }
 
 def remove-sessions [] {
-    let sessions = list-sessions
+    let sessions = list-sessions --expand
     let current_session = ^tmux display-message -p '#S' | str trim
 
     let prompt = $"(ansi cyan)Please choose sessions to kill(ansi reset)"
@@ -101,9 +126,14 @@ def main [
     --switch (-s): bool,  # switch to another open session
     --remove (-r): bool,  # remove any amount of open sessions (creates a new random one if current is deleted)
     --new (-n): bool,  # create a new random session
-    --list (-l): bool  # list all open sessions, in raw NUON format
+    --list (-l): bool,  # list all open sessions, in raw NUON format
+    --expand: bool
 ] {
     if $list {
+        if $expand {
+            return (list-sessions --expand | to nuon --raw)
+        }
+
         return (list-sessions | to nuon --raw)
     }
 
