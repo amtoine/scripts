@@ -64,7 +64,13 @@ def pick-session-with-style [
         return
     }
 
-    $choices | get name | ansi strip | split column " | " | get column1 | str trim --left --char '*' | str trim
+    $choices
+        | get name
+        | ansi strip
+        | split column " | "
+        | get column1
+        | str trim --left --char '*'
+        | str trim
 }
 
 def switch-session [session?: string, --expand: bool = false] {
