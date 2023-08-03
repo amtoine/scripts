@@ -64,6 +64,7 @@ def get_section [
 
 
 # TODO: documentation
+# FIXME: type annotation
 def format_section [
   section: list  # list<string>
 ] {

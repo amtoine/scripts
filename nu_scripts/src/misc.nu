@@ -735,6 +735,7 @@ export def "reveal.js download" [
 #     │ summary │ Nmap done: 256 IP addresses (2 hosts up) scanned in 6.91 seconds │
 #     ╰─────────┴──────────────────────────────────────────────────────────────────╯
 #
+# FIXME:
 # true return type (should be addressed by https://github.com/nushell/nushell/pull/9769):
 # record<
 #     header: string,
