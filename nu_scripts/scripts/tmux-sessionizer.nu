@@ -23,6 +23,7 @@ def list-sessions [--expand: bool] {
     let pwds = ^tmux list-sessions -F '#{session_name}:#{pane_current_path}'
         | lines
         | parse "{name}:{pwd}"
+        | update pwd { str replace $nu.home-path '~' }
 
     $sessions | join --outer $pwds name | update windows {|session|
         ^tmux list-windows -t $session.name
