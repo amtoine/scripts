@@ -1,5 +1,6 @@
 #!/usr/bin/env nu
 use std log
+use stdx *
 
 # FIXME: complex type annotation, waiting for https://github.com/nushell/nushell/pull/9769
 # record<stdout: string, stderr: string, exit_code: int>
@@ -18,6 +19,7 @@ def list-sessions [--expand: bool] {
     if not $expand {
         return $sessions
     }
+
     # FIXME: complex type annotation, waiting for https://github.com/nushell/nushell/pull/9769
     # let pwds: table<name: string, pwd: path> = ...
     let pwds = ^tmux list-sessions -F '#{session_name}:#{pane_current_path}'
@@ -37,14 +39,15 @@ def list-sessions [--expand: bool] {
 }
 
 # FIXME: complex type annotation, waiting for https://github.com/nushell/nushell/pull/9769
-# table<name: string, attached: bool, windows: table<app: string>, pwd: path>
+# table<name: string, attached: bool, windows: table<app: string>, pwd: path> -> record<type: string, some: bool, data: string>
+# table<name: string, attached: bool, windows: table<app: string>, pwd: path> -> record<type: string, some: bool, data: list<string>>
 def pick-session-with-style [
     message: string,
     current_session: string,
     session_color: string,
     --multi: bool,
     --expand: bool = false
-]: [table -> string, table -> list<string>] {
+] {
     let named_sessions = $in | update name {|it| (
             (if $it.name == $current_session { ansi $session_color } else { ansi default })
             ++ (if $it.attached { "* " } else { "  " })
@@ -68,7 +71,7 @@ def pick-session-with-style [
     }
 
     if ($choices | is-empty) {
-        return
+        return (Option new null)
     }
 
     let choices = if $expand {
@@ -77,7 +80,14 @@ def pick-session-with-style [
         $choices
     }
 
-    $choices | ansi strip | split column " | " | get column1 | str trim --left --char '*' | str trim
+    Option new (
+        $choices
+            | ansi strip
+            | split column " | "
+            | get column1
+            | str trim --left --char '*'
+            | str trim
+    )
 }
 
 def switch-session [session?: string, --expand: bool = false] {
@@ -92,11 +102,12 @@ def switch-session [session?: string, --expand: bool = false] {
         let prompt = $"(ansi cyan)Choose a session to switch to(ansi reset)"
         let choice = $sessions
             | pick-session-with-style --expand $expand $prompt $current_session "yellow"
-        if ($choice | is-empty) {
-            return
+
+        if ($choice | Option is-none) {
+            return (Option new null)
         }
 
-        $choice
+        $choice | Option unwrap
     } else {
         let sessions = list-sessions | get name
 
@@ -134,11 +145,13 @@ def remove-sessions [--expand: bool = false] {
     let choices = $sessions
         | pick-session-with-style --expand $expand --multi $prompt $current_session "red"
 
-    if ($choices | is-empty) {
-        return
+    if ($choices | Option is-none) {
+        return (Option new null)
     }
 
-    $sessions | where name in $choices | sort-by attached | each {|session|
+    let sessions_to_remove = $choices | Option unwrap
+
+    $sessions | where name in $sessions_to_remove | sort-by attached | each {|session|
         log debug $"killing session '($session.name)'"
         if $session.attached {
             new-session
