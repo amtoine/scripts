@@ -1,12 +1,6 @@
 #!/usr/bin/env nu
 use std log
 
-# FIXME: complex type annotation, waiting for https://github.com/nushell/nushell/pull/9769
-# record<stdout: string, stderr: string, exit_code: int>
-def run [cmd: closure]: nothing -> record {
-    do --ignore-errors $cmd | complete
-}
-
 def list-sessions [--expand: bool] {
     let sessions = ^tmux list-sessions
         | lines
@@ -211,7 +205,7 @@ def main [
         return
     }
 
-    if (run { ^tmux has-session -t $name }).exit_code == 1 {
+    if $name not-in (list-sessions | get name) {
         ^tmux new-session -ds $name -c $choice
     }
 
