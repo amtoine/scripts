@@ -766,3 +766,36 @@ def "scan lan" [
         summary: ($results | last 1 | to text | str trim)
     }
 }
+
+# FIXME: waiting for https://github.com/nushell/nushell/pull/9769
+# record<variables: record, profiles: table>
+export def "ssh profiles" [--config: path = "~/.ssh/config"]: nothing -> record {
+    let groups = open --raw $config
+        | str replace --all 'Host ' "\nHost "
+        | lines
+        | split list ""
+
+    let variables = $groups
+        | where {|group| not ($group.0 | str starts-with "Host ")}
+        | flatten
+        | parse "{key} {value}"
+        | transpose --header-row
+        | into record
+
+    let profiles = $groups
+        | where {|group| $group.0 | str starts-with "Host "}
+        | each {|group|
+            $group
+                | skip 1
+                | str trim
+                | parse "{key} {value}"
+                | transpose --header-row
+                | into record
+                | merge ($group.0 | parse "Host {Host}" | get 0)
+        }
+
+    {
+        variables: $variables
+        profiles: $profiles
+    }
+}
