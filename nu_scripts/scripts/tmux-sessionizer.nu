@@ -135,7 +135,12 @@ def remove-sessions [--expand: bool = false] {
     $sessions | where name in $choices | sort-by attached | each {|session|
         log debug $"killing session '($session.name)'"
         if $session.attached {
-            new-session
+            let alive_sessions = $sessions | where name not-in $choices
+            if ($alive_sessions | is-empty) {
+                new-session
+            } else {
+                ^tmux switch-client -t $alive_sessions.0.name
+            }
         }
         ^tmux kill-session -t $session.name
     }
