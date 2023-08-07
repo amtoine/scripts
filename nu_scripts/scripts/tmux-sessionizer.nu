@@ -30,6 +30,14 @@ def list-sessions [--expand: bool] {
     }
 }
 
+def "main list-sessions" [--expand: bool] {
+    if $expand {
+        list-sessions --expand | to nuon --raw
+    } else {
+        list-sessions | to nuon --raw
+    }
+}
+
 # FIXME: complex type annotation, waiting for https://github.com/nushell/nushell/pull/9769
 # table<name: string, attached: bool, windows: table<app: string>, pwd: path>
 def pick-session-with-style [
@@ -74,7 +82,7 @@ def pick-session-with-style [
     $choices | ansi strip | split column " | " | get column1 | str trim --left --char '*' | str trim
 }
 
-def switch-session [session?: string, --expand: bool = false] {
+def "main switch-session" [session?: string, --expand: bool] {
     let session = if $session == null {
         let sessions = if $expand {
             list-sessions --expand
@@ -108,7 +116,7 @@ def switch-session [session?: string, --expand: bool = false] {
     ^tmux switch-client -t $session
 }
 
-def new-session [] {
+def "main new-session" [] {
     let session_name = random uuid
     if not ($session_name in (list-sessions | get name)) {
         ^tmux new-session -ds $session_name -c $nu.home-path
@@ -116,7 +124,7 @@ def new-session [] {
     ^tmux switch-client -t $session_name
 }
 
-def remove-sessions [--expand: bool = false] {
+def "main remove-sessions" [--expand: bool] {
     let sessions = if $expand {
         list-sessions --expand
     } else {
@@ -137,7 +145,7 @@ def remove-sessions [--expand: bool = false] {
         if $session.attached {
             let alive_sessions = $sessions | where name not-in $choices
             if ($alive_sessions | is-empty) {
-                new-session
+                main new-session
             } else {
                 ^tmux switch-client -t $alive_sessions.0.name
             }
@@ -161,35 +169,7 @@ def remove-sessions [--expand: bool = false] {
 #     > tmux-sessionizer.nu | from nuon
 def main [
     ...paths: path,  # the list of paths to fuzzy find and jump to in a new session
-    --switch (-s): bool,  # switch to another open session
-    --remove (-r): bool,  # remove any amount of open sessions (creates a new random one if current is deleted)
-    --new (-n): bool,  # create a new random session
-    --list (-l): bool,  # list all open sessions, in raw NUON format
-    --expand: bool
 ] {
-    if $list {
-        if $expand {
-            return (list-sessions --expand | to nuon --raw)
-        }
-
-        return (list-sessions | to nuon --raw)
-    }
-
-    if $new {
-        new-session
-        return
-    }
-
-    if $remove {
-        remove-sessions --expand $expand
-        return
-    }
-
-    if $switch {
-        switch-session --expand $expand
-        return
-    }
-
     if ($paths | is-empty) {
         error make --unspanned {
             msg: $"(ansi red_bold)missing_argument_error(ansi reset):
