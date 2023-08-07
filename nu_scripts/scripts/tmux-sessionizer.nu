@@ -162,7 +162,7 @@ def "main switch-session" [
 }
 
 # open a new Tmux session with a random name and attach to it, from $nu.home-path
-def "main new-session" [] {
+def "main new-session" []: nothing -> nothing {
     let session_name = random uuid
     if not ($session_name in (list-sessions | get name)) {
         ^tmux new-session -ds $session_name -c $nu.home-path
@@ -237,7 +237,7 @@ def "main remove-sessions" [
 # ```
 def main [
     ...paths: path,  # the list of paths to fuzzy find and jump to in a new session
-] {
+]: nothing -> nothing {
     if ($paths | is-empty) {
         error make --unspanned {
             msg: $"(ansi red_bold)missing_argument_error(ansi reset):
