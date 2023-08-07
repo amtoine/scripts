@@ -22,19 +22,19 @@ export def main [output: string] {
             {code: "?", modifiers: []} => { menu-help },
             {code: "j", modifiers: []} => {
                 print $"    (ansi blue)decreasing(ansi reset) brightness of (ansi default_dimmed)($output)(ansi reset) by (ansi yellow_bold).1(ansi reset)"
-                xrandr-brightness $output --notify --invert .1
+                xrandr-brightness.nu $output --notify --invert .1
             },
             {code: "j", modifiers: ["control"]} => {
                 print $"    (ansi blue)decreasing(ansi reset) brightness of (ansi default_dimmed)($output)(ansi reset) by (ansi yellow_dimmed).05(ansi reset)"
-                xrandr-brightness $output --notify --invert .05
+                xrandr-brightness.nu $output --notify --invert .05
             },
             {code: "k", modifiers: []} => {
                 print $"    (ansi red)increasing(ansi reset) brightness of (ansi default_dimmed)($output)(ansi reset) by (ansi yellow_bold).1(ansi reset)"
-                xrandr-brightness $output --notify .1
+                xrandr-brightness.nu $output --notify .1
             },
             {code: "k", modifiers: ["control"]} => {
                 print $"    (ansi red)increasing(ansi reset) brightness of (ansi default_dimmed)($output)(ansi reset) by (ansi yellow_dimmed).05(ansi reset)"
-                xrandr-brightness $output --notify .05
+                xrandr-brightness.nu $output --notify .05
             },
             {code: "esc"} | $CTRL_C | $CTRL_D => { break },
             _ => {},
