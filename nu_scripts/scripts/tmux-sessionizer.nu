@@ -220,6 +220,21 @@ def "main remove-sessions" [
 # # Examples
 #     open a session in a Git repository managed by `nu-git-manager`
 #     > tmux-sessionizer.nu (gm list --full-path)
+#
+# # Configuration
+# `tmux-sessionizer.nu` can be used in a Tmux config as follows:
+# ```shell
+# TMUX_SESSIONIZER="~/.local/bin/tmux-sessionizer.nu"
+# NUSHELL_WITH_ENV="nu --env-config ~/.config/nushell/env.nu --commands"
+#
+# bind-key -r H new-window "$NUSHELL_WITH_ENV '\
+#     use nu-git-manager gm;\
+#     $TMUX_SESSIONIZER (gm list --full-path)\
+# '"
+# bind-key -r N new-window "$TMUX_SESSIONIZER new-session"
+# bind-key -r G new-window "$TMUX_SESSIONIZER switch-session --more-context"
+# bind-key -r R new-window "$TMUX_SESSIONIZER remove-sessions --more-context"
+# ```
 def main [
     ...paths: path,  # the list of paths to fuzzy find and jump to in a new session
 ] {
