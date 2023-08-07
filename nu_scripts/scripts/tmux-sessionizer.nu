@@ -3,8 +3,8 @@ use std log
 
 # FIXME: complex type annotation, waiting for https://github.com/nushell/nushell/pull/9769
 # default: nothing -> table<name: string, windows: int, date: date, attached: bool>
-# --expand: nothing -> table<name: string, windows: table<id: string, app: string, panes: string, active: bool>, date: date, attached: bool, pwd: string>
-def list-sessions [--expand: bool]: [nothing -> table, nothing -> table] {
+# --more: nothing -> table<name: string, windows: table<id: string, app: string, panes: string, active: bool>, date: date, attached: bool, pwd: string>
+def list-sessions [--more: bool]: [nothing -> table, nothing -> table] {
     let sessions = ^tmux list-sessions
         | lines
         | parse "{name}: {windows} windows (created {date}){attached}"
@@ -12,7 +12,7 @@ def list-sessions [--expand: bool]: [nothing -> table, nothing -> table] {
         | into datetime date
         | update attached {|it| $it.attached != ""}
 
-    if not $expand {
+    if not $more {
         return $sessions
     }
 
@@ -52,13 +52,13 @@ def list-sessions [--expand: bool]: [nothing -> table, nothing -> table] {
 #     table<name: string, windows: int, date: date, attached: bool>
 #
 #     the output table shape in *expanded* mode
-#     > tmux-sessionizer.nu list-sessions --expand | from nuon | describe
+#     > tmux-sessionizer.nu list-sessions --more | from nuon | describe
 #     table<name: string, windows: table<id: string, app: string, panes: string, active: bool>, date: date, attached: bool, pwd: string>
 def "main list-sessions" [
-    --expand: bool  # add more information to the output table, note that this will take more time
+    --more (-m): bool  # add more information to the output table, note that this will take more time
 ]: nothing -> string {
-    if $expand {
-        list-sessions --expand | to nuon --raw
+    if $more {
+        list-sessions --more | to nuon --raw
     } else {
         list-sessions | to nuon --raw
     }
@@ -71,7 +71,7 @@ def pick-session-with-style [
     current_session: string,
     session_color: string,
     --multi: bool,
-    --expand: bool = false
+    --more: bool = false
 ]: [table -> string, table -> list<string>] {
     let named_sessions = $in | update name {|it| (
             (if $it.name == $current_session { ansi $session_color } else { ansi default })
@@ -80,7 +80,7 @@ def pick-session-with-style [
             ++ (ansi reset)
         )}
 
-    let styled_sessions = if $expand {
+    let styled_sessions = if $more {
         $named_sessions
             | select name windows.app pwd
             | rename name apps pwd
@@ -99,7 +99,7 @@ def pick-session-with-style [
         return
     }
 
-    let choices = if $expand {
+    let choices = if $more {
         $choices | get name
     } else {
         $choices
@@ -115,7 +115,7 @@ def pick-session-with-style [
 #     > tmux-sessionizer.nu switch-session
 #
 #     fuzzy search and attach to a session with more context
-#     > tmux-sessionizer.nu switch-session --expand
+#     > tmux-sessionizer.nu switch-session --more
 #
 #     attach to another session directly
 #     > tmux-sessionizer.nu switch-session "my_other_session"
@@ -126,11 +126,11 @@ def pick-session-with-style [
 #       │                 expected one of [my_session, my_other_session], got not_a_session
 def "main switch-session" [
     session?: string  # query as session name to switch to without fuzzy search
-    --expand: bool  # use the *expanded* list of sessions for more context
+    --more-context: bool  # use the *expanded* list of sessions for more context
 ]: nothing -> nothing {
     let session = if $session == null {
-        let sessions = if $expand {
-            list-sessions --expand
+        let sessions = if $more_context {
+            list-sessions --more
         } else {
             list-sessions
         }
@@ -138,7 +138,7 @@ def "main switch-session" [
 
         let prompt = $"(ansi cyan)Choose a session to switch to(ansi reset)"
         let choice = $sessions
-            | pick-session-with-style --expand $expand $prompt $current_session "yellow"
+            | pick-session-with-style --more $more_context $prompt $current_session "yellow"
         if ($choice | is-empty) {
             return
         }
@@ -182,12 +182,12 @@ def "main new-session" [] {
 #     > tmux-sessionizer.nu remove-sessions
 #
 #     remove sessions with more context
-#     > tmux-sessionizer.nu remove-sessions --expand
+#     > tmux-sessionizer.nu remove-sessions --more-context
 def "main remove-sessions" [
-    --expand: bool  # use the *expanded* list of sessions for more context
+    --more-context (-m): bool  # use the *expanded* list of sessions for more context
 ]: nothing -> nothing {
-    let sessions = if $expand {
-        list-sessions --expand
+    let sessions = if $more_context {
+        list-sessions --more
     } else {
         list-sessions
     }
@@ -195,7 +195,7 @@ def "main remove-sessions" [
 
     let prompt = $"(ansi cyan)Please choose sessions to kill(ansi reset)"
     let choices = $sessions
-        | pick-session-with-style --expand $expand --multi $prompt $current_session "red"
+        | pick-session-with-style --more $more_context --multi $prompt $current_session "red"
 
     if ($choices | is-empty) {
         return
