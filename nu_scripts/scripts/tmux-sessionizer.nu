@@ -161,11 +161,21 @@ def "main switch-session" [
     ^tmux switch-client -t $session
 }
 
-# open a new Tmux session with a random name and attach to it, from $nu.home-path
-def "main new-session" []: nothing -> nothing {
-    let session_name = random uuid
+# open a new Tmux session and attach to it
+#
+# # Examples
+#     start a new session with a random name starting in $nu.home-path
+#     > tmux-sessionizer.nu new-session
+#
+#     or equivalently and more explicit
+#     > tmux-sessionizer.nu new-session (random uuid) --working-directory $nu.home-path
+def "main new-session" [
+    name?: string  # the name of the new session, only attach to it if the session already exists (defaults to a random UUID)
+    --working-directory (-d): path  # the working directory to start the session in (defaults to $nu.home-path)
+]: nothing -> nothing {
+    let session_name = $name | default (random uuid)
     if not ($session_name in (list-sessions | get name)) {
-        ^tmux new-session -ds $session_name -c $nu.home-path
+        ^tmux new-session -ds $session_name -c ($working_directory | default $nu.home-path)
     }
     ^tmux switch-client -t $session_name
 }
