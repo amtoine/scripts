@@ -1,7 +1,10 @@
 #!/usr/bin/env nu
 use std log
 
-def list-sessions [--expand: bool] {
+# FIXME: complex type annotation, waiting for https://github.com/nushell/nushell/pull/9769
+# default: nothing -> table<name: string, windows: int, date: date, attached: bool>
+# --expand: nothing -> table<name: string, windows: table<id: string, app: string, panes: string, active: bool>, date: date, attached: bool, pwd: string>
+def list-sessions [--expand: bool]: [nothing -> table, nothing -> table] {
     let sessions = ^tmux list-sessions
         | lines
         | parse "{name}: {windows} windows (created {date}){attached}"
@@ -12,6 +15,7 @@ def list-sessions [--expand: bool] {
     if not $expand {
         return $sessions
     }
+
     # FIXME: complex type annotation, waiting for https://github.com/nushell/nushell/pull/9769
     # let pwds: table<name: string, pwd: path> = ...
     let pwds = ^tmux list-sessions -F '#{session_name}:#{pane_current_path}'
@@ -30,7 +34,29 @@ def list-sessions [--expand: bool] {
     }
 }
 
-def "main list-sessions" [--expand: bool] {
+# list opened Tmux sessions
+#
+# > **Note**  
+# > `tmux-sessionizer.nu list-sessions` does not return a table but a raw string: the raw NUON
+# > table.
+# > to use the output, please pipe the output into `from nuon` to complete the pipeline.
+# >
+# > related to https://github.com/nushell/nushell/issues/9373
+#
+# # Examples
+#     list the names of all opened sessions
+#     > tmux-sessionizer.nu list-sessions | from nuon | get name
+#
+#     the output table shape
+#     > tmux-sessionizer.nu list-sessions | from nuon | describe
+#     table<name: string, windows: int, date: date, attached: bool>
+#
+#     the output table shape in *expanded* mode
+#     > tmux-sessionizer.nu list-sessions --expand | from nuon | describe
+#     table<name: string, windows: table<id: string, app: string, panes: string, active: bool>, date: date, attached: bool, pwd: string>
+def "main list-sessions" [
+    --expand: bool  # add more information to the output table, note that this will take more time
+]: nothing -> string {
     if $expand {
         list-sessions --expand | to nuon --raw
     } else {
@@ -82,7 +108,26 @@ def pick-session-with-style [
     $choices | ansi strip | split column " | " | get column1 | str trim --left --char '*' | str trim
 }
 
-def "main switch-session" [session?: string, --expand: bool] {
+# switch to another opened Tmux session
+#
+# # Examples
+#     fuzzy search and attach to a session
+#     > tmux-sessionizer.nu switch-session
+#
+#     fuzzy search and attach to a session with more context
+#     > tmux-sessionizer.nu switch-session --expand
+#
+#     attach to another session directly
+#     > tmux-sessionizer.nu switch-session "my_other_session"
+#
+#     try to attach to a session that does not exist
+#     > tmux-sessionizer.nu switch-session "not_a_session"
+#     Error:   × invalid_session_name:
+#       │                 expected one of [my_session, my_other_session], got not_a_session
+def "main switch-session" [
+    session?: string  # query as session name to switch to without fuzzy search
+    --expand: bool  # use the *expanded* list of sessions for more context
+]: nothing -> nothing {
     let session = if $session == null {
         let sessions = if $expand {
             list-sessions --expand
@@ -116,6 +161,7 @@ def "main switch-session" [session?: string, --expand: bool] {
     ^tmux switch-client -t $session
 }
 
+# open a new Tmux session with a random name and attach to it, from $nu.home-path
 def "main new-session" [] {
     let session_name = random uuid
     if not ($session_name in (list-sessions | get name)) {
@@ -124,7 +170,22 @@ def "main new-session" [] {
     ^tmux switch-client -t $session_name
 }
 
-def "main remove-sessions" [--expand: bool] {
+# remove any number of Tmux sessions
+#
+# `tmux-sessionizer.nu` will attach to another opened session if the currently attached on is
+# removed.
+# if all sessions are removed and there is no one to attach, a new random session starting in
+# $nu.home-path will be created and attached to.
+#
+# # Examples
+#     remove sessions
+#     > tmux-sessionizer.nu remove-sessions
+#
+#     remove sessions with more context
+#     > tmux-sessionizer.nu remove-sessions --expand
+def "main remove-sessions" [
+    --expand: bool  # use the *expanded* list of sessions for more context
+]: nothing -> nothing {
     let sessions = if $expand {
         list-sessions --expand
     } else {
@@ -156,17 +217,9 @@ def "main remove-sessions" [--expand: bool] {
 
 # manage any Tmux session in a single script
 #
-# > **Note**  
-# > in the following the options are in reverse order of priority, meaning the
-# > the further down the list, the more it will be executed first and overrides
-# > previous options when both set.
-#
 # # Examples
 #     open a session in a Git repository managed by `nu-git-manager`
 #     > tmux-sessionizer.nu (gm list --full-path)
-#
-#     list open sessions
-#     > tmux-sessionizer.nu | from nuon
 def main [
     ...paths: path,  # the list of paths to fuzzy find and jump to in a new session
 ] {
