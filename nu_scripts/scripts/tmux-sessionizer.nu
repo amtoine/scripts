@@ -85,6 +85,19 @@ def pick-session-with-style [
             | select name windows.app pwd
             | rename name apps pwd
             | update apps { str join ", " }
+            | update pwd {|session|
+                $session.pwd | path split | reverse | enumerate | each {|it|
+                    if $it.index >= 2 {
+                        if ($it.item | str starts-with '.') {
+                            $it.item | str substring ..2
+                        } else {
+                            $it.item | str substring ..1
+                        }
+                    } else {
+                        $it.item
+                    }
+                } | reverse | path join
+            }
     } else {
         $named_sessions | get name
     }
