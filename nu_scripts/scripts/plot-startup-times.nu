@@ -1,6 +1,6 @@
 #!/usr/bin/env nu
 
-def main [file?: path = "~/.local/share/nushell/startup-times.nuon"] {
+def main [file?: path = "~/.local/share/nushell/startup-times.nuon"]: nothing -> string {
     if not ($file | path exists) {
         let span = (metadata $file | get span)
         error make {

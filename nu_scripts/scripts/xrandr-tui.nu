@@ -2,7 +2,7 @@
 const CTRL_C = {code: "c", modifiers: ["control"]}
 const CTRL_D = {code: "d", modifiers: ["control"]}
 
-def menu-help [] {
+def menu-help []: nothing -> nothing {
     print ""
     print $"| (ansi blue)decrease(ansi reset) / (ansi red)increase(ansi reset) the brightness by (ansi yellow_bold).1(ansi reset) by hitting (ansi blue)j(ansi reset) / (ansi red)k(ansi reset)"
     print $"| (ansi blue)decrease(ansi reset) / (ansi red)increase(ansi reset) the brightness by (ansi yellow_dimmed).05(ansi reset) by hitting (ansi blue)j(ansi reset) / (ansi red)k(ansi reset) and (ansi yellow_dimmed)control(ansi reset)"
@@ -11,7 +11,7 @@ def menu-help [] {
     print ""
 }
 
-export def main [output: string] {
+export def main [output: string]: nothing -> nothing {
     print ""
     print $"        Welcome to (ansi cyan_bold)Xrandr TUI(ansi reset)"
     print ""

@@ -29,7 +29,7 @@
 extern-wrapped main [
     --help (-h): bool  # Display the help message for this command
     --notify: bool  # Throw a notification once an entry has been pasted
-    ...dmenu_args  # The arguments to dmenu
+    ...dmenu_args: string  # The arguments to dmenu
 ] {
     let password_store = $env.PASSWORD_STORE_DIR? | default "~/.password-store/"
 
