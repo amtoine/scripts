@@ -15,7 +15,7 @@ def main [file?: path = "~/.local/share/nushell/startup-times.nuon"] {
 
     open $file
         | where time < 1sec
-        | update date { date format "%Y-%m-%d-%H" }
+        | update date { format date "%Y-%m-%d-%H" }
         | group-by date
         | transpose date data
         | update data { get time | math avg }
