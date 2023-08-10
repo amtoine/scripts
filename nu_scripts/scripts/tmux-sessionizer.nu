@@ -18,6 +18,20 @@ def switch-to-or-create-session [session: record<name: string, path: path>]: not
     ^tmux switch-client -t $session.name
 }
 
+def spwd []: path -> path {
+    str replace $nu.home-path '~' | path split | reverse | enumerate | each {|it|
+        if $it.index >= 2 {
+            if ($it.item | str starts-with '.') {
+                $it.item | str substring ..2
+            } else {
+                $it.item | str substring ..1
+            }
+        } else {
+            $it.item
+        }
+    } | reverse | path join
+}
+
 # alternate between the current session and the last one
 #
 # commands that change the "last session"
@@ -134,7 +148,6 @@ def list-sessions [--more: bool]: [nothing -> table, nothing -> table] {
     let pwds = ^tmux list-sessions -F '#{session_name}:#{pane_current_path}'
         | lines
         | parse "{name}:{pwd}"
-        | update pwd { str replace $nu.home-path '~' }
 
     $sessions | join --outer $pwds name | update windows {|session|
         ^tmux list-windows -t $session.name
@@ -198,19 +211,7 @@ def pick-session-with-style [
             | select name windows.app pwd
             | rename name apps pwd
             | update apps { str join ", " }
-            | update pwd {|session|
-                $session.pwd | path split | reverse | enumerate | each {|it|
-                    if $it.index >= 2 {
-                        if ($it.item | str starts-with '.') {
-                            $it.item | str substring ..2
-                        } else {
-                            $it.item | str substring ..1
-                        }
-                    } else {
-                        $it.item
-                    }
-                } | reverse | path join
-            }
+            | update pwd { spwd }
     } else {
         $named_sessions | get name
     }
