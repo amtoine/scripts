@@ -57,6 +57,28 @@ def clean-lines [] {
     str trim | lines --skip-empty
 }
 
+# # Configuration
+# ```shell
+# TMUX_SESSIONIZER="~/.local/bin/tmux-sessionizer.nu"
+# NUSHELL_WITH_ENV="nu --env-config ~/.config/nushell/env.nu --commands"
+#
+# bind-key -r e display-popup -E "$NUSHELL_WITH_ENV '\
+#     $TMUX_SESSIONIZER harpoon edit\
+# '"
+# bind-key -r j display-popup -E "$TMUX_SESSIONIZER harpoon entries"
+# bind-key -r a run-shell "$TMUX_SESSIONIZER harpoon add"
+# bind-key -r 1 run-shell "$TMUX_SESSIONIZER harpoon jump 0"
+# bind-key -r 2 run-shell "$TMUX_SESSIONIZER harpoon jump 1"
+# bind-key -r 3 run-shell "$TMUX_SESSIONIZER harpoon jump 2"
+# bind-key -r 4 run-shell "$TMUX_SESSIONIZER harpoon jump 3"
+# ```
+def "main harpoon" []: nothing -> nothing {
+}
+
+# add the current session to the list of harpoons
+#
+# a session is identified by a name and a path.
+# two identical sessions won't be duplicated by `harpoon add`
 def "main harpoon add" []: nothing -> nothing {
     let harpoon_file = $TMUX_HARPOON_FILE | path expand
     mkdir ($harpoon_file | path dirname)
@@ -72,6 +94,7 @@ def "main harpoon add" []: nothing -> nothing {
     open $harpoon_file | clean-lines | append $current_session | uniq | save --force $harpoon_file
 }
 
+# edit the list of sessions with `$env.EDITOR`
 def "main harpoon edit" []: nothing -> nothing {
     let harpoon_file = $TMUX_HARPOON_FILE | path expand
     mkdir ($harpoon_file | path dirname)
@@ -82,6 +105,11 @@ def "main harpoon edit" []: nothing -> nothing {
     ^$env.EDITOR $harpoon_file
 }
 
+# jump to a harpoon entry without knowing it's index
+#
+# - if there are no harpoon, an error is thrown
+# - if there is a single harpoon, it asks for confirmation and jumps to it
+# - if there is more, a fuzzy selector is presented to the user
 def "main harpoon entries" []: nothing -> nothing {
     let harpoon_file = $TMUX_HARPOON_FILE | path expand
     if not ($harpoon_file | path exists) {
@@ -116,7 +144,12 @@ def "main harpoon entries" []: nothing -> nothing {
     }
 }
 
-def "main harpoon jump" [id: int]: nothing -> nothing {
+# jump to a harpoon by id
+#
+# the $id needs to be between *0* and *#harpoons - 1*
+def "main harpoon jump" [
+    id: int  # the 0-indexed id of the harpoon to jump to
+]: nothing -> nothing {
     let harpoon_file = $TMUX_HARPOON_FILE | path expand
     if not ($harpoon_file | path exists) {
         return
