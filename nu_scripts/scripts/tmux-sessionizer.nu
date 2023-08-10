@@ -8,6 +8,16 @@ def save-tmux-session-name []: nothing -> nothing {
     ^tmux display-message -p '#{session_name}' | save --force $TMUX_SESSION_FILE
 }
 
+def switch-to-or-create-session [session: record<name: string, path: path>]: nothing -> nothing {
+    save-tmux-session-name
+
+    if $session.name not-in (list-sessions | get name) {
+        ^tmux new-session -ds $session.name -c $session.path
+    }
+
+    ^tmux switch-client -t $session.name
+}
+
 # alternate between the current session and the last one
 #
 # commands that change the "last session"
@@ -69,30 +79,14 @@ def "main harpoon entries" []: nothing -> nothing {
         0 => {
             error make --unspanned { msg: $"(ansi red_bold)no harpoon to jump to(ansi reset)" }
         },
-        1 => {
-            let session = $harpoons.0 | parse "{name} {path}" | get 0
-
-            save-tmux-session-name
-
-            if $session.name not-in (list-sessions | get name) {
-                ^tmux new-session -ds $session.name -c $session.path
-            }
-
-            ^tmux switch-client -t $session.name
-        },
+        1 => { switch-to-or-create-session ($harpoons.0 | parse "{name} {path}" | get 0) },
         _ => {
             let session = $harpoons | parse "{name} {path}" | input list "foo"
             if ($session | is-empty) {
                 return
             }
 
-            save-tmux-session-name
-
-            if $session.name not-in (list-sessions | get name) {
-                ^tmux new-session -ds $session.name -c $session.path
-            }
-
-            ^tmux switch-client -t $session.name
+            switch-to-or-create-session $session
         },
     }
 }
@@ -115,15 +109,7 @@ def "main harpoon jump" [id: int]: nothing -> nothing {
         }
     }
 
-    let session = $harpoons | get $id | parse "{name} {path}" | get 0
-
-    save-tmux-session-name
-
-    if $session.name not-in (list-sessions | get name) {
-        ^tmux new-session -ds $session.name -c $session.path
-    }
-
-    ^tmux switch-client -t $session.name
+    switch-to-or-create-session ($harpoons | get $id | parse "{name} {path}" | get 0)
 }
 
 # FIXME: complex type annotation, waiting for https://github.com/nushell/nushell/pull/9769
@@ -311,12 +297,10 @@ def "main new-session" [
     name?: string  # the name of the new session, only attach to it if the session already exists (defaults to a random UUID)
     --working-directory (-d): path  # the working directory to start the session in (defaults to $nu.home-path)
 ]: nothing -> nothing {
-    let session_name = $name | default (random uuid)
-    if not ($session_name in (list-sessions | get name)) {
-        save-tmux-session-name
-        ^tmux new-session -ds $session_name -c ($working_directory | default $nu.home-path)
+    switch-to-or-create-session {
+        name: ($name | default (random uuid))
+        path: ($working_directory | default $nu.home-path)
     }
-    ^tmux switch-client -t $session_name
 }
 
 # remove any number of Tmux sessions
@@ -446,11 +430,5 @@ def main [
         return
     }
 
-    save-tmux-session-name
-
-    if $result.name not-in (list-sessions | get name) {
-        ^tmux new-session -ds $result.name -c $result.path
-    }
-
-    ^tmux switch-client -t $result.name
+    switch-to-or-create-session $result
 }
