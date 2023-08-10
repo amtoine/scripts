@@ -106,7 +106,7 @@ def "main harpoon entries" []: nothing -> nothing {
             let session = $harpoons
                 | parse $TMUX_HARPOON_SESSION_FORMAT
                 | update path { spwd }
-                | input list "foo"
+                | input list $"(ansi cyan)Choose a harpoon to jump to(ansi reset)"
             if ($session | is-empty) {
                 return
             }
