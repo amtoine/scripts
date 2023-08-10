@@ -97,7 +97,10 @@ def "main harpoon entries" []: nothing -> nothing {
             switch-to-or-create-session ($harpoons.0 | parse $TMUX_HARPOON_SESSION_FORMAT | get 0)
         },
         _ => {
-            let session = $harpoons | parse $TMUX_HARPOON_SESSION_FORMAT | input list "foo"
+            let session = $harpoons
+                | parse $TMUX_HARPOON_SESSION_FORMAT
+                | update path { spwd }
+                | input list "foo"
             if ($session | is-empty) {
                 return
             }
