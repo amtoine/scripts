@@ -1,6 +1,31 @@
 #!/usr/bin/env nu
 use std log
 
+const TMUX_SESSION_FILE = "/tmp/tmux-session"
+
+def save-tmux-session-name [] {
+    mkdir ($TMUX_SESSION_FILE | path dirname)
+    ^tmux display-message -p '#{session_name}' | save --force $TMUX_SESSION_FILE
+}
+
+# alternate between the current session and the last one
+#
+# commands that change the "last session"
+# - the sessionizer itself
+# - `new-session`
+# - `switch-session`
+# - `remove-sessions`: this one might not be able to get a valid "last session" if it's getting removed
+def "main alternate" [] {
+    if not ($TMUX_SESSION_FILE | path exists) {
+        return
+    }
+
+    let previous_session = open $TMUX_SESSION_FILE | str trim
+    if $previous_session in (list-sessions | get name) {
+        main switch-session $previous_session
+    }
+}
+
 # FIXME: complex type annotation, waiting for https://github.com/nushell/nushell/pull/9769
 # default: nothing -> table<name: string, windows: int, date: date, attached: bool>
 # --more: nothing -> table<name: string, windows: table<id: string, app: string, panes: string, active: bool>, date: date, attached: bool, pwd: string>
@@ -170,6 +195,7 @@ def "main switch-session" [
         $session
     }
 
+    save-tmux-session-name
     ^tmux switch-client -t $session
 }
 
@@ -187,6 +213,7 @@ def "main new-session" [
 ]: nothing -> nothing {
     let session_name = $name | default (random uuid)
     if not ($session_name in (list-sessions | get name)) {
+        save-tmux-session-name
         ^tmux new-session -ds $session_name -c ($working_directory | default $nu.home-path)
     }
     ^tmux switch-client -t $session_name
@@ -230,6 +257,7 @@ def "main remove-sessions" [
             if ($alive_sessions | is-empty) {
                 main new-session
             } else {
+                save-tmux-session-name
                 ^tmux switch-client -t $alive_sessions.0.name
             }
         }
@@ -317,6 +345,8 @@ def main [
         ^tmux new-session -s $result.name -c $result.path
         return
     }
+
+    save-tmux-session-name
 
     if $result.name not-in (list-sessions | get name) {
         ^tmux new-session -ds $result.name -c $result.path
