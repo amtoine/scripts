@@ -94,7 +94,13 @@ def "main harpoon entries" []: nothing -> nothing {
             error make --unspanned { msg: $"(ansi red_bold)no harpoon to jump to(ansi reset)" }
         },
         1 => {
-            switch-to-or-create-session ($harpoons.0 | parse $TMUX_HARPOON_SESSION_FORMAT | get 0)
+            let session = $harpoons.0 | parse $TMUX_HARPOON_SESSION_FORMAT | get 0
+
+            let prompt = $"(ansi cyan)Do you want to jump to ($session.name)?(ansi reset)"
+            match (["no" "yes"] | input list $prompt) {
+                "yes" => { switch-to-or-create-session $session },
+                _ => { return },
+            }
         },
         _ => {
             let session = $harpoons
