@@ -260,6 +260,7 @@ def "main remove-sessions" [
 # ```
 def main [
     ...paths: path,  # the list of paths to fuzzy find and jump to in a new session
+    --short (-s): bool  # only show the short session names instead of the full paths
 ]: nothing -> nothing {
     if ($paths | is-empty) {
         error make --unspanned {
@@ -268,26 +269,45 @@ def main [
         }
     }
 
-    let options = $paths | wrap path | insert key {|it| $it.path | path split | last 2 | path join}
+    let result = if $short {
+        let options = $paths
+            | wrap path
+            | insert key {|it| $it.path | path split | last 2 | path join}
 
-    let choice = $options
-        | get key
-        | input list --fuzzy $"(ansi cyan)Choose a directory to open a session in(ansi reset)"
-    if ($choice | is-empty) {
-        return
+        let choice = $options
+            | get key
+            | input list --fuzzy $"(ansi cyan)Choose a directory to open a session in(ansi reset)"
+
+        if ($choice | is-empty) {
+            return
+        }
+
+        {
+            name: ($choice | str replace --all --string "." "_")
+            path: ($options | where key == $choice | get 0.path)
+        }
+    } else {
+        let choice = $paths
+            | input list --fuzzy $"(ansi cyan)Choose a directory to open a session in(ansi reset)"
+
+        if ($choice | is-empty) {
+            return
+        }
+
+        {
+            name: ($choice | path split | last 2 | path join | str replace --all --string "." "_")
+            path: $choice
+        }
     }
-
-    let name = $choice | str replace --all --string "." "_"
-    let path = $options | where key == $choice | get 0.path
 
     if ($env.TMUX? | is-empty) and (pgrep tmux | is-empty) {
-        ^tmux new-session -s $name -c $path
+        ^tmux new-session -s $result.name -c $result.path
         return
     }
 
-    if $name not-in (list-sessions | get name) {
-        ^tmux new-session -ds $name -c $path
+    if $result.name not-in (list-sessions | get name) {
+        ^tmux new-session -ds $result.name -c $result.path
     }
 
-    ^tmux switch-client -t $name
+    ^tmux switch-client -t $result.name
 }
