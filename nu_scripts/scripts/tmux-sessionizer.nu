@@ -38,6 +38,10 @@ def "main alternate" []: nothing -> nothing {
 
 const TMUX_HARPOON_FILE = "~/.local/state/tmux/harpoon"
 
+def clean-lines [] {
+    str trim | lines --skip-empty
+}
+
 def "main harpoon add" []: nothing -> nothing {
     let harpoon_file = $TMUX_HARPOON_FILE | path expand
     mkdir ($harpoon_file | path dirname)
@@ -50,12 +54,7 @@ def "main harpoon add" []: nothing -> nothing {
         (^tmux display-message -p '#{pane_current_path}' | str trim)
     ] | str join " "
 
-    open $harpoon_file
-        | str trim
-        | lines --skip-empty
-        | append $current_session
-        | uniq
-        | save --force $harpoon_file
+    open $harpoon_file | clean-lines | append $current_session | uniq | save --force $harpoon_file
 }
 
 def "main harpoon edit" []: nothing -> nothing {
@@ -74,7 +73,7 @@ def "main harpoon entries" []: nothing -> nothing {
         return
     }
 
-    let harpoons = open $harpoon_file | str trim | lines --skip-empty
+    let harpoons = open $harpoon_file | clean-lines
     match ($harpoons | length) {
         0 => {
             error make --unspanned { msg: $"(ansi red_bold)no harpoon to jump to(ansi reset)" }
@@ -97,7 +96,7 @@ def "main harpoon jump" [id: int]: nothing -> nothing {
         return
     }
 
-    let harpoons = open $harpoon_file | str trim | lines --skip-empty
+    let harpoons = open $harpoon_file | clean-lines
     if $id < 0 {
         error make --unspanned {
             msg: $"(ansi red_bold)invalid_argument(ansi reset): $id is negative"
