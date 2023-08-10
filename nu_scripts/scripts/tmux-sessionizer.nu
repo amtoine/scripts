@@ -341,8 +341,7 @@ def "main switch-session" [
         $session
     }
 
-    save-tmux-session-name --new-session $session
-    ^tmux switch-client -t $session
+    switch-to-or-create-session { name: $session, path: "" }
 }
 
 # open a new Tmux session and attach to it
@@ -401,8 +400,7 @@ def "main remove-sessions" [
             if ($alive_sessions | is-empty) {
                 main new-session
             } else {
-                save-tmux-session-name --new-session $alive_sessions.0.name
-                ^tmux switch-client -t $alive_sessions.0.name
+                switch-to-or-create-session { name: $alive_sessions.0.name, path: "" }
             }
         }
         ^tmux kill-session -t $session.name
