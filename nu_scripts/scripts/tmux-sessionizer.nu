@@ -170,7 +170,6 @@ def "main switch-session" [
         $session
     }
 
-
     ^tmux switch-client -t $session
 }
 
@@ -236,6 +235,8 @@ def "main remove-sessions" [
         }
         ^tmux kill-session -t $session.name
     }
+
+    null
 }
 
 # manage any Tmux session in a single script
