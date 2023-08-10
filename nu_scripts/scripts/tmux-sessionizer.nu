@@ -10,6 +10,7 @@ def save-tmux-session-name [--new-session: string]: nothing -> nothing {
 
     let current_session = ^tmux display-message -p '#{session_name}' | str trim
     if $current_session != $new_session {
+        log debug $"changing session: ($current_session) -> ($new_session)"
         $current_session | save --force $TMUX_SESSION_FILE
     }
 }
@@ -18,9 +19,11 @@ def switch-to-or-create-session [session: record<name: string, path: path>]: not
     save-tmux-session-name --new-session $session.name
 
     if $session.name not-in (list-sessions | get name) {
+        log debug $"creating session ($session.name) at ($session.path)"
         ^tmux new-session -ds $session.name -c $session.path
     }
 
+    log debug $"switching to ($session.name)"
     ^tmux switch-client -t $session.name
 }
 
@@ -47,11 +50,13 @@ def spwd []: path -> path {
 # - `remove-sessions`: this one might not be able to get a valid "last session" if it's getting removed
 def "main alternate" []: nothing -> nothing {
     if not ($TMUX_SESSION_FILE | path exists) {
+        log debug "no session to alternate with found"
         return
     }
 
     let previous_session = open $TMUX_SESSION_FILE | str trim
     if $previous_session in (list-sessions | get name) {
+        log debug $"alternating ($previous_session)"
         main switch-session $previous_session
     }
 }
@@ -89,6 +94,7 @@ def "main harpoon add" []: nothing -> nothing {
     let harpoon_file = $TMUX_HARPOON_FILE | path expand
     mkdir ($harpoon_file | path dirname)
     if not ($harpoon_file | path exists) {
+        log debug $"creating harpoon file at ($harpoon_file)"
         touch $harpoon_file
     }
 
@@ -97,6 +103,7 @@ def "main harpoon add" []: nothing -> nothing {
         (^tmux display-message -p '#{pane_current_path}' | str trim)
     ] | str join " "
 
+    log debug $"adding ($current_session) to ($harpoon_file)"
     open $harpoon_file | clean-lines | append $current_session | uniq | save --force $harpoon_file
 }
 
@@ -105,9 +112,11 @@ def "main harpoon edit" []: nothing -> nothing {
     let harpoon_file = $TMUX_HARPOON_FILE | path expand
     mkdir ($harpoon_file | path dirname)
     if not ($harpoon_file | path exists) {
+        log debug $"creating harpoon file at ($harpoon_file)"
         touch $harpoon_file
     }
 
+    log debug $"opening ($harpoon_file) with '($env.EDITOR? | default "")'"
     ^$env.EDITOR $harpoon_file
 }
 
@@ -119,6 +128,7 @@ def "main harpoon edit" []: nothing -> nothing {
 def "main harpoon entries" []: nothing -> nothing {
     let harpoon_file = $TMUX_HARPOON_FILE | path expand
     if not ($harpoon_file | path exists) {
+        log debug $"($harpoon_file) not found, aborting `harpoon entries`"
         return
     }
 
@@ -128,6 +138,7 @@ def "main harpoon entries" []: nothing -> nothing {
             error make --unspanned { msg: $"(ansi red_bold)no harpoon to jump to(ansi reset)" }
         },
         1 => {
+            log debug "harpoon entries: there is a single harpoon"
             let session = $harpoons.0 | parse $TMUX_HARPOON_SESSION_FORMAT | get 0
 
             let prompt = $"(ansi cyan)Do you want to jump to ($session.name)?(ansi reset)"
@@ -137,6 +148,7 @@ def "main harpoon entries" []: nothing -> nothing {
             }
         },
         _ => {
+            log debug "harpoon entries: there are multiple harpoons"
             let options = $harpoons
                 | parse $TMUX_HARPOON_SESSION_FORMAT
                 | insert pwd {|it| $it.path | spwd}
@@ -161,6 +173,7 @@ def "main harpoon jump" [
 ]: nothing -> nothing {
     let harpoon_file = $TMUX_HARPOON_FILE | path expand
     if not ($harpoon_file | path exists) {
+        log debug $"($harpoon_file) not found, aborting `harpoon entries`"
         return
     }
 
@@ -183,6 +196,7 @@ def "main harpoon jump" [
 # default: nothing -> table<name: string, windows: int, date: date, attached: bool>
 # --more: nothing -> table<name: string, windows: table<id: string, app: string, panes: string, active: bool>, date: date, attached: bool, pwd: string>
 def list-sessions [--more: bool]: [nothing -> table, nothing -> table] {
+    log debug "listing sessions"
     let sessions = ^tmux list-sessions
         | lines
         | parse "{name}: {windows} windows (created {date}){attached}"
@@ -194,6 +208,7 @@ def list-sessions [--more: bool]: [nothing -> table, nothing -> table] {
         return $sessions
     }
 
+    log debug "adding extra information to the session list"
     # FIXME: complex type annotation, waiting for https://github.com/nushell/nushell/pull/9769
     # let pwds: table<name: string, pwd: path> = ...
     let pwds = ^tmux list-sessions -F '#{session_name}:#{pane_current_path}'
@@ -399,7 +414,6 @@ def "main remove-sessions" [
     }
 
     $sessions | where name in $choices | sort-by attached | each {|session|
-        log debug $"killing session '($session.name)'"
         if $session.attached {
             let alive_sessions = $sessions | where name not-in $choices
             if ($alive_sessions | is-empty) {
@@ -408,6 +422,8 @@ def "main remove-sessions" [
                 switch-to-or-create-session { name: $alive_sessions.0.name, path: "" }
             }
         }
+
+        log debug $"killing session '($session.name)'"
         ^tmux kill-session -t $session.name
     }
 
