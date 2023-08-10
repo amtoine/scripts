@@ -135,15 +135,18 @@ def "main harpoon entries" []: nothing -> nothing {
             }
         },
         _ => {
-            let session = $harpoons
+            let options = $harpoons
                 | parse $TMUX_HARPOON_SESSION_FORMAT
-                | update path { spwd }
+                | insert pwd {|it| $it.path | spwd}
+
+            let session = $options
+                | select name pwd
                 | input list $"(ansi cyan)Choose a harpoon to jump to(ansi reset)"
             if ($session | is-empty) {
                 return
             }
 
-            switch-to-or-create-session $session
+            switch-to-or-create-session ($options | where name == $session.name | get 0)
         },
     }
 }
