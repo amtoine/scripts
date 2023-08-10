@@ -3,7 +3,7 @@ use std log
 
 const TMUX_SESSION_FILE = "/tmp/tmux-session"
 
-def save-tmux-session-name [] {
+def save-tmux-session-name []: nothing -> nothing {
     mkdir ($TMUX_SESSION_FILE | path dirname)
     ^tmux display-message -p '#{session_name}' | save --force $TMUX_SESSION_FILE
 }
@@ -15,7 +15,7 @@ def save-tmux-session-name [] {
 # - `new-session`
 # - `switch-session`
 # - `remove-sessions`: this one might not be able to get a valid "last session" if it's getting removed
-def "main alternate" [] {
+def "main alternate" []: nothing -> nothing {
     if not ($TMUX_SESSION_FILE | path exists) {
         return
     }
