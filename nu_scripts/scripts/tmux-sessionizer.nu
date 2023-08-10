@@ -268,21 +268,25 @@ def main [
         }
     }
 
-    let choice = $paths
+    let options = $paths | wrap path | insert key {|it| $it.path | path split | last 2 | path join}
+
+    let choice = $options
+        | get key
         | input list --fuzzy $"(ansi cyan)Choose a directory to open a session in(ansi reset)"
     if ($choice | is-empty) {
         return
     }
 
-    let name = $choice | path split | last 2 | path join | str replace --all --string "." "_"
+    let name = $choice | str replace --all --string "." "_"
+    let path = $options | where key == $choice | get 0.path
 
     if ($env.TMUX? | is-empty) and (pgrep tmux | is-empty) {
-        ^tmux new-session -s $name -c $choice
+        ^tmux new-session -s $name -c $path
         return
     }
 
     if $name not-in (list-sessions | get name) {
-        ^tmux new-session -ds $name -c $choice
+        ^tmux new-session -ds $name -c $path
     }
 
     ^tmux switch-client -t $name
