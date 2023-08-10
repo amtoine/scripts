@@ -245,6 +245,7 @@ def "main remove-sessions" [
 #     > tmux-sessionizer.nu (gm list --full-path)
 #
 # # Configuration
+# - recommended when using a fullscreen window
 # `tmux-sessionizer.nu` can be used in a Tmux config as follows:
 # ```shell
 # TMUX_SESSIONIZER="~/.local/bin/tmux-sessionizer.nu"
@@ -257,6 +258,17 @@ def "main remove-sessions" [
 # bind-key -r N new-window "$TMUX_SESSIONIZER new-session"
 # bind-key -r G new-window "$TMUX_SESSIONIZER switch-session --more-context"
 # bind-key -r R new-window "$TMUX_SESSIONIZER remove-sessions --more-context"
+# ```
+#
+# - recommended when using a smaller window or a popup
+# ```shell
+# bind-key -r H display-popup -E "$NUSHELL_WITH_ENV '\
+#     use nu-git-manager gm;\
+#     $TMUX_SESSIONIZER (gm list --full-path) --short\
+# '"
+# bind-key -r N run-shell "$TMUX_SESSIONIZER new-session"
+# bind-key -r G display-popup -E "$TMUX_SESSIONIZER switch-session"
+# bind-key -r R display-popup -E "$TMUX_SESSIONIZER remove-sessions"
 # ```
 def main [
     ...paths: path,  # the list of paths to fuzzy find and jump to in a new session
