@@ -37,6 +37,7 @@ def "main alternate" []: nothing -> nothing {
 }
 
 const TMUX_HARPOON_FILE = "~/.local/state/tmux/harpoon"
+const TMUX_HARPOON_SESSION_FORMAT = "{name} {path}"
 
 def clean-lines [] {
     str trim | lines --skip-empty
@@ -78,9 +79,11 @@ def "main harpoon entries" []: nothing -> nothing {
         0 => {
             error make --unspanned { msg: $"(ansi red_bold)no harpoon to jump to(ansi reset)" }
         },
-        1 => { switch-to-or-create-session ($harpoons.0 | parse "{name} {path}" | get 0) },
+        1 => {
+            switch-to-or-create-session ($harpoons.0 | parse $TMUX_HARPOON_SESSION_FORMAT | get 0)
+        },
         _ => {
-            let session = $harpoons | parse "{name} {path}" | input list "foo"
+            let session = $harpoons | parse $TMUX_HARPOON_SESSION_FORMAT | input list "foo"
             if ($session | is-empty) {
                 return
             }
@@ -108,7 +111,7 @@ def "main harpoon jump" [id: int]: nothing -> nothing {
         }
     }
 
-    switch-to-or-create-session ($harpoons | get $id | parse "{name} {path}" | get 0)
+    switch-to-or-create-session ($harpoons | get $id | parse $TMUX_HARPOON_SESSION_FORMAT | get 0)
 }
 
 # FIXME: complex type annotation, waiting for https://github.com/nushell/nushell/pull/9769
