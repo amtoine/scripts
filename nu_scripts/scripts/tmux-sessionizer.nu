@@ -3,13 +3,17 @@ use std log
 
 const TMUX_SESSION_FILE = "/tmp/tmux-session"
 
-def save-tmux-session-name []: nothing -> nothing {
+def save-tmux-session-name [--new-session: string]: nothing -> nothing {
     mkdir ($TMUX_SESSION_FILE | path dirname)
-    ^tmux display-message -p '#{session_name}' | save --force $TMUX_SESSION_FILE
+
+    let current_session = ^tmux display-message -p '#{session_name}' | str trim
+    if $current_session != $new_session {
+        $current_session | save --force $TMUX_SESSION_FILE
+    }
 }
 
 def switch-to-or-create-session [session: record<name: string, path: path>]: nothing -> nothing {
-    save-tmux-session-name
+    save-tmux-session-name --new-session $session.name
 
     if $session.name not-in (list-sessions | get name) {
         ^tmux new-session -ds $session.name -c $session.path
@@ -326,7 +330,7 @@ def "main switch-session" [
         $session
     }
 
-    save-tmux-session-name
+    save-tmux-session-name --new-session $session
     ^tmux switch-client -t $session
 }
 
@@ -386,7 +390,7 @@ def "main remove-sessions" [
             if ($alive_sessions | is-empty) {
                 main new-session
             } else {
-                save-tmux-session-name
+                save-tmux-session-name --new-session $alive_sessions.0.name
                 ^tmux switch-client -t $alive_sessions.0.name
             }
         }
