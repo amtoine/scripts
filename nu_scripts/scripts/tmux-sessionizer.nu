@@ -278,7 +278,18 @@ def pick-session-with-style [
         $choices
     }
 
-    $choices | ansi strip | split column " | " | get column1 | str trim --left --char '*' | str trim
+    let result = $choices
+        | ansi strip
+        | split column " | "
+        | get column1
+        | str trim --left --char '*'
+        | str trim
+
+    if $multi {
+        $result
+    } else {
+        $result | get 0
+    }
 }
 
 # switch to another opened Tmux session
