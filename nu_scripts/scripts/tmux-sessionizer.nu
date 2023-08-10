@@ -288,7 +288,7 @@ def main [
 
         let choice = $options
             | get key
-            | input list --fuzzy $"(ansi cyan)Choose a directory to open a session in(ansi reset)"
+            | input list --fuzzy $"(ansi cyan)Choose a project to open a session in(ansi reset)"
 
         if ($choice | is-empty) {
             return
