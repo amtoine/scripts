@@ -26,6 +26,106 @@ def "main alternate" []: nothing -> nothing {
     }
 }
 
+const TMUX_HARPOON_FILE = "~/.local/state/tmux/harpoon"
+
+def "main harpoon add" []: nothing -> nothing {
+    let harpoon_file = $TMUX_HARPOON_FILE | path expand
+    mkdir ($harpoon_file | path dirname)
+    if not ($harpoon_file | path exists) {
+        touch $harpoon_file
+    }
+
+    let current_session = [
+        (^tmux display-message -p '#{session_name}' | str trim)
+        (^tmux display-message -p '#{pane_current_path}' | str trim)
+    ] | str join " "
+
+    open $harpoon_file
+        | str trim
+        | lines --skip-empty
+        | append $current_session
+        | uniq
+        | save --force $harpoon_file
+}
+
+def "main harpoon edit" []: nothing -> nothing {
+    let harpoon_file = $TMUX_HARPOON_FILE | path expand
+    mkdir ($harpoon_file | path dirname)
+    if not ($harpoon_file | path exists) {
+        touch $harpoon_file
+    }
+
+    ^$env.EDITOR $harpoon_file
+}
+
+def "main harpoon entries" []: nothing -> nothing {
+    let harpoon_file = $TMUX_HARPOON_FILE | path expand
+    if not ($harpoon_file | path exists) {
+        return
+    }
+
+    let harpoons = open $harpoon_file | str trim | lines --skip-empty
+    match ($harpoons | length) {
+        0 => {
+            error make --unspanned { msg: $"(ansi red_bold)no harpoon to jump to(ansi reset)" }
+        },
+        1 => {
+            let session = $harpoons.0 | parse "{name} {path}" | get 0
+
+            save-tmux-session-name
+
+            if $session.name not-in (list-sessions | get name) {
+                ^tmux new-session -ds $session.name -c $session.path
+            }
+
+            ^tmux switch-client -t $session.name
+        },
+        _ => {
+            let session = $harpoons | parse "{name} {path}" | input list "foo"
+            if ($session | is-empty) {
+                return
+            }
+
+            save-tmux-session-name
+
+            if $session.name not-in (list-sessions | get name) {
+                ^tmux new-session -ds $session.name -c $session.path
+            }
+
+            ^tmux switch-client -t $session.name
+        },
+    }
+}
+
+def "main harpoon jump" [id: int]: nothing -> nothing {
+    let harpoon_file = $TMUX_HARPOON_FILE | path expand
+    if not ($harpoon_file | path exists) {
+        return
+    }
+
+    let harpoons = open $harpoon_file | str trim | lines --skip-empty
+    if $id < 0 {
+        error make --unspanned {
+            msg: $"(ansi red_bold)invalid_argument(ansi reset): $id is negative"
+        }
+    } else if $id > ($harpoons | length) {
+        error make --unspanned {
+            msg: $"(ansi red_bold)invalid_argument(ansi reset): $id is bigger than the number of harpoons
+            expected $id to be between 0 and (($harpoons | length) - 1), found ($id)"
+        }
+    }
+
+    let session = $harpoons | get $id | parse "{name} {path}" | get 0
+
+    save-tmux-session-name
+
+    if $session.name not-in (list-sessions | get name) {
+        ^tmux new-session -ds $session.name -c $session.path
+    }
+
+    ^tmux switch-client -t $session.name
+}
+
 # FIXME: complex type annotation, waiting for https://github.com/nushell/nushell/pull/9769
 # default: nothing -> table<name: string, windows: int, date: date, attached: bool>
 # --more: nothing -> table<name: string, windows: table<id: string, app: string, panes: string, active: bool>, date: date, attached: bool, pwd: string>
