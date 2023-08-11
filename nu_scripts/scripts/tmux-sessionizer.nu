@@ -3,6 +3,8 @@ use std log
 
 const TMUX_SESSION_FILE = "/tmp/tmux-session"
 
+$env.LOG_FORMAT = "%ANSI_START%%DATE%|%LEVEL%|%MSG%%ANSI_STOP%"
+
 def save-tmux-session-name [--new-session: string]: nothing -> nothing {
     mkdir ($TMUX_SESSION_FILE | path dirname)
 
