@@ -92,6 +92,7 @@ def "main harpoon" []: nothing -> nothing {
 # two identical sessions won't be duplicated by `harpoon add`
 def "main harpoon add" []: nothing -> nothing {
     let harpoon_file = $TMUX_HARPOON_FILE | path expand
+
     mkdir ($harpoon_file | path dirname)
     if not ($harpoon_file | path exists) {
         log debug $"creating harpoon file at ($harpoon_file)"
@@ -110,6 +111,7 @@ def "main harpoon add" []: nothing -> nothing {
 # edit the list of sessions with `$env.EDITOR`
 def "main harpoon edit" []: nothing -> nothing {
     let harpoon_file = $TMUX_HARPOON_FILE | path expand
+
     mkdir ($harpoon_file | path dirname)
     if not ($harpoon_file | path exists) {
         log debug $"creating harpoon file at ($harpoon_file)"
@@ -133,6 +135,7 @@ def "main harpoon entries" []: nothing -> nothing {
     }
 
     let harpoons = open $harpoon_file | clean-lines
+
     match ($harpoons | length) {
         0 => {
             error make --unspanned { msg: $"(ansi red_bold)no harpoon to jump to(ansi reset)" }
@@ -156,6 +159,7 @@ def "main harpoon entries" []: nothing -> nothing {
             let session = $options
                 | select name pwd
                 | input list $"(ansi cyan)Choose a harpoon to jump to(ansi reset)"
+
             if ($session | is-empty) {
                 return
             }
@@ -178,6 +182,7 @@ def "main harpoon jump" [
     }
 
     let harpoons = open $harpoon_file | clean-lines
+
     if $id < 0 {
         error make --unspanned {
             msg: $"(ansi red_bold)invalid_argument(ansi reset): $id is negative"
@@ -343,6 +348,7 @@ def "main switch-session" [
         let prompt = $"(ansi cyan)Choose a session to switch to(ansi reset)"
         let choice = $sessions
             | pick-session-with-style --more $more_context $prompt $current_session "yellow"
+
         if ($choice | is-empty) {
             return
         }
