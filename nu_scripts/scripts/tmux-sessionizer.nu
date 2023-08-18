@@ -28,7 +28,7 @@ def switch-to-or-create-session [session: record<name: string, path: path>]: not
 }
 
 def spwd []: path -> path {
-    str replace $nu.home-path '~' | path split | reverse | enumerate | each {|it|
+    str replace --regex $nu.home-path '~' | path split | reverse | enumerate | each {|it|
         if $it.index >= 2 {
             if ($it.item | str starts-with '.') {
                 $it.item | str substring ..2
@@ -493,7 +493,7 @@ def main [
         }
 
         {
-            name: ($choice | str replace --all --string "." "_")
+            name: ($choice | str replace --all "." "_")
             path: ($options | where key == $choice | get 0.path)
         }
     } else {
@@ -505,7 +505,7 @@ def main [
         }
 
         {
-            name: ($choice | path split | last 2 | path join | str replace --all --string "." "_")
+            name: ($choice | path split | last 2 | path join | str replace --all "." "_")
             path: $choice
         }
     }

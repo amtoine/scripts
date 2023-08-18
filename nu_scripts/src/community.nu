@@ -71,7 +71,7 @@ export def-env br [args = "."] {
     ^broot --outcmd $cmd_file $args;
     let cmd = ((open $cmd_file) | str trim);
     ^rm --trash $cmd_file;
-    cd ($cmd | str replace "cd" "" | str trim)
+    cd ($cmd | str replace --regex "cd" "" | str trim)
 }
 
 
@@ -82,7 +82,7 @@ def mvr [
   path: string
   moveto: string
 ] {
-  mv $path ($moveto | str replace % ($path | path dirname))
+  mv $path ($moveto | str replace --regex % ($path | path dirname))
 }
 
 

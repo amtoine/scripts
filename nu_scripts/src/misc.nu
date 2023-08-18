@@ -53,15 +53,15 @@ export def pass-menu [
         ls $path |
             select name |
             rename theme |
-            str replace $"^($path)" "" theme |
-            str replace ".rasi$" "" theme
+            str replace --regex $"^($path)" "" theme |
+            str replace --regex ".rasi$" "" theme
     } else {
         let entry = (
             ls $"($env.PASSWORD_STORE_DIR)/**/*" |
             where type == file |
             select name |
-            str replace $"^($env.PASSWORD_STORE_DIR)/" "" name |
-            str replace ".gpg$" "" name |
+            str replace --regex $"^($env.PASSWORD_STORE_DIR)/" "" name |
+            str replace --regex ".gpg$" "" name |
             to csv |
             rofi -config $"($path)($theme).rasi" -show -dmenu |
             str trim
@@ -308,8 +308,8 @@ export def "youtube share" [
     use std clip
     let video = (
         http get $url
-        | str replace --all "<" "\n<"  # separate all HTML blocks into `<...> ...` chunks without the closing `</...>`
-        | str replace --all "</.*>" ""
+        | str replace --regex --all "<" "\n<"  # separate all HTML blocks into `<...> ...` chunks without the closing `</...>`
+        | str replace --regex --all "</.*>" ""
         | lines
         | find "var ytInitialPlayerResponse = "  # all the data is located in this JSON structure...
         | parse --regex 'var ytInitialPlayerResponse = (?<data>.*);'
@@ -324,7 +324,7 @@ export def "youtube share" [
             $it.url
             | url parse
             | reject query params
-            | update path {|it| $it.path | str replace "/embed/" ""}
+            | update path {|it| $it.path | str replace --regex "/embed/" ""}
             | update host youtu.be
             | url join
         }
@@ -369,13 +369,13 @@ export def "list todos" [] {
 export def "cargo list" [] {
     ^cargo install --list
     | lines
-    | str replace '^(\w)' "\n${1}"
+    | str replace --regex '^(\w)' "\n${1}"
     | str join
     | lines | skip 1
     | parse --regex '(?<pkg>.*) v(?<version>\d+\.\d+\.\d+)(?<path>.*):(?<bins>.*)'
     | str trim
-    | update bins {|it| $it.bins | str replace '\s+' ' ' | split row ' '}
-    | update path {|it| $it.path | str replace --string '(' '' | str replace --string ')' ''}
+    | update bins {|it| $it.bins | str replace --regex '\s+' ' ' | split row ' '}
+    | update path {|it| $it.path | str replace --string '(' '' | str replace --regex ')' ''}
 }
 
 
@@ -771,7 +771,7 @@ def "scan lan" [
 # record<variables: record, profiles: table>
 export def "ssh profiles" [--config: path = "~/.ssh/config"]: nothing -> record {
     let groups = open --raw $config
-        | str replace --all 'Host ' "\nHost "
+        | str replace --regex --all 'Host ' "\nHost "
         | lines
         | split list ""
 

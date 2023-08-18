@@ -17,7 +17,7 @@ export def find [
                 grep -w $regex -H $it
               }
             | lines
-            | str replace ":" ":GOATFILES-CFGF:"
+            | str replace --regex ":" ":GOATFILES-CFGF:"
             | split column ":GOATFILES-CFGF:"
             | rename file match
     )
@@ -38,7 +38,7 @@ def pick_worktree [
     prompt: string
 ] {
     git --git-dir $bare --work-tree $env.DOTFILES_WORKTREE worktree list |
-    str replace --all $"($env.DOTFILES_WORKTREE)" "~~" |
+    str replace --regex --all $"($env.DOTFILES_WORKTREE)" "~~" |
     prompt fzf_ask $prompt
 }
 
@@ -72,7 +72,7 @@ export def-env "worktree goto" [
         lines |
         split column "  " |
         get column1 |
-        str replace --all "~~" $"($env.DOTFILES_WORKTREE)" |
+        str replace --regex --all "~~" $"($env.DOTFILES_WORKTREE)" |
         to text
     )
     cd $path
@@ -96,11 +96,11 @@ export def "worktree add" [
 
     let branch = (
         $branches |
-        str replace "  " "" |
+        str replace --regex "  " "" |
         sort --ignore-case |
         to text |
-        str replace --all "\\* (.*)" $"(ansi red)\$1(ansi reset)" |
-        str replace --all "\\+ (.*)" $"(ansi yellow)\$1(ansi reset)" |
+        str replace --regex --all "\\* (.*)" $"(ansi red)\$1(ansi reset)" |
+        str replace --regex --all "\\+ (.*)" $"(ansi yellow)\$1(ansi reset)" |
         prompt fzf_ask "Please choose a branch to create a worktree from: "
     )
 
@@ -121,7 +121,7 @@ export def "worktree remove" [
         $worktree |
         parse "{path} {rest}" |
         get path |
-        str replace "~~" $"($env.DOTFILES_WORKTREE)" |
+        str replace --regex "~~" $"($env.DOTFILES_WORKTREE)" |
         to text
     )
     GIT worktree remove $path

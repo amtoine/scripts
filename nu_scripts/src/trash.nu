@@ -20,7 +20,7 @@ export def preview [name: string] {
     open $path
   } else {
     ls $"($path)/**/*"
-    | str replace $"($env.XDG_DATA_HOME | path join Trash files)/" "" name
+    | str replace --regex $"($env.XDG_DATA_HOME | path join Trash files)/" "" name
     | reject modified
   }
 }

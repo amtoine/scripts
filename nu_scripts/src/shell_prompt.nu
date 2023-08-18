@@ -14,7 +14,7 @@ def spwd [sep?: string] {
 
     let tokens = (
         ["!" $env.PWD] | str join
-        | str replace (["!" $nu.home-path] | str join) "~"
+        | str replace --regex (["!" $nu.home-path] | str join) "~"
         | split row $sep
     )
 
@@ -144,7 +144,7 @@ def create_left_prompt_eldyj [] {
         let git_branch = {
             bg: $git.bg,
             fg: $git.fg,
-            text: (git branch --show-current | str replace --all "\n" "")
+            text: (git branch --show-current | str replace --regex --all "\n" "")
         }
         $common | append $git_branch
     } else {

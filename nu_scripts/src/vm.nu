@@ -22,7 +22,7 @@ def list_release_for_os [os: string] {
     lines |
     find "- Releases" |
     str trim |
-    str replace " *- Releases: " "" |
+    str replace --regex " *- Releases: " "" |
     split column " " |
     transpose |
     get column1 |

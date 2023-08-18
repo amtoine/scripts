@@ -1,7 +1,7 @@
 export def export [] {
     open $nu.plugin-path
     | lines
-    | str replace '^register (.*) \s+{' `{"binary": '$1',`
+    | str replace --regex '^register (.*) \s+{' `{"binary": '$1',`
     | split list ""
     | each {|| to text | from json | update binary {|| get binary | path parse | get stem } }
 }
@@ -19,7 +19,7 @@ export def import [] {
             | path join '.cargo')
             | path join 'bin' $binary
         )
-        $plugin | reject binary | to json | str replace '^{' $"\nregister ($binary_path) {"
+        $plugin | reject binary | to json | str replace --regex '^{' $"\nregister ($binary_path) {"
     }
     | str join "\n"
     | save --force $nu.plugin-path

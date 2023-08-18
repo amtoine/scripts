@@ -7,7 +7,7 @@ def _list_venvs [] {
   ls $env.VIRTUALENVWRAPPER_HOOK_DIR |
     where type == dir |
     get name |
-    str replace ([$env.VIRTUALENVWRAPPER_HOOK_DIR ""] | path join) ""
+    str replace --regex ([$env.VIRTUALENVWRAPPER_HOOK_DIR ""] | path join) ""
 }
 
 

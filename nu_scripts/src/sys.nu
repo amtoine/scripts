@@ -1,7 +1,7 @@
 # TODO: documentation
 export def disk [] {
   df -h |
-  str replace "Mounted on" "Mountpoint" |
+  str replace --regex "Mounted on" "Mountpoint" |
   detect columns |
   rename filesystem size used avail used% mountpoint |
   into filesize size used avail |
@@ -12,7 +12,7 @@ export def disk [] {
 # TODO: documentation
 export def devices [] {
   lsblk -lp |
-  str replace --all ":" " " |
+  str replace --regex --all ":" " " |
   detect columns |
   rename name major minor RM size RO type mountpoints |
   into filesize size

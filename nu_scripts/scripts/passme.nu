@@ -48,8 +48,8 @@ extern-wrapped main [
         | path parse
         | update extension ""
         | path join
-        | str replace $password_store ""
-        | str replace '^/' ""
+        | str replace --regex $password_store ""
+        | str replace --regex '^/' ""
         | to text
         | ^$dmenu $dmenu_args
         | str trim
