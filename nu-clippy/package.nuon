@@ -4,4 +4,6 @@
     version: 0.1.0
     documentation: "https://github.com/goatfiles/scripts/blob/main/nu-clippy/README.md"
     license: "https://github.com/goatfiles/scripts/blob/main/LICENSE"
+    type: "script"
+    scripts: ["clippy.nu"]
 }

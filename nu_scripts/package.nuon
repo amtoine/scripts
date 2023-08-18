@@ -8,4 +8,18 @@
         @atxr
     ]
     license: "https://github.com/goatfiles/scripts/blob/main/LICENSE"
+    type: "module"
+    scripts: [
+        "scripts/gh-notifications.nu"
+        "scripts/happy-day.nu"
+        "scripts/kill-systemd-service.nu"
+        "scripts/nupm-update.nu"
+        "scripts/nushell-news.nu"
+        "scripts/passme.nu"
+        "scripts/plot-startup-times.nu"
+        "scripts/tmux-sessionizer.nu"
+        "scripts/xrandr-brightness.nu"
+        "scripts/xrandr-tui.nu"
+        "scripts/xrandr.nu"
+    ]
 }
