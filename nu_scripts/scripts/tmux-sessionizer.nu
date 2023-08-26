@@ -425,6 +425,10 @@ def "main remove-sessions" [
             if ($alive_sessions | is-empty) {
                 main new-session
             } else {
+                (tmux display-message
+                    -d 5000
+                    $"($current_session) has been removed, falling back to ($alive_sessions.0.name)"
+                )
                 switch-to-or-create-session { name: $alive_sessions.0.name, path: "" }
             }
         }
