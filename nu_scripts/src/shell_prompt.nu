@@ -31,6 +31,80 @@ def spwd [sep?: string] {
     | path join
 }
 
+# give the revision of the repo given as input
+#
+# the input repo defaults to the current working directory
+#
+# in the output, $.type is guaranteed to be one of
+# - "branch"
+# - "tag"
+# - "detached"
+#
+# # Examples
+#     get the revision in another repo
+#     > "/some/other/path/" | get-revision
+#
+#     when on a branch
+#     > get-revision, would show the same even if the current branch commit is tagged
+#     ╭──────┬────────╮
+#     │ name │ main   │
+#     │ type │ branch │
+#     ╰──────┴────────╯
+#
+#     when on a tag
+#     > get-revision
+#     ╭──────┬───────╮
+#     │ name │ 0.1.0 │
+#     │ type │ tag   │
+#     ╰──────┴───────╯
+#
+#     when the HEAD is detached
+#     > get-revision
+#     ╭──────┬──────────────────────────────────────────╮
+#     │ name │ fa3c06510b3250f4a901db2e9a026a45c971b518 │
+#     │ type │ detached                                 │
+#     ╰──────┴──────────────────────────────────────────╯
+#
+#     when the HEAD is detached (short-version)
+#     > get-revision --short-hash
+#     ╭──────┬──────────╮
+#     │ name │ fa3c0651 │
+#     │ type │ detached │
+#     ╰──────┴──────────╯
+#
+# true return type: record<name: string, type: string>
+def get-revision [
+    --short-hash: bool  # print the hash of a detached HEAD in short format
+]: path -> record {
+    let repo = $in | default $env.PWD
+
+    let tag = do -i {
+        git -C $repo describe HEAD --tags
+    } | complete
+    let is_tag = $tag.exit_code == 0 and (
+        $tag.stdout
+            | str trim
+            | parse --regex '(?<tag>.*)-(?<n>\d+)-(?<hash>[0-9a-fg]+)'
+            | is-empty
+    )
+
+    let branch = git -C $repo branch --show-current | str trim
+
+    if not ($branch | is-empty) {
+        {name: $branch, type: "branch"}
+    } else if $is_tag {
+        {name: ($tag.stdout | str trim), type: "tag"}
+    } else {
+        let hash = if $short_hash {
+            git -C $repo rev-parse --short HEAD | str trim
+        } else {
+            git -C $repo rev-parse HEAD | str trim
+        }
+
+        {name: $hash, type: "detached"}
+    }
+}
+
 def "nu-complete pwd modes" [] {
     [
         [value, description];
