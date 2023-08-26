@@ -147,7 +147,14 @@ export def-env setup [
             do --ignore-errors { git rev-parse --is-inside-work-tree } | is-empty
         )
         let branch_segment = if $is_git_repo {
-            $"\((ansi yellow_bold)(git branch --show-current | str trim)(ansi reset)\)"
+            let revision = get-revision --short-hash
+            let color = match $revision.type {
+                "branch" => "yellow_bold",
+                "tag" => "blue_bold",
+                "detached" => "default_dimmed",
+            }
+
+            $"\((ansi $color)($revision.name)(ansi reset)\)"
         } else {
             null
         }
