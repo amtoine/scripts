@@ -368,14 +368,14 @@ export def "list todos" [] {
 # TODO: docstring
 export def "cargo list" [] {
     ^cargo install --list
-    | lines
-    | str replace --regex '^(\w)' "\n${1}"
-    | str join
-    | lines | skip 1
-    | parse --regex '(?<pkg>.*) v(?<version>\d+\.\d+\.\d+)(?<path>.*):(?<bins>.*)'
-    | str trim
-    | update bins {|it| $it.bins | str replace --regex '\s+' ' ' | split row ' '}
-    | update path {|it| $it.path | str replace --string '(' '' | str replace --regex ')' ''}
+        | lines
+        | str replace --regex '^(\w)' "\n${1}"
+        | str join
+        | lines | skip 1
+        | parse --regex '(?<pkg>.*) v(?<version>\d+\.\d+\.\d+)(?<path>.*):(?<bins>.*)'
+        | str trim
+        | update bins {|it| $it.bins | str replace --regex '\s+' ' ' | split row ' '}
+        | update path {|it| $it.path | str replace '(' '' | str replace --regex '\)' ''}
 }
 
 
