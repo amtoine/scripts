@@ -1,40 +1,24 @@
-# credit to @Eldyj
-# https://discord.com/channels/601130461678272522/615253963645911060/1036225475288252446
-# revised by @eldyj in
-# https://discord.com/channels/601130461678272522/615253963645911060/1037327061481701468
-# revised by @fdncred in
-# https://discord.com/channels/601130461678272522/615253963645911060/1037354164147200050
-#
-# i've fixed a bug when outside `$env.HOME` and refactored the source to use `str`
-# subcommands
-def spwd [sep?: string] {
-    let sep = (if ($sep | is-empty) {
-        char path_sep
-    } else { $sep })
-
-    let tokens = (
-        ["!" $env.PWD] | str join
-        | str replace --regex (["!" $nu.home-path] | str join) "~"
-        | split row $sep
-    )
-
-    $tokens
-    | enumerate
-    | each {|it|
-        $it.item
-        | if ($it.index != (($tokens | length) - 1)) {
-            str substring (
-                if ($it.item | str starts-with '.') { 0..2 } else { 0..1 }
-            )
-        } else { $it.item }
-    }
-    | path join
-    | str trim
-    | str replace --regex '^/' "!/"
-}
-
 def simplify-path []: path -> string {
     str replace $nu.home-path "~" | str replace --regex '^/' "!/"
+}
+
+def spwd [] {
+    $env.PWD
+        | simplify-path
+        | path split
+        | reverse
+        | enumerate
+        | each {|it|
+            if $it.index != 0 {
+                $it.item | str substring (
+                    if ($it.item | str starts-with '.') { 0..2 } else { 0..1 }
+                )
+            } else {
+                $it.item
+            }
+        }
+        | reverse
+        | path join
 }
 
 def color [color: string]: string -> string {
