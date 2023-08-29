@@ -117,7 +117,10 @@ def "nu-complete pwd modes" [] {
 }
 
 export def-env setup [
-    --indicators = {}
+    --indicators = {
+        plain: "> ",
+        vi: {insert: ": ", normal: "> "}
+    }
     --pwd-mode: string@"nu-complete pwd modes" = "full"  # one of spwd, basename or full
 ] {
     let pwd = match $pwd_mode {
