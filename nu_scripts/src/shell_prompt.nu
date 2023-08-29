@@ -110,6 +110,7 @@ def "nu-complete pwd modes" [] {
         [value, description];
 
         ["full", "e.g. ~/path/to/some/directory"]
+        ["git", "e.g. ~/path/to/some/directory in a normal directory and directory in a Git repo"],
         ["spwd", "e.g. ~/p/t/s/directory"],
         ["basename", "e.g. directory"],
     ]
@@ -121,6 +122,17 @@ export def-env setup [
 ] {
     let pwd = match $pwd_mode {
         "spwd" => {{ spwd | str trim }},
+        "git" => {{
+            let is_git_repo = not (
+                do --ignore-errors { git rev-parse --is-inside-work-tree } | is-empty
+            )
+
+            if $is_git_repo {
+                $env.PWD | str replace $nu.home-path "~" | path basename
+            } else {
+                $env.PWD | str replace $nu.home-path "~"
+            }
+        }},
         "basename" => {{ $env.PWD | str replace $nu.home-path "~" | path basename }},
         "full" => {{ $env.PWD | str replace $nu.home-path "~" }},
         _ => {
