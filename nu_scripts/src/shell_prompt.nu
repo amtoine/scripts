@@ -29,6 +29,16 @@ def spwd [sep?: string] {
         } else { $it.item }
     }
     | path join
+    | str trim
+    | str replace --regex '^/' "!/"
+}
+
+def simplify-path []: path -> string {
+    str replace $nu.home-path "~" | str replace --regex '^/' "!/"
+}
+
+def color [color: string]: string -> string {
+    $"(ansi $color)($in)(ansi reset)"
 }
 
 # give the revision of the repo given as input
@@ -124,20 +134,22 @@ export def-env setup [
     --pwd-mode: string@"nu-complete pwd modes" = "full"  # one of spwd, basename or full
 ] {
     let pwd = match $pwd_mode {
-        "spwd" => {{ spwd | str trim }},
+        "spwd" => {{ spwd | color "green" }},
         "git" => {{
             let is_git_repo = not (
                 do --ignore-errors { git rev-parse --is-inside-work-tree } | is-empty
             )
 
+            let pwd = $env.PWD | simplify-path
+
             if $is_git_repo {
-                $env.PWD | str replace $nu.home-path "~" | path basename
+                $pwd | path basename | color "magenta_bold"
             } else {
-                $env.PWD | str replace $nu.home-path "~"
+                $pwd | color "green"
             }
         }},
-        "basename" => {{ $env.PWD | str replace $nu.home-path "~" | path basename }},
-        "full" => {{ $env.PWD | str replace $nu.home-path "~" }},
+        "basename" => {{ $env.PWD | simplify-path | path basename | color "green" }},
+        "full" => {{ $env.PWD | simplify-path | color "green" }},
         _ => {
             let span = (metadata $pwd_mode | get span)
             error make {
@@ -152,10 +164,10 @@ export def-env setup [
     }
 
     $env.PROMPT_COMMAND = {
-        let path_segment = if (is-admin) {
-            $"(ansi red_bold)(do $pwd)(ansi reset)"
+        let admin_segment = if (is-admin) {
+            "!!" | color "red_bold"
         } else {
-            $"(ansi green_bold)(do $pwd)(ansi reset)"
+            null
         }
 
         let is_git_repo = not (
@@ -169,18 +181,18 @@ export def-env setup [
                 "detached" => "default_dimmed",
             }
 
-            $"\((ansi $color)($revision.name)(ansi reset)\)"
+            $"\(($revision.name | color $color)\)"
         } else {
             null
         }
 
         let command_failed_segment = if $env.LAST_EXIT_CODE != 0 {
-            $"(ansi red_bold)($env.LAST_EXIT_CODE)(ansi reset)"
+            $env.LAST_EXIT_CODE | color "red_bold"
         } else {
             null
         }
 
-        [$path_segment $branch_segment $command_failed_segment] | compact | str join " "
+        [$admin_segment (do $pwd) $branch_segment $command_failed_segment] | compact | str join " "
     }
     $env.PROMPT_COMMAND_RIGHT = ""
 
