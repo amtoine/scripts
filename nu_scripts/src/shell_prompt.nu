@@ -159,7 +159,13 @@ export def-env setup [
             null
         }
 
-        [$path_segment $branch_segment] | compact | str join " "
+        let command_failed_segment = if $env.LAST_EXIT_CODE != 0 {
+            $"(ansi red_bold)($env.LAST_EXIT_CODE)(ansi reset)"
+        } else {
+            null
+        }
+
+        [$path_segment $branch_segment $command_failed_segment] | compact | str join " "
     }
     $env.PROMPT_COMMAND_RIGHT = ""
 
