@@ -116,6 +116,7 @@ export def-env setup [
         vi: {insert: ": ", normal: "> "}
     }
     --pwd-mode: string@"nu-complete pwd modes" = "full"  # one of spwd, basename or full
+    --duration-threshold: duration = 1sec  # the threshold above which the command duration is shown
 ] {
     let pwd = match $pwd_mode {
         "spwd" => {{ spwd | color "green" }},
@@ -176,7 +177,16 @@ export def-env setup [
             null
         }
 
-        [$admin_segment (do $pwd) $branch_segment $command_failed_segment] | compact | str join " "
+        let cmd_duration = $"($env.CMD_DURATION_MS)ms" | into duration
+        let duration_segment = if $cmd_duration > $duration_threshold {
+            $cmd_duration | color "light_yellow"
+        } else {
+            null
+        }
+
+        [$admin_segment (do $pwd) $branch_segment $duration_segment $command_failed_segment]
+            | compact
+            | str join " "
     }
     $env.PROMPT_COMMAND_RIGHT = ""
 
