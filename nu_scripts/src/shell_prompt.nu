@@ -184,7 +184,16 @@ export def-env setup [
             null
         }
 
-        [$admin_segment (do $pwd) $branch_segment $duration_segment $command_failed_segment]
+        let login_segment = if $nu.is-login { "l" | color "cyan" } else { "" }
+
+        [
+            $admin_segment
+            (do $pwd)
+            $branch_segment
+            $duration_segment
+            $command_failed_segment
+            $login_segment
+        ]
             | compact
             | str join " "
     }
