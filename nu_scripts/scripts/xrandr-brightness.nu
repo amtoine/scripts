@@ -7,7 +7,7 @@ const DUNST_ID = 5
 # set the brightness of XRANDR monitors
 def main [
     output: string  # the monitor to change the brightness of
-    step: decimal  # the  brightness step
+    step: float  # the  brightness step
     --invert (-v): bool  # trigger this option to turn the step into a negative value
     --notify: bool  # give a notification
 ]: nothing -> nothing {
@@ -50,7 +50,7 @@ def main [
         }
     }
 
-    let brightness = $monitor.Brightness | into decimal
+    let brightness = $monitor.Brightness | into float
 
     let brightness = if $invert {
         $brightness - $step
