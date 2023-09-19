@@ -16,7 +16,7 @@ def user-confirmation [cmd: closure, prompt: string]: nothing -> bool {
 
 # a menu to quit the system interactively
 def main [
-    --lock: closure  # the application to lock the screen
+    --lock: string # the application to lock the screen
     --launcher: string  # the app launcher to use as a menu
     --no-confirm (-y): bool  # do not ask for confirmation
 ] {
@@ -53,7 +53,7 @@ def main [
                 return
             }
 
-            do $lock
+            nu --commands $lock
         },
         "Logout" => {
             if (not $no_confirm) and (not (user-confirmation $cmd $confirmation_prompt)) {
