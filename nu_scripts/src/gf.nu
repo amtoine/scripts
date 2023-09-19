@@ -40,9 +40,9 @@ def log_debug [message: string] {
 def ungraph [
   commitish: string = "HEAD"
 ] {
-  str replace --regex -as "|" "" |
-  str replace --regex -as '\' "" |
-  str replace --regex -as "/" "" |
+  str replace --regex -a "|" "" |
+  str replace --regex -a '\' "" |
+  str replace --regex -a "/" "" |
   str replace --regex "^\\s*\\*\\s*" "* "
 }
 
@@ -138,7 +138,7 @@ export def checkout [
 
   let branch = (
     $choice |
-    str replace --regex -as "*" "" |
+    str replace --regex -a "*" "" |
     str replace --regex "^\\s*" "" |
     str replace --regex " .*" ""
   )
