@@ -21,7 +21,7 @@ def spwd [] {
         | path join
 }
 
-def color [color: string]: string -> string {
+def color [color]: string -> string {
     $"(ansi $color)($in)(ansi reset)"
 }
 
@@ -163,13 +163,19 @@ export def-env setup [
         )
         let branch_segment = if $is_git_repo {
             let revision = get-revision --short-hash
-            let color = match $revision.type {
-                "branch" => "yellow_bold",
-                "tag" => "blue_bold",
-                "detached" => "default_dimmed",
+            let pretty_branch_tokens = match $revision.type {
+                "branch" => [
+                    ($revision.name | color {fg: "yellow", attr: "ub"}),
+                    ($revision.hash | color "yellow_dimmed")
+                ],
+                "tag" => [
+                    ($revision.name | color {fg: "blue", attr: "ub"}),
+                    ($revision.hash | color "blue_dimmed")
+                ],
+                "detached" => ["_", ($revision.hash | color "default_dimmed")]
             }
 
-            $"\(($revision.name | color $color)\)"
+            $"\(($pretty_branch_tokens | str join ":")\)"
         } else {
             null
         }
