@@ -40,33 +40,37 @@ def color [color: string]: string -> string {
 #
 #     when on a branch
 #     > get-revision, would show the same even if the current branch commit is tagged
-#     ╭──────┬────────╮
-#     │ name │ main   │
-#     │ type │ branch │
-#     ╰──────┴────────╯
+#     ╭──────┬──────────────────────────────────────────╮
+#     │ name │ main                                     │
+#     │ hash │ fa3c06510b3250f4a901db2e9a026a45c971b518 │
+#     │ type │ branch                                   │
+#     ╰──────┴──────────────────────────────────────────╯
 #
 #     when on a tag
 #     > get-revision
-#     ╭──────┬───────╮
-#     │ name │ 0.1.0 │
-#     │ type │ tag   │
-#     ╰──────┴───────╯
+#     ╭──────┬──────────────────────────────────────────╮
+#     │ name │ 1.2.3                                    │
+#     │ hash │ fa3c06510b3250f4a901db2e9a026a45c971b518 │
+#     │ type │ tag                                      │
+#     ╰──────┴──────────────────────────────────────────╯
 #
 #     when the HEAD is detached
 #     > get-revision
 #     ╭──────┬──────────────────────────────────────────╮
-#     │ name │ fa3c06510b3250f4a901db2e9a026a45c971b518 │
+#     │ name │                                          │
+#     │ hash │ fa3c06510b3250f4a901db2e9a026a45c971b518 │
 #     │ type │ detached                                 │
 #     ╰──────┴──────────────────────────────────────────╯
 #
 #     when the HEAD is detached (short-version)
 #     > get-revision --short-hash
 #     ╭──────┬──────────╮
-#     │ name │ fa3c0651 │
+#     │ name │          │
+#     │ hash │ fa3c0651 │
 #     │ type │ detached │
 #     ╰──────┴──────────╯
 #
-# true return type: record<name: string, type: string>
+# true return type: record<name: string, hash: string, type: string>
 def get-revision [
     --short-hash: bool  # print the hash of a detached HEAD in short format
 ]: path -> record {
@@ -82,20 +86,19 @@ def get-revision [
             | is-empty
     )
 
-    let branch = git -C $repo branch --show-current | str trim
+    let branch = git -C $repo branch --show-current
+    let hash = if $short_hash {
+        git -C $repo rev-parse --short HEAD | str trim
+    } else {
+        git -C $repo rev-parse HEAD | str trim
+    }
 
     if not ($branch | is-empty) {
-        {name: $branch, type: "branch"}
+        {name: $branch, hash: $hash, type: "branch"}
     } else if $is_tag {
-        {name: ($tag.stdout | str trim), type: "tag"}
+        {name: ($tag.stdout | str trim), hash: $hash, type: "tag"}
     } else {
-        let hash = if $short_hash {
-            git -C $repo rev-parse --short HEAD | str trim
-        } else {
-            git -C $repo rev-parse HEAD | str trim
-        }
-
-        {name: $hash, type: "detached"}
+        {name: null, hash: $hash, type: "detached"}
     }
 }
 
