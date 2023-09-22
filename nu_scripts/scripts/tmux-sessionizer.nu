@@ -200,7 +200,7 @@ def "main harpoon jump" [
 # FIXME: complex type annotation, waiting for https://github.com/nushell/nushell/pull/9769
 # default: nothing -> table<name: string, windows: int, date: date, attached: bool>
 # --more: nothing -> table<name: string, windows: table<id: string, app: string, panes: string, active: bool>, date: date, attached: bool, pwd: string>
-def list-sessions [--more: bool]: [nothing -> table, nothing -> table] {
+def list-sessions [--more: bool = false]: [nothing -> table, nothing -> table] {
     log debug "listing sessions"
     let sessions = ^tmux list-sessions
         | lines
@@ -254,11 +254,7 @@ def list-sessions [--more: bool]: [nothing -> table, nothing -> table] {
 def "main list-sessions" [
     --more (-m): bool  # add more information to the output table, note that this will take more time
 ]: nothing -> string {
-    if $more {
-        list-sessions --more | to nuon --raw
-    } else {
-        list-sessions | to nuon --raw
-    }
+    list-sessions --more $more | to nuon --raw
 }
 
 # FIXME: complex type annotation, waiting for https://github.com/nushell/nushell/pull/9769
@@ -338,11 +334,7 @@ def "main switch-session" [
     --more-context: bool  # use the *expanded* list of sessions for more context
 ]: nothing -> nothing {
     let session = if $session == null {
-        let sessions = if $more_context {
-            list-sessions --more
-        } else {
-            list-sessions
-        }
+        let sessions = list-sessions --more $more_context
         let current_session = ^tmux display-message -p '#{session_name}' | str trim
 
         let prompt = $"(ansi cyan)Choose a session to switch to(ansi reset)"
@@ -404,16 +396,12 @@ def "main new-session" [
 def "main remove-sessions" [
     --more-context (-m): bool  # use the *expanded* list of sessions for more context
 ]: nothing -> nothing {
-    let sessions = if $more_context {
-        list-sessions --more
-    } else {
-        list-sessions
-    }
+    let sessions = list-sessions --more $more_context
     let current_session = ^tmux display-message -p '#{session_name}' | str trim
 
     let prompt = $"(ansi cyan)Please choose sessions to kill(ansi reset)"
     let choices = $sessions
-        | pick-session-with-style --more $more_context --multi $prompt $current_session "red"
+        | pick-session-with-style --more $more_context --multi true $prompt $current_session "red"
 
     if ($choices | is-empty) {
         return
