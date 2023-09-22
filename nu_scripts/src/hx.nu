@@ -31,11 +31,7 @@ export def "get lsp" [
   --progress (-p): bool
   --quiet (-q): bool
 ] {
-  let languages = if ($quiet) {
-    get languages --quiet
-  } else {
-    get languages
-  }
+  let languages = get languages --quiet $quiet
 
   let lsp = (
     $languages
@@ -65,8 +61,8 @@ export def "get lsp" [
 export def "get health" [] {
   let health = {
     info: (get info)
-    languages: (get languages --quiet)
-    lsp: (get lsp --progress --quiet)
+    languages: (get languages --quiet true)
+    lsp: (get lsp --progress true --quiet true)
   }
   if (($health.languages | find "…" | length) != 0) {
     print $"hx get health: (ansi yellow_bold)warning(ansi reset): terminal too narrow"

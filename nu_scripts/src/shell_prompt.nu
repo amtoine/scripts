@@ -162,7 +162,7 @@ export def-env setup [
             do --ignore-errors { git rev-parse --is-inside-work-tree } | is-empty
         )
         let branch_segment = if $is_git_repo {
-            let revision = get-revision --short-hash
+            let revision = get-revision --short-hash true
             let pretty_branch_tokens = match $revision.type {
                 "branch" => [
                     ($revision.name | color {fg: "yellow", attr: "ub"}),
