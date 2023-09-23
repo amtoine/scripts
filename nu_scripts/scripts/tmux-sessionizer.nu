@@ -263,7 +263,7 @@ def pick-session-with-style [
     message: string,
     current_session: string,
     session_color: string,
-    --multi: bool,
+    --multi: bool = false,
     --more: bool = false
 ]: [table -> string, table -> list<string>] {
     let named_sessions = $in | update name {|it| (
