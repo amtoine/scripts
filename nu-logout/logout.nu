@@ -18,7 +18,7 @@ def user-confirmation [cmd: closure, prompt: string]: nothing -> bool {
 def main [
     --lock: string # the application to lock the screen
     --launcher: string  # the app launcher to use as a menu
-    --no-confirm (-y): bool  # do not ask for confirmation
+    --no-confirm (-y) # do not ask for confirmation
 ] {
     let cmd: closure = match ($launcher | default "builtin") {
         "builtin" => {{|prompt| input list --fuzzy $prompt }},

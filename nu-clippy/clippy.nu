@@ -27,7 +27,7 @@ def error-or-warning [
 # check a file for common mistakes
 def main [
     file: path  # the path to the script to check
-    --no-mutable: bool  # disallow the use of the `mut` keyword
+    --no-mutable # disallow the use of the `mut` keyword
     --error (-D): string = "errors"  # transform warnings into errors
 ] {
     let ast = nu --ide-ast $file | from json
