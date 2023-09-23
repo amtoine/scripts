@@ -1,29 +1,38 @@
 #!/usr/bin/env nu
 
-def main [--notify: bool]: [nothing -> nothing, nothing -> table] {
+def notify-send [
+    title: string, body: string, --urgency: string = "low", --expire-time: int = 10_000
+] {
+    ^notify-send $title $body --urgency $urgency --expire-time $expire_time
+}
+
+def notify-one [notification: record] {
+    let title = $"($notification.repository.owner.login)/($notification.repository.name): ($notification.subject.url)"
+    let body = $notification.subject.title
+
+    notify-send $title $body
+}
+
+def main [--notify]: nothing -> string {
     if $notify {
-        notify-send "gh-notifications.nu" "pulling information from the API..." --expire-time 10000
+        notify-send "gh-notifications.nu" "pulling information from the API..."
     }
     let notifications = gh api notifications --jq '.' | from json
 
-    if ($notifications | is-empty) {
-        if $notify {
-            notify-send "gh-notifications.nu" "no notifications for now..." --urgency low --expire-time 10000
-        } else {
-        }
-        return
-    }
-
-    $notifications | each {|notification|
-        let title = $"($notification.repository.owner.login)/($notification.repository.name): ($notification.subject.url)"
-        let body = $notification.subject.title
-
-        if $notify {
-            notify-send $title $body --urgency low --expire-time 10000
+    if $notify {
+        let n = $notifications | length
+        match $n {
+            0 => { notify-send "gh-notifications.nu" "no notifications for now..." }
+            1 => { notify-one $notifications.0 }
+            _ => {
+                if $n <= 5 {
+                    $notifications | each {|notification| notify-one $notification}
+                } else {
+                    notify-send "gh-notifications.nu" $"you have ($n) notifications"
+                }
+            }
         }
     }
 
-    if not $notify {
-        $notifications
-    }
+    $notifications | to nuon
 }
