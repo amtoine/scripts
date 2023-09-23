@@ -252,7 +252,7 @@ def list-sessions [--more: bool = false]: [nothing -> table, nothing -> table] {
 #     > tmux-sessionizer.nu list-sessions --more | from nuon | describe
 #     table<name: string, windows: table<id: string, app: string, panes: string, active: bool>, date: date, attached: bool, pwd: string>
 def "main list-sessions" [
-    --more (-m): bool  # add more information to the output table, note that this will take more time
+    --more (-m) # add more information to the output table, note that this will take more time
 ]: nothing -> string {
     list-sessions --more $more | to nuon --raw
 }
@@ -331,7 +331,7 @@ def pick-session-with-style [
 #       │                 expected one of [my_session, my_other_session], got not_a_session
 def "main switch-session" [
     session?: string  # query as session name to switch to without fuzzy search
-    --more-context: bool  # use the *expanded* list of sessions for more context
+    --more-context # use the *expanded* list of sessions for more context
 ]: nothing -> nothing {
     let session = if $session == null {
         let sessions = list-sessions --more $more_context
@@ -394,7 +394,7 @@ def "main new-session" [
 #     remove sessions with more context
 #     > tmux-sessionizer.nu remove-sessions --more-context
 def "main remove-sessions" [
-    --more-context (-m): bool  # use the *expanded* list of sessions for more context
+    --more-context (-m) # use the *expanded* list of sessions for more context
 ]: nothing -> nothing {
     let sessions = list-sessions --more $more_context
     let current_session = ^tmux display-message -p '#{session_name}' | str trim
@@ -462,7 +462,7 @@ def "main remove-sessions" [
 # ```
 def main [
     ...paths: path,  # the list of paths to fuzzy find and jump to in a new session
-    --short (-s): bool  # only show the short session names instead of the full paths
+    --short (-s) # only show the short session names instead of the full paths
 ]: nothing -> nothing {
     if ($paths | is-empty) {
         error make --unspanned {

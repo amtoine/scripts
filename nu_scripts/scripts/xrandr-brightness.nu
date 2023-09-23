@@ -8,8 +8,8 @@ const DUNST_ID = 5
 def main [
     output: string  # the monitor to change the brightness of
     step: float  # the  brightness step
-    --invert (-v): bool  # trigger this option to turn the step into a negative value
-    --notify: bool  # give a notification
+    --invert (-v) # trigger this option to turn the step into a negative value
+    --notify # give a notification
 ]: nothing -> nothing {
     let monitor = ^xrandr --verbose --current
         | rg $output -A5
