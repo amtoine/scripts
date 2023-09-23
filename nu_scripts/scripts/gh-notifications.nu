@@ -13,7 +13,7 @@ def notify-one [notification: record] {
     notify-send $title $body
 }
 
-def main [--notify]: nothing -> string {
+def main [--max-notifications (-m): int = 5, --notify]: nothing -> string {
     if $notify {
         notify-send "gh-notifications.nu" "pulling information from the API..."
     }
@@ -25,7 +25,7 @@ def main [--notify]: nothing -> string {
             0 => { notify-send "gh-notifications.nu" "no notifications for now..." }
             1 => { notify-one $notifications.0 }
             _ => {
-                if $n <= 5 {
+                if $n <= $max_notifications {
                     $notifications | each {|notification| notify-one $notification}
                 } else {
                     notify-send "gh-notifications.nu" $"you have ($n) notifications"
