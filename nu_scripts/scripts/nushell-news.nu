@@ -39,7 +39,7 @@ use std log
 #     2023-07-27T10:40:39.015|INF|Pulling down the Nushell news...
 #     2023-07-27T10:40:40.507|INF|No news for Nushell today!
 export def main [
-    --force: bool  # pull the news even if they have been today
+    --force # pull the news even if they have been today
 ]: nothing -> nothing {
     if not $force {
         let last = $nu.home-path | path join ".local" "state" "nushell" "latest"

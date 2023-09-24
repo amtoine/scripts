@@ -1,6 +1,6 @@
 # TODO: docstring
 export def "keys ls" [
-  --short (-s): bool  # TODO: arg
+  --short (-s)  # TODO: arg
 ] {
   ls $env.SSH_KEYS_HOME
   | where name =~ ".*.pub$"

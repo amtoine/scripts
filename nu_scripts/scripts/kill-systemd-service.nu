@@ -1,6 +1,6 @@
 #!/usr/bin/env nu
 
-def main [name: string, --no-confirm (-y): bool]: nothing -> nothing {
+def main [name: string, --no-confirm (-y)]: nothing -> nothing {
     let services = systemctl --type=service --state=running
         | detect columns
         | compact UNIT
