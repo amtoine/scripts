@@ -34,13 +34,11 @@ def main [
         }
     }
 
-    let options = if $no_ansi {
-        $OPTIONS | ansi strip
+    let choice = if $no_ansi {
+        $OPTIONS | ansi strip | do $cmd "Please choose an option to run: "
     } else {
-        $OPTIONS
+        $OPTIONS | do $cmd $"Please choose an (ansi default_underline)option to run(ansi reset): "
     }
-
-    let choice = $options | do $cmd $"Please choose an (ansi default_underline)option to run(ansi reset): "
     if ($choice | is-empty) {
         return
     }
