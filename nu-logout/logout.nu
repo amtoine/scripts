@@ -1,13 +1,13 @@
 #!/usr/bin/env nu
 use std log
 
-const OPTIONS = [
-    "Lock screen"
-    "Logout"
-    "Reboot"
-    "Shutdown"
-    "Suspend"
-    "Quit"
+let OPTIONS = [
+    $"(ansi cyan)Lock screen(ansi reset)"
+    $"(ansi yellow)Logout(ansi reset)"
+    $"(ansi red)Reboot(ansi reset)"
+    $"(ansi red)Shutdown(ansi reset)"
+    $"(ansi yellow)Suspend(ansi yellow)"
+    $"(ansi green)Quit(ansi reset)"
 ]
 
 def user-confirmation [cmd: closure, prompt: string]: nothing -> bool {
@@ -19,6 +19,7 @@ def main [
     --lock: string # the application to lock the screen
     --launcher: string  # the app launcher to use as a menu
     --no-confirm (-y) # do not ask for confirmation
+    --no-ansi # do not use ANSI colors in the prompts and options
 ] {
     let cmd: closure = match ($launcher | default "builtin") {
         "builtin" => {{|prompt| input list --fuzzy $prompt }},
@@ -33,14 +34,20 @@ def main [
         }
     }
 
-    let choice = $OPTIONS | do $cmd "Please choose an option to run: "
+    let options = if $no_ansi {
+        $OPTIONS | ansi strip
+    } else {
+        $OPTIONS
+    }
+
+    let choice = $options | do $cmd $"Please choose an (ansi default_underline)option to run(ansi reset): "
     if ($choice | is-empty) {
         return
     }
 
     let confirmation_prompt = $"($choice)? "
 
-    match $choice {
+    match ($choice | ansi strip) {
         "Lock screen" => {
             if $lock == null {
                 error make --unspanned {
