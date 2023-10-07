@@ -5,6 +5,40 @@ const TMUX_SESSION_FILE = "/tmp/tmux-session"
 
 $env.LOG_FORMAT = "%ANSI_START%%DATE%|%LEVEL%|%MSG%%ANSI_STOP%"
 
+# FIXME: complex type annotation, waiting for https://github.com/nushell/nushell/pull/9769
+# default: nothing -> table<name: string, windows: int, date: date, attached: bool>
+# --more: nothing -> table<name: string, windows: table<id: string, app: string, panes: string, active: bool>, date: date, attached: bool, pwd: string>
+def list-sessions [--more: bool = false]: [nothing -> table, nothing -> table] {
+    log debug "listing sessions"
+    let sessions = ^tmux list-sessions
+        | lines
+        | parse "{name}: {windows} windows (created {date}){attached}"
+        | into int windows
+        | into datetime date
+        | update attached {|it| $it.attached != ""}
+
+    if not $more {
+        return $sessions
+    }
+
+    log debug "adding extra information to the session list"
+    # FIXME: complex type annotation, waiting for https://github.com/nushell/nushell/pull/9769
+    # let pwds: table<name: string, pwd: path> = ...
+    let pwds = ^tmux list-sessions -F '#{session_name}:#{pane_current_path}'
+        | lines
+        | parse "{name}:{pwd}"
+
+    $sessions | join --outer $pwds name | update windows {|session|
+        ^tmux list-windows -t $session.name
+            | lines
+            | parse "{id}: {app} ({panes} panes) {rest}"
+            | str trim --right --char '*' app
+            | str trim --right --char '-' app
+            | insert active {|it| not ($it.rest | find '(active)' | is-empty)}
+            | reject rest
+    }
+}
+
 def save-tmux-session-name [--new-session: string]: nothing -> nothing {
     mkdir ($TMUX_SESSION_FILE | path dirname)
 
@@ -195,40 +229,6 @@ def "main harpoon jump" [
     }
 
     switch-to-or-create-session ($harpoons | get $id | parse $TMUX_HARPOON_SESSION_FORMAT | get 0)
-}
-
-# FIXME: complex type annotation, waiting for https://github.com/nushell/nushell/pull/9769
-# default: nothing -> table<name: string, windows: int, date: date, attached: bool>
-# --more: nothing -> table<name: string, windows: table<id: string, app: string, panes: string, active: bool>, date: date, attached: bool, pwd: string>
-def list-sessions [--more: bool = false]: [nothing -> table, nothing -> table] {
-    log debug "listing sessions"
-    let sessions = ^tmux list-sessions
-        | lines
-        | parse "{name}: {windows} windows (created {date}){attached}"
-        | into int windows
-        | into datetime date
-        | update attached {|it| $it.attached != ""}
-
-    if not $more {
-        return $sessions
-    }
-
-    log debug "adding extra information to the session list"
-    # FIXME: complex type annotation, waiting for https://github.com/nushell/nushell/pull/9769
-    # let pwds: table<name: string, pwd: path> = ...
-    let pwds = ^tmux list-sessions -F '#{session_name}:#{pane_current_path}'
-        | lines
-        | parse "{name}:{pwd}"
-
-    $sessions | join --outer $pwds name | update windows {|session|
-        ^tmux list-windows -t $session.name
-            | lines
-            | parse "{id}: {app} ({panes} panes) {rest}"
-            | str trim --right --char '*' app
-            | str trim --right --char '-' app
-            | insert active {|it| not ($it.rest | find '(active)' | is-empty)}
-            | reject rest
-    }
 }
 
 # list opened Tmux sessions
