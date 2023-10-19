@@ -174,7 +174,7 @@ export def "get ldd deps" [exec: string] {
         if ($tokens | is-empty) {
             {
                 lib: $it.lib
-                symlink: $nothing
+                symlink: null
             }
         } else {
             $tokens
@@ -232,7 +232,7 @@ export def "history stats" [
 ] {
     let top_commands = (
         history
-        | if ($last_cmds != $nothing) { last $last_cmds } else { $in }
+        | if ($last_cmds != null) { last $last_cmds } else { $in }
         | get command
         | split column ' ' command
         | uniq -c
