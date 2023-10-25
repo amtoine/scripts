@@ -113,7 +113,7 @@ def "nu-complete pwd modes" [] {
     ]
 }
 
-export def-env setup [
+export def --env setup [
     --indicators = {
         plain: "> ",
         vi: {insert: ": ", normal: "> "}

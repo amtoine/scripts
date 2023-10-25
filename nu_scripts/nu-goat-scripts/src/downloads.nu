@@ -12,7 +12,7 @@ export def show [] {
     }
 }
 
-export def-env go [] {
+export def --env go [] {
     let dir = (downloads_dir)
 
     if not ($dir | path exists) {

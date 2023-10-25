@@ -59,7 +59,7 @@ def pick_worktree [
 #        cfg worktree add some/path/to/worktree my_branch
 #
 #  . and then `dotfiles worktree` will let you pick one of the worktrees
-export def-env "worktree goto" [
+export def --env "worktree goto" [
     --bare (-b): string  # the path to the *bare* repository (defaults to $env.DOTFILES_GIT_DIR)
     --debug (-d)
 ] {

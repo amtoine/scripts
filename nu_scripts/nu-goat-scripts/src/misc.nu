@@ -154,7 +154,7 @@ export def "aoc fetch answers" [
 
 
 # TODO: docstring
-export def-env back [] { cd - }
+export def --env back [] { cd - }
 
 
 # TODO: docstring

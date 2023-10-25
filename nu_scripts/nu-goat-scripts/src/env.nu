@@ -39,6 +39,6 @@ export def "path show" [] {
     _open_path
 }
 
-export def-env "path load" [] {
+export def --env "path load" [] {
     [(_open_path)] | wrap PATH | into record | load-env
 }

@@ -16,7 +16,7 @@ export def hc [category?: string@"nu-complete help categories"] {
 
 # credit to @/dev/adrien#4649
 # https://discord.com/channels/601130461678272522/615253963645911060/1019056732841967647
-export def-env up [nb: int = 1] {
+export def --env up [nb: int = 1] {
     let path = (1..($nb) | each {|_| ".."} | reduce {|it, acc| $acc + "/" + $it})
     cd $path
 }
@@ -24,7 +24,7 @@ export def-env up [nb: int = 1] {
 
 # credit to @/dev/adrien#4649
 # https://discord.com/channels/601130461678272522/615253963645911060/1019056732841967647
-export def-env mkcd [name: path] {
+export def --env mkcd [name: path] {
     mkdir $name --verbose
     cd $name
 }
@@ -66,7 +66,7 @@ export def show_banner [] {
 # slightly improved:
 #   - does not use an extra br_cmd and alias
 #   - allows the use of extra arguments, e.g. `br "-s"`
-export def-env br [args = "."] {
+export def --env br [args = "."] {
     let cmd_file = (^mktemp | str trim);
     ^broot --outcmd $cmd_file $args;
     let cmd = ((open $cmd_file) | str trim);
