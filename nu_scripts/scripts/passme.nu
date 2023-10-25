@@ -26,7 +26,7 @@
 # > [dmenu-wl]: https://github.com/nyyManni/dmenu-wayland
 # > [ydotool]: https://github.com/ReimuNotMoe/ydotool
 # > [uinput]: https://www.kernel.org/doc/html/v4.12/input/uinput.html
-extern-wrapped main [
+def --wrapped main [
     --help (-h)  # Display the help message for this command
     --notify  # Throw a notification once an entry has been pasted
     ...dmenu_args: string  # The arguments to dmenu
