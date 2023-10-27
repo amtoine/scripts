@@ -18,7 +18,6 @@
         "scripts/nushell-news.nu"
         "scripts/passme.nu"
         "scripts/plot-startup-times.nu"
-        "scripts/tmux-sessionizer.nu"
         "scripts/xrandr-brightness.nu"
         "scripts/xrandr-tui.nu"
         "scripts/xrandr.nu"
