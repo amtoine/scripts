@@ -25,7 +25,7 @@ def main [
         "builtin" => {{|prompt| input list --fuzzy $prompt }},
         "dmenu" => {{|prompt|  str join "\n" | ^dmenu -p $prompt -l 10 -bw 5 -i | str trim }},
         "fzf" => {{|prompt|  str join "\n" | ^fzf --prompt $prompt | str trim }},
-        "rofi" => {{|prompt|  str join "\n" | ^rofi -dmenu -p $prompt | str trim }},
+        "rofi" => {{|prompt|  str join "\n" | ^rofi -dmenu -i -p $prompt | str trim }},
         _ => {
             error make --unspanned {
                 msg: $"(ansi red_bold)unknown_app_launcher(ansi reset):
