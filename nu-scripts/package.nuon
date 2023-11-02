@@ -1,8 +1,8 @@
 {
-    name: "nu-goat-scripts"
+    name: "nu-scripts"
     version: 0.1.0
-    description: "The collection of `nushell` scripts for GOATs."
-    documentation: "https://github.com/amtoine/scripts/blob/main/nu_scripts/README.md"
+    description: "A collection of scripts for my daily use on ArchLinux."
+    documentation: "https://github.com/amtoine/scripts/blob/main/nu-scripts/README.md"
     maintainers: [
         @amtoine
         @atxr
