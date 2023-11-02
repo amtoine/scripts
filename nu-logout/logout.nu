@@ -58,7 +58,7 @@ def main [
                 return
             }
 
-            nu --commands $lock
+            ^$nu.current-exe --commands $lock
         },
         "Logout" => {
             if (not $no_confirm) and (not (user-confirmation $cmd $confirmation_prompt)) {
