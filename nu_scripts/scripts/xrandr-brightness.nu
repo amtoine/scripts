@@ -1,7 +1,7 @@
 #!/usr/bin/env nu
 use std log
 
-const ICONS = "/usr/share/icons/goat-icons-git/stickers/100x100"
+const ICONS = "/usr/share/icons/amtoine-icons-git/stickers/100x100"
 const DUNST_ID = 5
 
 # set the brightness of XRANDR monitors

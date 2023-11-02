@@ -2,8 +2,8 @@
     name: "nu-clippy"
     description: "a linter written in `nu` for the Nushell programming language"
     version: 0.1.0
-    documentation: "https://github.com/goatfiles/scripts/blob/main/nu-clippy/README.md"
-    license: "https://github.com/goatfiles/scripts/blob/main/LICENSE"
+    documentation: "https://github.com/amtoine/scripts/blob/main/nu-clippy/README.md"
+    license: "https://github.com/amtoine/scripts/blob/main/LICENSE"
     type: "script"
     scripts: ["clippy.nu"]
 }

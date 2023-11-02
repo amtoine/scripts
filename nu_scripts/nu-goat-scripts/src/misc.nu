@@ -282,7 +282,7 @@ export def "get wallpapers" [
 ] {
     [
         /usr/share/backgrounds
-        ($env.GIT_REPOS_HOME | path join "github.com/goatfiles/wallpapers/wallpapers")
+        ($env.GIT_REPOS_HOME | path join "github.com/amtoine/wallpapers/wallpapers")
     ]
     | each {||
         let glob_path = ($in | path join "*")

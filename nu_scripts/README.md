@@ -3,16 +3,16 @@ The collection of `nushell` scripts for GOATs.
 
 ## source the scripts
 in my `nushell` environment configuration file,
-[`env.nu`](https://github.com/goatfiles/dotfiles/blob/main/.config/nushell/env.nu)
+[`env.nu`](https://github.com/amtoine/dotfiles/blob/main/.config/nushell/env.nu)
 i run the following:
 
 - define the upstream remote URL
 ```bash
-$env.NU_SCRIPTS_REMOTE = "ssh://git@github.com/goatfiles/nu_scripts.git"
+$env.NU_SCRIPTS_REMOTE = "ssh://git@github.com/amtoine/nu_scripts.git"
 ```
 - define the local location of the `nu_scripts`
 ```bash
-$env.NU_SCRIPTS_DIR = ($env.GIT_REPOS_HOME | path join "github.com/goatfiles/nu_scripts")
+$env.NU_SCRIPTS_DIR = ($env.GIT_REPOS_HOME | path join "github.com/amtoine/nu_scripts")
 ```
 - make the local `nu_scripts` available to `nushell`
 ```bash
@@ -30,7 +30,7 @@ if not ($env.NU_SCRIPTS_DIR | path exists) {
 }
 ```
 - source any script in
-[`config.nu`](https://github.com/goatfiles/dotfiles/blob/main/.config/nushell/config.nu)
+[`config.nu`](https://github.com/amtoine/dotfiles/blob/main/.config/nushell/config.nu)
 ```bash
 use scripts/<nu_script>.nu
 ```

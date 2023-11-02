@@ -2,8 +2,8 @@
     name: "nu-logout"
     description: "a script to logout from a machine, from without Nushell, using a menu."
     version: 0.1.0
-    documentation: "https://github.com/goatfiles/scripts/blob/main/nu-logout/README.md"
-    license: "https://github.com/goatfiles/scripts/blob/main/LICENSE"
+    documentation: "https://github.com/amtoine/scripts/blob/main/nu-logout/README.md"
+    license: "https://github.com/amtoine/scripts/blob/main/LICENSE"
     type: "script"
     scripts: ["logout.nu"]
 }

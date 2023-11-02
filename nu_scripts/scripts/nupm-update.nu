@@ -13,7 +13,7 @@ def update [repo: path, --path: string = ""]: nothing -> nothing {
 export def main []: nothing -> nothing {
     let repos_dir = $env.GIT_REPOS_HOME | path join "github.com"
     update ($repos_dir | path join "amtoine" "nu-git-manager")
-    update ($repos_dir | path join "goatfiles" "scripts") --path "nu_scripts"
+    update ($repos_dir | path join "amtoine" "scripts") --path "nu_scripts"
     update ($repos_dir | path join "amtoine" "zellij-layouts") --path "nu-zellij"
     update ($repos_dir | path join "nushell" "nu_scripts")
 
