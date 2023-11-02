@@ -1,13 +1,13 @@
 * scripts
-A collection of scripts for goats.
+A collection of scripts for my daily use on ArchLinux.
 
 ** Installation
 *** on ArchLinux
-one can use [[https://github.com/goatfiles/pkgbuilds/blob/main/x86_64/goat-scripts-git/PKGBUILD][the PKGBUILD for goats]] as follows:
+one can use [[https://github.com/amtoine/pkgbuilds/blob/main/x86_64/amtoine-scripts-git/PKGBUILD][the PKGBUILD for amtoines]] as follows:
 #+begin_src bash
-git clone https://github.com/goatfiles/pkgbuilds
+git clone https://github.com/amtoine/pkgbuilds
 cd ./pkgbuilds
-./install.sh x86_64/goat-scripts-git
+./install.sh x86_64/amtoine-scripts-git
 #+end_src
 
 *** on another distribution of Linux

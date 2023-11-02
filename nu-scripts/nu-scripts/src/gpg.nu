@@ -12,7 +12,7 @@
 #
 # - import the keys in the new keyring
 # ```nushell
-# use nu-goat-scripts gpg
+# use nu-scripts gpg
 # let keyring = /tmp/gnupg/
 #
 # cd $key_dump
