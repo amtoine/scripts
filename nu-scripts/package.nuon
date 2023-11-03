@@ -14,6 +14,7 @@
         "scripts/happy-day.nu"
         "scripts/kill-systemd-service.nu"
         "scripts/notify-date.nu"
+        "scripts/notify-battery.nu"
         "scripts/nupm-update.nu"
         "scripts/nushell-news.nu"
         "scripts/passme.nu"
