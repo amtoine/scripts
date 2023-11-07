@@ -102,6 +102,47 @@ def get-revision [
     }
 }
 
+# https://stackoverflow.com/questions/59603312/git-how-can-i-easily-tell-if-im-in-the-middle-of-a-rebase
+def git-action [repo?: path]: nothing -> string {
+    let git_dir = ^git -C ($repo | default (pwd)) rev-parse --git-dir | str trim | path expand
+
+    def test-dir [target: string]: nothing -> bool {
+        ($git_dir | path join $target | path type) == "dir"
+    }
+
+    def test-file [target: string]: nothing -> bool {
+        ($git_dir | path join $target | path type) == "file"
+    }
+
+    if (test-dir "rebase-merge") {
+        if (test-file "rebase-merge/interactive") {
+            "REBASE-i" | color blue
+        } else {
+            "REBASE-m" | color magenta
+        }
+    } else {
+        if (test-dir "rebase-apply") {
+            if (test-file "rebase-apply/rebasing") {
+                "REBASE" | color cyan
+            } else if (test-file "rebase-apply/applying") {
+                "AM" | color cyan
+            } else {
+                "AM/REBASE" | color cyan
+            }
+        } else if (test-file "MERGE_HEAD") {
+            "MERGING" | color dark_gray
+        } else if (test-file "CHERRY_PICK_HEAD") {
+            "CHERRY-PICKING" | color green
+        } else if (test-file "REVERT_HEAD") {
+            "REVERTING" | color red
+        } else if (test-file "BISECT_LOG") {
+            "BISECTING" | color yellow
+        } else {
+            null
+        }
+    }
+}
+
 def "nu-complete pwd modes" [] {
     [
         [value, description];
@@ -180,6 +221,17 @@ export def --env setup [
             null
         }
 
+        let git_action_segment = if $is_git_repo {
+            let action = (git-action (pwd))
+            if $action != null {
+                $"\(($action)\)"
+            } else {
+                null
+            }
+        } else {
+            null
+        }
+
         let command_failed_segment = if $env.LAST_EXIT_CODE != 0 {
             $env.LAST_EXIT_CODE | color "red_bold"
         } else {
@@ -199,6 +251,7 @@ export def --env setup [
             $admin_segment
             (do $pwd)
             $branch_segment
+            $git_action_segment
             $duration_segment
             $command_failed_segment
             $login_segment
