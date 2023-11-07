@@ -202,7 +202,7 @@ export def --env setup [
         let is_git_repo = not (
             do --ignore-errors { git rev-parse --is-inside-work-tree } | is-empty
         )
-        let branch_segment = if $is_git_repo {
+        let git_branch_segment = if $is_git_repo {
             let revision = get-revision --short-hash true
             let pretty_branch_tokens = match $revision.type {
                 "branch" => [
@@ -250,7 +250,7 @@ export def --env setup [
         [
             $admin_segment
             (do $pwd)
-            $branch_segment
+            $git_branch_segment
             $git_action_segment
             $duration_segment
             $command_failed_segment
