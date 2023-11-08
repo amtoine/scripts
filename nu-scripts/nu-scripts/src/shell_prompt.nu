@@ -169,12 +169,24 @@ export def --env setup [
                 do --ignore-errors { git rev-parse --is-inside-work-tree } | is-empty
             )
 
-            let pwd = $env.PWD | simplify-path
-
             if $is_git_repo {
-                $pwd | path basename | color "magenta_bold"
+                let repo_root = (
+                    ^git rev-parse --show-toplevel | str trim
+                )
+                let repo = $repo_root | path basename | color "magenta_bold"
+                let sub_dir = pwd
+                    | str replace $repo_root ''
+                    | str trim --char (char path_sep)
+                    | simplify-path
+
+                if $sub_dir != "" {
+                    [$repo, ($sub_dir | color "magenta_dimmed")]
+                        | str join (char path_sep | color "magenta_dimmed")
+                } else {
+                    $repo
+                }
             } else {
-                $pwd | color "green"
+                pwd | simplify-path | color "green"
             }
         }},
         "basename" => {{ $env.PWD | simplify-path | path basename | color "green" }},
