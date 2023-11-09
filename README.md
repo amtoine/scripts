@@ -11,7 +11,9 @@ git clone https://github.com/amtoine/scripts
 - activate the `nupm` module with `use nupm`
 - install the packages
 ```nushell
-[nu-clippy, nu-logout, nu-scripts, nu-sound-manager] | each { nupm install --path --force $in }
+[
+    nu-clippy, nu-logout, nu-scripts, nu-sound-manager, nu-monitor-manager
+] | each { nupm install --path --force $in }
 ```
 
 [Nupm]: https://github.com/nushell/nupm

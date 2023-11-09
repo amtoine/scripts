@@ -1,0 +1,9 @@
+{
+    name: "nu-monitor-manager"
+    description: "manage your monitors from Nushell"
+    version: 0.1.0
+    documentation: "https://github.com/amtoine/scripts/blob/main/nu-monitor-manager/README.md"
+    license: "https://github.com/amtoine/scripts/blob/main/LICENSE"
+    type: "script"
+    scripts: ["monitor-manager.nu"]
+}
