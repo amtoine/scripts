@@ -10,7 +10,6 @@ export module src/ipfs.nu
 export module src/job.nu
 export module src/misc.nu
 export module src/plugin.nu
-export module src/shell_prompt.nu
 export module src/ssh.nu
 export module src/sys.nu
 export module src/trash.nu
