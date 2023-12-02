@@ -20,6 +20,7 @@ def main [
     --launcher: string  # the app launcher to use as a menu
     --no-confirm (-y) # do not ask for confirmation
     --no-ansi # do not use ANSI colors in the prompts and options
+    --sudo # use sudo to run sensitive commands
 ] {
     let cmd: closure = match ($launcher | default "builtin") {
         "builtin" => {{|prompt| input list --fuzzy $prompt }},
@@ -72,21 +73,33 @@ def main [
                 log debug "User chose not to reboot."
                 return
             }
-            systemctl reboot
+            if $sudo {
+                sudo systemctl reboot
+            } else {
+                systemctl reboot
+            }
         },
         "Shutdown" => {
             if (not $no_confirm) and (not (user-confirmation $cmd $confirmation_prompt)) {
                 log debug "User chose not to shutdown."
                 return
             }
-            systemctl poweroff
+            if $sudo {
+                sudo systemctl poweroff
+            } else {
+                systemctl poweroff
+            }
         },
         "Suspend" => {
             if (not $no_confirm) and (not (user-confirmation $cmd $confirmation_prompt)) {
                 log debug "User chose not to suspend."
                 return
             }
-            systemctl suspend
+            if $sudo {
+                sudo systemctl suspend
+            } else {
+                systemctl suspend
+            }
         },
         "Quit" => { return },
         _ => {
