@@ -42,8 +42,7 @@ def "main set-brightness" [
                 msg: $"(ansi red_bold)invalid_direction(ansi reset)"
                 label: {
                     text: $"expected one of (nu-complete directions)"
-                    start: (metadata $direction).span.start
-                    end: (metadata $direction).span.end
+                    span: (metadata $direction).span
                 }
             }
         },
