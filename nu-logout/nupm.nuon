@@ -5,5 +5,4 @@
     documentation: "https://github.com/amtoine/scripts/blob/main/nu-logout/README.md"
     license: "https://github.com/amtoine/scripts/blob/main/LICENSE"
     type: "script"
-    scripts: ["logout.nu"]
 }

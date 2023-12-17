@@ -5,5 +5,4 @@
     documentation: "https://github.com/amtoine/scripts/blob/main/nu-monitor-manager/README.md"
     license: "https://github.com/amtoine/scripts/blob/main/LICENSE"
     type: "script"
-    scripts: ["monitor-manager.nu"]
 }

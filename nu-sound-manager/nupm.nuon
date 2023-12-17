@@ -5,5 +5,4 @@
     documentation: "https://github.com/amtoine/scripts/blob/main/nu-sound-manager/README.md"
     license: "https://github.com/amtoine/scripts/blob/main/LICENSE"
     type: "script"
-    scripts: ["sound-manager.nu"]
 }

@@ -5,5 +5,4 @@
     documentation: "https://github.com/amtoine/scripts/blob/main/nu-clippy/README.md"
     license: "https://github.com/amtoine/scripts/blob/main/LICENSE"
     type: "script"
-    scripts: ["clippy.nu"]
 }
