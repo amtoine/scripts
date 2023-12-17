@@ -3,19 +3,17 @@
 const STEP = 5
 const ID = 456
 
-const OUTPUT = "HDMI-2"
-
 def main [] { monitor-manager.nu --help }
 
-def "main get-brightness" []: nothing -> float {
+def "main get-brightness" [output: string]: nothing -> float {
     let res = ^xrandr --verbose --current
-        | ^rg $OUTPUT -A5
+        | ^rg $output -A5
         | lines
         | last
         | parse --regex '\s*Brightness: (.*)'
     if $res == null {
         error make --unspanned {
-            msg: $"($OUTPUT) not found in the monitors"
+            msg: $"($output) not found in the monitors"
         }
     }
 
@@ -32,6 +30,7 @@ def "nu-complete directions" [] {
 }
 
 def "main set-brightness" [
+    output: string,
     direction: string@"nu-complete directions",
     --notify
 ] {
@@ -50,10 +49,10 @@ def "main set-brightness" [
         },
     }
 
-    let brightness = main get-brightness
+    let brightness = main get-brightness $output
     let new_brightness = $brightness + $delta | math clamp 0 100
 
-    ^xrandr --output $OUTPUT --brightness ($new_brightness / 100)
+    ^xrandr --output $output --brightness ($new_brightness / 100)
 
     if $notify {
         ^notify-send $"brightness: ($new_brightness | math round --precision 0)" --hint $"int:value:($new_brightness)" --replace-id $ID
