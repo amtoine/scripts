@@ -31,6 +31,8 @@ export def main [
         ^notify-send $"($battery) is discharging" $level $args
     } else if ($status == "charging") and ($level >= $max) {
         ^notify-send $"($battery) is charging" $level $args
+    } else if ($status == "not charging") and ($level >= $max) {
+        ^notify-send $"($battery) is full" $level $args
     } else if $report {
         ^notify-send $"($battery) is ($status)" $level ($args | update 1 "normal")
     }
