@@ -50,8 +50,8 @@ def ungraph [
 # TODO
 export def log [
   commitish: string = "HEAD"
-  --all (-a): bool
-  --debug (-d): bool
+  --all (-a)
+  --debug (-d)
 ] {
   alias GIT_LOG = git log --graph --oneline --decorate --color=always
 
@@ -90,7 +90,7 @@ export def log [
 
 # TODO
 export def stash [
-  --debug (-d): bool
+  --debug (-d)
 ] {
   let choice = (
     git stash list --color=always |
@@ -118,7 +118,7 @@ export def stash [
 
 # TODO
 export def checkout [
-  --debug (-d): bool
+  --debug (-d)
 ] {
   let choice = (
     git branch --list --color=always | lines |

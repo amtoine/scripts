@@ -22,7 +22,7 @@ export def --env go [] {
     cd $dir
 }
 
-export def clean [--force (-f): bool] {
+export def clean [--force (-f)] {
     if (show | is-empty) {
         print $"no files in (downloads_dir)..."
         return

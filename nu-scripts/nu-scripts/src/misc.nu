@@ -188,7 +188,7 @@ export def "get ldd deps" [exec: string] {
 export def "open pdf" [
     ...from: path
     --launcher: string = "okular"
-    --no-swallow: bool
+    --no-swallow
     --swallower: string = "devour"
 ] {
     let from = if $from == [] {
@@ -228,7 +228,7 @@ export def "open pdf" [
 export def "history stats" [
     --summary (-s): int = 5
     --last-cmds (-l): int
-    --verbose (-v): bool
+    --verbose (-v)
 ] {
     let top_commands = (
         history
@@ -278,7 +278,7 @@ export def "history search" [
 # TODO: docstring
 export def "get wallpapers" [
   nb_wallpapers: int
-  --shuffle (-s): bool
+  --shuffle (-s)
 ] {
     [
         /usr/share/backgrounds
@@ -302,8 +302,8 @@ export def "glow wide" [file: string] {
 # TODO: docstring
 export def "youtube share" [
     url: string
-    --pretty: bool
-    --clip (-c): bool
+    --pretty
+    --clip (-c)
 ] {
     use std clip
     let video = (
@@ -506,7 +506,7 @@ export def "into hex" [] {
 #       × Breaking pipeline: conditional execution aborted
 export def pipeif [
     expected: any  # Expected value to not break the pipeline
-    --invert (-v): bool
+    --invert (-v)
 ] {
     let value = $in
 
@@ -551,7 +551,7 @@ def get-image [
 export def "images edit" [
     image?: path@"nu-complete list-images"
     --editor: string = kolourpaint
-    --devour (-d): bool
+    --devour (-d)
 ] {
     let image = (get-image $image)
 
@@ -581,9 +581,9 @@ def _throw-not-a-list-of-strings [files: any] {
 
 export def edit [
     ...rest: path
-    --no-auto-cmd (-n): bool
+    --no-auto-cmd (-n)
     --auto-cmd: string
-    --projects (-p): bool
+    --projects (-p)
 ] {
     let files = $in | default []
     if (not ($files | is-empty)) and (($files | describe) != "list<string>") {
@@ -618,7 +618,7 @@ export def edit [
 export def rg [
     pattern: string
     path?: path
-    --files: bool
+    --files
 ] {
     let matches = (
         ^rg $pattern ($path | default "." | path expand)
@@ -655,8 +655,8 @@ export def "hash dir" [directory: path] {
 
 # compute the merkle tree of a sequence of tokens
 export def "hash merkle" [
-    --last: bool
-    --pretty: bool
+    --last
+    --pretty
 ] {
     let tokens = $in
 

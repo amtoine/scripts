@@ -5,8 +5,8 @@ alias GIT = ^git --git-dir $env.DOTFILES_GIT_DIR --work-tree $env.DOTFILES_WORKT
 # TODO
 export def find [
     regex: string
-    --files-only (-f): bool
-    --edit (-e): bool
+    --files-only (-f)
+    --edit (-e)
 ] {
     print $"Looking for config files matching '($regex)'..."
     let matches = (

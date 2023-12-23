@@ -15,10 +15,10 @@ export def enter [
 
 # TODO: docstring
 export def prune [
-  --system (-s): bool  # TODO: arg
-  --images (-i): bool  # TODO: arg
-  --processes (-p): bool  # TODO: arg
-  --all (-a): bool  # TODO: arg
+  --system (-s)  # TODO: arg
+  --images (-i)  # TODO: arg
+  --processes (-p)  # TODO: arg
+  --all (-a)  # TODO: arg
 ] {
   if ($system or $all) {
     print $"(ansi red)docker system prune(ansi reset):"

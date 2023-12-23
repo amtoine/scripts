@@ -23,7 +23,7 @@ export def "path dump" [] {
 }
 
 export def "path add" [
-    --append (-a): bool
+    --append (-a)
     ...paths
 ] {
     _open_path
