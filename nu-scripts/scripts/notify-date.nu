@@ -8,7 +8,7 @@ def main [
 ] {
     let now = date now
 
-    notify-send [
+    notify-send ...[
         ($now | format date "%A %B %d %Y")
         ($now | format date "%T")
         --icon $"($icons_dir)/($icon)"
