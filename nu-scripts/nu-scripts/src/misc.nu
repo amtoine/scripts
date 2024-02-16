@@ -305,7 +305,6 @@ export def "youtube share" [
     --pretty
     --clip (-c)
 ] {
-    use std clip
     let video = (
         http get $url
         | str replace --regex --all "<" "\n<"  # separate all HTML blocks into `<...> ...` chunks without the closing `</...>`

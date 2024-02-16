@@ -1,5 +1,4 @@
 use prompt.nu
-use std clip
 
 
 # TODO
