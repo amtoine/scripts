@@ -7,6 +7,7 @@ export module src/gf.nu
 export module src/gpg.nu
 export module src/hx.nu
 export module src/ipfs.nu
+export module src/iwctl.nu
 export module src/job.nu
 export module src/misc.nu
 export module src/plugin.nu
