@@ -9,12 +9,11 @@ def "main get-volume" [
     sink?: string = "@DEFAULT_SINK@"
 ] {
     ^pactl get-sink-volume $sink
-        | parse "Volume: {left}, {right}\n{balance}"
+        | parse "Volume: {left}, {right}"
         | into record
         | str trim
         | update left { parse "front-left: {volume} / {percentage}% / {decibel}dB" | str trim | into value | into record }
         | update right { parse "front-right: {volume} / {percentage}% / {decibel}dB" | str trim | into value | into record }
-        | update balance { parse "balance {balance}" | into record | get balance | into float }
 }
 
 def "math clamp" [min: float, max: float]: float -> float {
