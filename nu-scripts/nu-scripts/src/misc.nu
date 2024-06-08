@@ -798,3 +798,80 @@ export def "ssh profiles" [--config: path = "~/.ssh/config"]: nothing -> record 
         profiles: $profiles
     }
 }
+
+# show the tree structure of a directory
+#
+# # Examples
+# ```nushell
+# # compute the tree with a max depth of 2
+# tree . --depth 2
+# ```
+# ---
+# ```
+# ───────────────────┬───────────────────
+# CODE_OF_CONDUCT.md │CODE_OF_CONDUCT.md
+# CONTRIBUTING.md    │CONTRIBUTING.md
+# Cargo.lock         │Cargo.lock
+# Cargo.toml         │Cargo.toml
+# Cross.toml         │Cross.toml
+# LICENSE            │LICENSE
+# README.md          │README.md
+# assets             │{record 3 fields}
+# benches            │{record 2 fields}
+# crates             │{record 39 fields}
+# devdocs            │{record 5 fields}
+# docker             │{record 1 field}
+# rust-toolchain.toml│rust-toolchain.toml
+# scripts            │{record 12 fields}
+# src                │{record 10 fields}
+# target             │{record 4 fields}
+# tests              │{record 15 fields}
+# toolkit.nu         │toolkit.nu
+# typos.toml         │typos.toml
+# wix                │{record 3 fields}
+# ───────────────────┴───────────────────
+# ```
+export def tree [
+    p: path = '.', # the root of the tree
+    --full-path (-f), # show the path as absolute instead of relative to the root of the tree
+    --depth (-d): int, # the depth at which to step building the tree, defaults to bottom of filesystem
+]: [ nothing -> record ] {
+    def aux [c: path, r: path, d: int]: [ nothing -> record ] {
+        if $depth != null and $d == $depth {
+            return
+        }
+
+        let level = ls $c | insert . { |it|
+            if $it.type == file {
+                if $full_path {
+                    $it.name
+                } else {
+                    $it.name | str replace $"($r)(char path_sep)" ''
+                }
+            } else {
+                aux $it.name $r ($d + 1)
+            }
+        }
+
+        $level
+            | select name .
+            | update name { path parse | update parent '' | path join }
+            | transpose --header-row
+            | into record
+    }
+
+    if not ($p | path exists) {
+        error make {
+            msg: $"(ansi red_bold)no_such_file_or_directory(ansi reset)",
+            label: {
+                text: "no such file or directory",
+                span: (metadata $p).span,
+            },
+        }
+    }
+
+    # NOTE: expand to remove potential trailing path separator
+    let p = $p | path expand
+
+    aux $p $p 0
+}
